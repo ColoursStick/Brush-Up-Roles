@@ -1,0 +1,36 @@
+
+<!--
+  v19 构建用：跳过 BepInEx.IL2CPP.MSBuild 的 interop 生成任务，
+  改为直接引用 BepInEx 在 v19 游戏目录里已经生成好的 interop 程序集。
+
+  为什么需要这个开关：
+    官方分发的 AmongUs.GameLibs.Steam 是「未处理」的 dummy，由 MSBuild 任务
+    (Il2CppInterop.Generator) 现场 hollow 成 interop。
+    v19 的 BepInEx 用的是新版 Cpp2IL，它导出的 dummy 引用了 System.Private.CoreLib，
+    而 MSBuild 任务里那个旧版 Generator 不认识该程序集，直接 KeyNotFoundException。
+    所以 v19 不再自己生成，而是复用游戏目录里 BepInEx 已经生成好的 interop。
+
+  用法：
+    dotnet build -c Release -p:Platform=Windows -p:GameV19=true -p:UseV19Interop=true
+-->
+<Project>
+  <PropertyGroup Condition="'$(UseV19Interop)' == 'true'">
+    <BURV19InteropDir Condition="'$(BURV19InteropDir)' == ''">E:\DeepSeek\Among Us 模组\刷牙模组\Among Us 原版 V19.0.0\BepInEx\interop</BURV19InteropDir>
+    <BURV19CoreDir Condition="'$(BURV19CoreDir)' == ''">E:\DeepSeek\Among Us 模组\刷牙模组\Among Us 原版 V19.0.0\BepInEx\core</BURV19CoreDir>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(UseV19Interop)' == 'true'">
+    <!-- 直接引用已 hollow 好的 interop；不再让 MSBuild 任务生成 -->
+    <Reference Include="%(V19Interop.Identity)">
+      <HintPath>%(V19Interop.FullPath)</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="BURV19GatherRefs" BeforeTargets="ResolveAssemblyReferences" Condition="'$(UseV19Interop)' == 'true'">
+    <ItemGroup>
+      <V19Interop Include="$(BURV19InteropDir)\*.dll" />
+    </ItemGroup>
+    <Message Importance="high" Text="BUR: 使用 v19 已生成的 interop ($(BURV19InteropDir))，共 @(V19Interop->Count()) 个" />
+  </Target>
+</Project>

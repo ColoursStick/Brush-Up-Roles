@@ -1,0 +1,302 @@
+using System;
+using System.Collections.Generic;
+using HarmonyLib;
+using UnityEngine;
+using static TONE.Utils;
+
+namespace TONE.Patches;
+
+/// <summary>
+/// 主菜单进场动画：整个菜单「板子」从下往上滑入。
+///
+/// ── 借鉴来源：EHR (EndlessHostRoles) ────────────────────────────
+/// EHR 主菜单动 RightPanel（Patches/MainMenuManagerPatch.cs）：
+///     RightPanel.transform.localPosition = RightPanelOp + new Vector3(10f, 0f, 0f);  // Start：先摆到目标右侧
+///     // LateUpdate：比例式 Lerp 滑回
+///     Vector3.Lerp(pos, RightPanelOp + (ShowingPanel ? 0f : 10f), Time.deltaTime * 3f);
+///
+/// 并且它建按钮时第一件事就是拆掉会抢位置的组件：
+///     Object.Destroy(button.GetComponent&lt;AspectPosition&gt;());
+///
+/// ── 本模组为什么必须逐个搬，而不能只搬父级 ──────────────────────
+/// 主菜单的每个按钮/面板各自挂着一个 <c>AspectPosition</c>，它每帧按屏幕锚点
+/// 重新算位置。只移动父级的话，子对象会被它拉回原位 —— 表现就是「父级动了、
+/// 按钮纹丝不动」。所以这里把要搬的每个对象的 AspectPosition 关掉，
+/// 记下它的原始 localPosition，再整体一起做 Lerp。
+///
+/// ── 手感 ────────────────────────────────────────────────────────
+/// 用 EHR 同款「比例式 Lerp」：Vector3.Lerp(pos, target, deltaTime * speed)。
+/// 这种写法不过冲、落地平滑，速度就是 EHR 那个手感。
+/// </summary>
+[HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.LateUpdate))]
+internal static class MainMenuIntroAnimationPatch
+{
+    // ── 状态 ──
+    private static bool _running;
+    private static bool _played;      // 本次进入主菜单是否已播过
+    private static bool _everPlayed;  // 本进程是否播过（判断「刚进游戏」）
+    private static float _delay;      // 开播前还要等多久
+    private static float _awayFor;    // 离开主菜单已持续多久（过滤闪断）
+    private static bool _captured;    // 是否已抓取要搬的对象
+
+    /// <summary>刚启动游戏那一次，先露着背景等一会儿再让板子升起来</summary>
+    private const float FirstLaunchDelay = 1.0f;
+    /// <summary>离开主菜单多久才算「真的走了」（过滤启动时 activeInHierarchy 的闪断）</summary>
+    private const float AwayGrace = 0.75f;
+    /// <summary>Lerp 速度：越小越慢。EHR 用 3f；这里放慢一点，看得清升起过程</summary>
+    private const float LerpSpeed = 1.4f;
+    /// <summary>从下方多远处升上来</summary>
+    private const float RiseDistance = 6.5f;
+
+    /// <summary>一个要搬的部件</summary>
+    private class Piece
+    {
+        public Transform Tr;
+        public Vector3 Home;      // 原始 localPosition
+        public Vector3 From;      // 进场起点
+        public Behaviour Killed;  // 被关掉的 AspectPosition（离开时恢复）
+    }
+
+    private static readonly List<Piece> _pieces = [];
+
+    [HarmonyPostfix]
+    [HarmonyPriority(Priority.Low)]
+    public static void Postfix(MainMenuManager __instance)
+    {
+        try
+        {
+            if (__instance == null) return;
+
+            bool inMenu = __instance.mainMenuUI != null && __instance.mainMenuUI.activeInHierarchy;
+
+            // ⚠️ 启动/登录过程中 activeInHierarchy 会短暂闪断，
+            //    一断就复位会让动画反复被打断重播，所以要「持续离开」才算真走了。
+            if (!inMenu)
+            {
+                _awayFor += Time.deltaTime;
+                if (_awayFor < AwayGrace) return;
+
+                Restore();     // 恢复原状，下次回来重新搬
+                return;
+            }
+            _awayFor = 0f;
+
+            if (_played) return;
+
+            if (!_captured) Capture(__instance);
+            if (!_captured || _pieces.Count == 0) return;
+
+            // 刚进游戏先等 1 秒（这段时间板子停在屏幕下方）
+            if (_delay > 0f)
+            {
+                _delay -= Time.deltaTime;
+                Place(0f);
+                return;
+            }
+
+            if (!_running)
+            {
+                _played = true;
+                _everPlayed = true;
+                _running = true;
+                Logger.Info($"主菜单进场动画开始：{_pieces.Count} 个部件从下方 {RiseDistance} 升起", "MainMenuIntro");
+            }
+
+            Tick();
+        }
+        catch (Exception ex)
+        {
+            Logger.Exception(ex, "MainMenuIntro");
+            _running = false;
+            _played = true;
+        }
+    }
+
+    /// <summary>
+    /// EHR 式的比例 Lerp 推进（每帧一次）：
+    ///     pos = Vector3.Lerp(pos, target, Time.deltaTime * speed)
+    /// 不过冲、落地平滑，手感就是 EHR 那个速度。
+    /// </summary>
+    private static void Tick()
+    {
+        bool done = true;
+
+        foreach (var p in _pieces)
+        {
+            if (p?.Tr == null) continue;
+
+            var next = Vector3.Lerp(p.Tr.localPosition, p.Home, Time.deltaTime * LerpSpeed);
+            p.Tr.localPosition = next;
+
+            if (Mathf.Abs(next.y - p.Home.y) > 0.01f) done = false;
+        }
+
+        if (!done) return;
+
+        foreach (var p in _pieces)
+            if (p?.Tr != null) p.Tr.localPosition = p.Home;
+
+        _running = false;
+        Logger.Info("主菜单进场动画结束", "MainMenuIntro");
+    }
+
+    // ─────────── 抓取要搬的部件 ───────────
+
+    private static void Capture(MainMenuManager menu)
+    {
+        _pieces.Clear();
+
+        var root = menu.mainMenuUI != null ? menu.mainMenuUI.transform : null;
+        if (root == null) return;
+
+        // 左栏（开始/仓库/商店…）与右栏（账号面板）是两个承担全部布局的容器。
+        // 搬这两个就等于搬整块板子。
+        AddPiece(root, "LeftPanel");
+        AddPiece(root, "RightPanel");
+
+        // 模组 Logo 不在上面两层里，单独补上
+        var logo = GameObject.Find("titleLogo_TONE");
+        if (logo != null) AddExisting(logo.transform);
+
+        _captured = _pieces.Count > 0;
+
+        // 临时诊断：打印主菜单真实层级，确认按钮到底挂在哪一层
+        DumpHierarchy(root, menu);
+
+        // 刚启动游戏那一次先等 1 秒再升起来；之后每次回主菜单立刻播
+        _delay = _everPlayed ? 0f : FirstLaunchDelay;
+
+        Logger.Info($"抓到 {_pieces.Count} 个部件用于进场动画（首播延迟 {_delay:0.##}s）", "MainMenuIntro");
+    }
+
+    /// <summary>临时诊断：打印 MainUI 下两层结构与每个按钮的位置</summary>
+    private static void DumpHierarchy(Transform root, MainMenuManager menu)
+    {
+        try
+        {
+            Logger.Info($"[Diag] MainUI 子物体数={root.childCount}", "MainMenuIntro");
+
+            for (int i = 0; i < root.childCount; i++)
+            {
+                var c = root.GetChild(i);
+                if (c == null) continue;
+                Logger.Info($"[Diag]   ├ {c.name}  localPos={c.localPosition} 子物体={c.childCount}", "MainMenuIntro");
+
+                // 展开每个子物体的直接子级，找 "Main Buttons" 住在哪
+                for (int j = 0; j < c.childCount; j++)
+                {
+                    var g = c.GetChild(j);
+                    if (g == null) continue;
+                    Logger.Info($"[Diag]   │   └ {g.name}  localPos={g.localPosition} 子物体={g.childCount}", "MainMenuIntro");
+                }
+            }
+
+            // 逐级向上打印 playButton 的祖先链
+            if (menu?.playButton != null)
+            {
+                var t = menu.playButton.transform;
+                var chain = new List<string>();
+                int guard = 0;
+                while (t != null && guard++ < 10) { chain.Add($"{t.name}(ap={t.GetComponent<AspectPosition>() != null})"); t = t.parent; }
+                Logger.Info($"[Diag] PlayButton 祖先链: {string.Join(" ← ", chain)}", "MainMenuIntro");
+            }
+
+            // 按钮字段指向的对象，它们的父级是谁
+            if (menu != null)
+            {
+                Report("playButton", menu.playButton);
+                Report("inventoryButton", menu.inventoryButton);
+                Report("shopButton", menu.shopButton);
+                Report("newsButton", menu.newsButton);
+                Report("settingsButton", menu.settingsButton);
+            }
+        }
+        catch (Exception ex) { Logger.Warn($"DumpHierarchy 失败: {ex.Message}", "MainMenuIntro"); }
+
+        void Report(string label, Component comp)
+        {
+            if (comp == null) { Logger.Info($"[Diag] {label} = null", "MainMenuIntro"); return; }
+            var t = comp.transform;
+            var ap = t.GetComponent<AspectPosition>();
+            var parent = t.parent;
+            Logger.Info($"[Diag] {label}: name={t.name} 父级={parent?.name} " +
+                        $"AspectPosition={(ap != null)} localPos={t.localPosition}", "MainMenuIntro");
+        }
+    }
+
+    private static void AddPiece(Transform root, string name)
+    {
+        // ⚠️ 必须递归查找：LeftPanel / RightPanel 住在 MainUI/AspectScaler 下面，
+        //    用 root.Find(name)（只查直接子级）会找不到，进而回退 GameObject.Find 抓错对象。
+        //    实测层级：
+        //      MainUI → AspectScaler → LeftPanel(带 AspectPosition) → Main Buttons → PlayButton
+        var t = FindDeep(root, name);
+
+        if (t == null)
+        {
+            Logger.Warn($"找不到 {name}，跳过", "MainMenuIntro");
+            return;
+        }
+
+        AddExisting(t);
+    }
+
+    /// <summary>递归查找子物体（含自身）</summary>
+    private static Transform FindDeep(Transform root, string name)
+    {
+        if (root == null) return null;
+        if (root.name == name) return root;
+
+        for (int i = 0; i < root.childCount; i++)
+        {
+            var r = FindDeep(root.GetChild(i), name);
+            if (r != null) return r;
+        }
+        return null;
+    }
+
+    private static void AddExisting(Transform t)
+    {
+        if (t == null) return;
+
+        // ⚠️ 关键：拆掉会每帧抢位置的 AspectPosition，否则移了也会被拉回去
+        var ap = t.GetComponent<AspectPosition>();
+        if (ap != null) ap.enabled = false;
+
+        var home = t.localPosition;
+        _pieces.Add(new Piece
+        {
+            Tr = t,
+            Home = home,
+            From = home + new Vector3(0f, -RiseDistance, 0f),
+            Killed = ap,
+        });
+    }
+
+    // ─────────── 摆位 / 恢复 ───────────
+
+    /// <summary>按进度 t∈[0,1] 摆放（0 = 还在下面，1 = 就位）</summary>
+    private static void Place(float t)
+    {
+        foreach (var p in _pieces)
+        {
+            if (p?.Tr == null) continue;
+            p.Tr.localPosition = Vector3.Lerp(p.From, p.Home, t);
+        }
+    }
+
+    private static void Restore()
+    {
+        foreach (var p in _pieces)
+        {
+            if (p?.Tr != null) p.Tr.localPosition = p.Home;
+            if (p?.Killed != null) p.Killed.enabled = true;
+        }
+
+        _pieces.Clear();
+        _captured = false;
+        _running = false;
+        _played = false;
+        _delay = 0f;
+    }
+}

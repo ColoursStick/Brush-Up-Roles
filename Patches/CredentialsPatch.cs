@@ -1,0 +1,254 @@
+using System.Text;
+using TMPro;
+using TONE.Modules;
+using UnityEngine;
+using static TONE.Translator;
+
+namespace TONE;
+
+[HarmonyPatch(typeof(PingTracker), nameof(PingTracker.Update))]
+class PingTrackerUpdatePatch
+{
+    public static PingTracker Instance;
+    private static int DelayUpdate = 0;
+    private static readonly StringBuilder sb = new();
+
+    private static bool Prefix(PingTracker __instance)
+    {
+        try
+        {
+            Instance ??= __instance;
+
+            DelayUpdate--;
+
+            if (DelayUpdate > 0 && sb.Length > 0)
+            {
+                ChangeText(__instance);
+                __instance.aspectPosition.DistanceFromEdge = GetPingPosition();
+                __instance.text.text = sb.ToString();
+                return false;
+            }
+
+            DelayUpdate = 500;
+
+            ChangeText(__instance);
+            sb.Clear();
+
+            sb.Append(Main.credentialsText);
+
+            var ping = AmongUsClient.Instance.Ping;
+            string pingcolor = "#ff4500";
+            if (ping < 30) pingcolor = "#44dfcc";
+            else if (ping < 100) pingcolor = "#7bc690";
+            else if (ping < 200) pingcolor = "#f3920e";
+            else if (ping < 400) pingcolor = "#ff146e";
+
+            var FPSGame = 1.0f / Time.deltaTime;
+            Color fpscolor = Color.green;
+
+            if (FPSGame < 20f) fpscolor = Color.red;
+            else if (FPSGame < 40f) fpscolor = Color.yellow;
+
+            sb.Append($"\r\n").Append($"<color={pingcolor}>{ping} ms</size> <size=60%>Ping</size></color>  <color=#00a4ff>{((int)FPSGame).ToString()} <size=60%>FPS</size></color>  <color=#3aa675>{Utils.GetRegionName() + "</color>"}");
+
+            if (!GameStates.IsModHost)
+            {
+                //CheckIsModHost = true;
+                sb.Append($"\r\n{Utils.ColorString(Color.red, GetString("Warning.NoModHost"))}");
+            }
+
+            if (Main.ShowTextOverlay.Value)
+            {
+                var sbOverlay = new StringBuilder();
+                if (Options.LowLoadMode.GetBool()) sbOverlay.Append($"\r\n<size=50%>{Utils.ColorString(Color.green, GetString("LowLoadMode"))}</size>");
+                if (Options.NoGameEnd.GetBool()) sbOverlay.Append($"\r\n<size=50%>{Utils.ColorString(Color.red, GetString("NoGameEnd"))}</size>");
+                if (Options.GuesserMode.GetBool()) sbOverlay.Append($"\r\n<size=50%>{Utils.ColorString(Color.yellow, GetString("GuesserMode"))}</size>");
+                if (Options.AllowConsole.GetBool() && PlayerControl.LocalPlayer.FriendCode.GetDevUser().DeBug) sbOverlay.Append($"\r\n<size=50%>{Utils.ColorString(Color.red, GetString("AllowConsole"))}</size>");
+                if (DebugModeManager.IsDebugMode) sbOverlay.Append($"\r\n<size=50%>{Utils.ColorString(Color.green, GetString("DebugMode"))}</size>");
+
+                if (sbOverlay.Length > 0)
+                    sb.Append(sbOverlay);
+            }
+
+            __instance.aspectPosition.DistanceFromEdge = GetPingPosition();
+            __instance.text.text = sb.ToString();
+            return false;
+        }
+        catch
+        {
+            DelayUpdate = 0;
+            sb.Clear();
+
+            return false;
+        }
+    }
+    private static Vector3 GetPingPosition()
+    {
+        var settingButtonTransformPosition = DestroyableSingleton<HudManager>.Instance.SettingsButton.transform.localPosition;
+        var offset_x = HudManager.Instance.MatchInfoButton.isActiveAndEnabled ? settingButtonTransformPosition.x - 2.45f : settingButtonTransformPosition.x - 1.58f;
+        var offset_y = settingButtonTransformPosition.y + 3.2f;
+        Vector3 position;
+        if (!Main.ShowTextOverlay.Value)
+        {
+            offset_y += 0.1f;
+        }
+        if (AmongUsClient.Instance.IsGameStarted)
+        {
+            if (DestroyableSingleton<HudManager>.Instance && !HudManager.Instance.Chat.isActiveAndEnabled)
+            {
+                offset_x += 0.7f; // Additional offsets for chat button if present
+            }
+            else
+            {
+                offset_x += 0.1f;
+            }
+
+            position = new Vector3(offset_x, offset_y, 0f);
+        }
+        else
+        {
+            position = new Vector3(offset_x, offset_y, 0f);
+        }
+
+        return position;
+    }
+    private static void ChangeText(PingTracker __instance)
+    {
+        __instance.text.alignment = TextAlignmentOptions.Right;
+        __instance.text.outlineColor = Color.black;
+
+        var language = DestroyableSingleton<TranslationController>.Instance.currentLanguage.languageID;
+        __instance.text.outlineWidth = language switch
+        {
+            SupportedLangs.Russian or SupportedLangs.Japanese or SupportedLangs.SChinese or SupportedLangs.TChinese => 0.25f,
+            _ => 0.40f,
+        };
+    }
+}
+[HarmonyPatch(typeof(VersionShower), nameof(VersionShower.Start))]
+class VersionShowerStartPatch
+{
+    static TextMeshPro SpecialEventText;
+    private static void Postfix(VersionShower __instance)
+    {
+        // 抬头只显示模组名，不再附带简称 (BUR)
+        Main.credentialsText = $"<color={Main.ModColor}>{Main.ModName}</color> - {Main.PluginDisplayVersion}";
+        var buildtype = "";
+
+#if RELEASE
+        buildtype = "Release";
+#endif
+
+#if BETA
+        Main.credentialsText += $"\r\n<color=#ffc0cb>Beta:</color><color=#f34c50>{ThisAssembly.Git.Branch}</color>(<color=#ffc0cb>{ThisAssembly.Git.Commit}</color>)";
+        buildtype = "Beta";
+#endif
+
+#if DEBUG
+        Main.credentialsText += $"\r\n<color=#ffc0cb>Debug:</color><color=#f34c50>{ThisAssembly.Git.Branch}</color>(<color=#ffc0cb>{ThisAssembly.Git.Commit}</color>)";
+        buildtype = "Debug";
+#endif
+        Logger.Info($"v{Main.PluginVersion}, {buildtype}:{ThisAssembly.Git.Branch}:({ThisAssembly.Git.Commit}), link [{ThisAssembly.Git.RepositoryUrl}], dirty: [{ThisAssembly.Git.IsDirty}]", "Brush Up Roles version");
+
+        if (Main.IsAprilFools)
+            Main.credentialsText = $"<color={Main.ModColor}>{Main.ModName}</color> - 1.0.0";
+
+        ErrorText.Create(__instance.text);
+        if (Main.hasArgumentException && ErrorText.Instance != null)
+        {
+            ErrorText.Instance.AddError(ErrorCode.Main_DictionaryError);
+        }
+
+        VersionChecker.Check();
+
+        if (SpecialEventText == null && MainMenuManagerStartPatch.ToneLogo != null)
+        {
+            SpecialEventText = Object.Instantiate(__instance.text, MainMenuManagerStartPatch.ToneLogo.transform);
+            SpecialEventText.name = "SpecialEventText";
+            SpecialEventText.text = "";
+            SpecialEventText.color = Color.white;
+            SpecialEventText.fontSizeMin = 3f;
+            SpecialEventText.alignment = TextAlignmentOptions.Center;
+            SpecialEventText.transform.localPosition = new Vector3(0f, 0.8f, 0f);
+        }
+        if (SpecialEventText != null)
+        {
+            SpecialEventText.enabled = MainMenuManagerStartPatch.amongUsLogo != null;
+        }
+        if (Main.IsTOHEInitialRelease)
+        {
+            SpecialEventText.text = $"Happy Birthday to TOHE!";
+            if (ColorUtility.TryParseHtmlString(Main.ModColor, out var col))
+            {
+                SpecialEventText.color = col;
+            }
+        }
+        if (Main.IsPlan17InitialRelease)
+        {
+            SpecialEventText.text = $"Happy Birthday to Plan17!";
+            if (ColorUtility.TryParseHtmlString(Main.ModColor, out var col))
+            {
+                SpecialEventText.color = col;
+            }
+        }
+        if (Main.IsTONEInitialRelease)
+        {
+            SpecialEventText.text = $"Happy Birthday to TONE!";
+            if (ColorUtility.TryParseHtmlString(Main.ModColor, out var col))
+            {
+                SpecialEventText.color = col;
+            }
+        }
+    }
+}
+// From TONX/Patches/AccountManagerPatch.cs, by KARPED1EM
+[HarmonyPatch(typeof(AccountTab), nameof(AccountTab.Awake))]
+public static class UpdateFriendCodeUIPatch
+{
+    public static GameObject VersionShower;
+
+    public static void Prefix()
+    {
+        // Brush Up Roles：不再显示上游作者署名；抬头也不带简称
+        var credentialsText = $"<color={Main.ModColor}>{Main.ModName}</color> - {Main.PluginDisplayVersion}";
+
+        GameObject friendCode = GameObject.Find("FriendCode");
+
+        if (friendCode && !VersionShower)
+        {
+            VersionShower = Object.Instantiate(friendCode, friendCode.transform.parent);
+            VersionShower.name = "TONE Version Shower";
+            VersionShower.transform.localPosition = friendCode.transform.localPosition + new Vector3(3.2f, 0f, 0f);
+            VersionShower.transform.localScale *= 1.7f;
+            var tmp = VersionShower.GetComponent<TextMeshPro>();
+            tmp.alignment = TextAlignmentOptions.Right;
+            tmp.fontSize = 30f;
+            tmp.SetText(credentialsText);
+        }
+
+        GameObject newRequest = GameObject.Find("NewRequest");
+
+        if (newRequest)
+        {
+            newRequest.transform.localPosition -= new Vector3(0f, 0f, 10f);
+            newRequest.transform.localScale = new(0f, 0f, 0f);
+        }
+    }
+}
+[HarmonyPatch(typeof(ModManager), nameof(ModManager.LateUpdate))]
+class ModManagerLateUpdatePatch
+{
+    public static void Prefix(ModManager __instance)
+    {
+        __instance.ShowModStamp();
+
+        LateTask.Update(Time.deltaTime);
+    }
+    public static void Postfix(ModManager __instance)
+    {
+        var offset_y = HudManager.InstanceExists ? 1.8f : 0.9f;
+        __instance.ModStamp.transform.position = AspectPosition.ComputeWorldPosition(
+            __instance.localCamera, AspectPosition.EdgeAlignments.RightTop,
+            new Vector3(0.4f, offset_y, __instance.localCamera.nearClipPlane + 0.1f));
+    }
+}

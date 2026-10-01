@@ -1,0 +1,222 @@
+using TONE.Modules;
+using TONE.Roles.AddOns.Common;
+using static TONE.MeetingHudStartPatch;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
+
+namespace TONE.Roles.Crewmate;
+
+internal class Retributionist : RoleBase
+{
+    //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Retributionist;
+    private const int Id = 11000;
+    public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
+    //==================================================================\\
+
+    private static OptionItem RetributionistCanKillNum;
+    private static OptionItem MinimumPlayersAliveToRetri;
+    private static OptionItem CanOnlyRetributeWithTasksDone;
+    private static OptionItem PreventSeeRolesBeforeSkillUsedUp;
+
+    private static readonly Dictionary<byte, int> RetributionistRevenged = [];
+
+    public override void SetupCustomOption()
+    {
+        SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Retributionist);
+        RetributionistCanKillNum = IntegerOptionItem.Create(Id + 10, "RetributionistCanKillNum", new(1, 15, 1), 1, TabGroup.CrewmateRoles, false)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Retributionist])
+            .SetValueFormat(OptionFormat.Players);
+        PreventSeeRolesBeforeSkillUsedUp = BooleanOptionItem.Create(Id + 20, "PreventSeeRolesBeforeSkillUsedUp", true, TabGroup.CrewmateRoles, false)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Retributionist]);
+        MinimumPlayersAliveToRetri = IntegerOptionItem.Create(Id + 11, "MinimumPlayersAliveToRetri", new(0, 15, 1), 5, TabGroup.CrewmateRoles, false)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Retributionist])
+            .SetValueFormat(OptionFormat.Players);
+        CanOnlyRetributeWithTasksDone = BooleanOptionItem.Create(Id + 12, "CanOnlyRetributeWithTasksDone", true, TabGroup.CrewmateRoles, false)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Retributionist]);
+        OverrideTasksData.Create(Id + 13, TabGroup.CrewmateRoles, CustomRoles.Retributionist);
+    }
+    public override void Init()
+    {
+        RetributionistRevenged.Clear();
+    }
+    public override void Add(byte playerId)
+    {
+        RetributionistRevenged[playerId] = 0;
+    }
+    public static bool PreventKnowRole(PlayerControl seer)
+    {
+        if (!seer.Is(CustomRoles.Retributionist) || seer.IsAlive()) return false;
+        if (PreventSeeRolesBeforeSkillUsedUp.GetBool() && RetributionistRevenged.TryGetValue(seer.PlayerId, out var killNum) && killNum < RetributionistCanKillNum.GetInt())
+            return true;
+        return false;
+    }
+    public override string GetMark(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false)
+    {
+        seen ??= seer;
+
+        if (!seer.IsAlive() && seen.IsAlive())
+            return ColorString(GetRoleColor(CustomRoles.Retributionist), " " + seen.PlayerId.ToString()) + " ";
+
+        return string.Empty;
+    }
+
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
+    {
+        if (!AmongUsClient.Instance.AmHost) return false;
+        if (!GameStates.IsInGame || pc == null) return false;
+        if (!pc.Is(CustomRoles.Retributionist)) return false;
+        msg = msg.Trim().ToLower();
+        if (msg.Length < 4 || msg[..4] != "/ret") return false;
+        if (RetributionistCanKillNum.GetInt() < 1)
+        {
+            pc.ShowInfoMessage(isUI, GetString("RetributionistKillDisable"));
+            return true;
+        }
+        int playerCount = Main.AllAlivePlayerControls.Count;
+
+        if (playerCount <= MinimumPlayersAliveToRetri.GetInt() && !pc.IsAlive())
+        {
+            pc.ShowInfoMessage(isUI, GetString("RetributionistKillTooManyDead"));
+            return true;
+        }
+
+
+        if (CanOnlyRetributeWithTasksDone.GetBool())
+        {
+            if (!pc.GetPlayerTaskState().IsTaskFinished && !pc.IsAlive() && !CopyCat.playerIdList.Contains(pc.PlayerId) && !Main.TasklessCrewmate.Contains(pc.PlayerId))
+            {
+                pc.ShowInfoMessage(isUI, GetString("RetributionistKillDisable"));
+                return true;
+            }
+        }
+        if (pc.IsAlive())
+        {
+            pc.ShowInfoMessage(isUI, GetString("RetributionistAliveKill"));
+            return true;
+        }
+
+        if (msg == "/ret")
+        {
+            bool canSeeRoles = PreventSeeRolesBeforeSkillUsedUp.GetBool();
+            string text = GetString("PlayerIdList");
+            foreach (var npc in Main.EnumerateAlivePlayerControls())
+                text += $"\n{npc.PlayerId} → " + (canSeeRoles ? $"({npc.GetDisplayRoleAndSubName(npc, false, false)}) " : string.Empty) + npc.GetRealName();
+            SendMessage(text, pc.PlayerId);
+            return true;
+        }
+
+        if (RetributionistRevenged.TryGetValue(pc.PlayerId, out var killNum) && killNum >= RetributionistCanKillNum.GetInt())
+        {
+            pc.ShowInfoMessage(isUI, GetString("RetributionistKillMax"));
+            return true;
+        }
+        else
+        {
+            RetributionistRevenged.TryAdd(pc.PlayerId, 0);
+        }
+
+        int targetId;
+        PlayerControl target;
+        try
+        {
+            targetId = int.Parse(msg.Replace("/ret", string.Empty));
+            target = GetPlayerById(targetId);
+        }
+        catch
+        {
+            pc.ShowInfoMessage(isUI, GetString("RetributionistKillDead"));
+            return true;
+        }
+
+        if (target == null || !target.IsAlive())
+        {
+            pc.ShowInfoMessage(isUI, GetString("RetributionistKillDead"));
+            return true;
+        }
+        else if (target.IsTransformedNeutralApocalypse())
+        {
+            pc.ShowInfoMessage(isUI, GetString("ApocalypseImmune"));
+            return true;
+        }
+        else if (CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && target.PlayerId == RoundUp.Deputy)
+        {
+            pc.ShowInfoMessage(isUI, GetString("RoundUp_TryKillDeputy"));
+            return true;
+        }
+        else if (target.Is(CustomRoles.Mini) && Mini.Age < 18)
+        {
+            pc.ShowInfoMessage(isUI, GetString("GuessMini"));
+            return true;
+        }
+        else if (target.Is(CustomRoles.Solsticer))
+        {
+            pc.ShowInfoMessage(isUI, GetString("GuessSolsticer"));
+            return true;
+        }
+        else if (target.Is(CustomRoles.Jinx) || target.Is(CustomRoles.CursedWolf))
+        {
+            pc.ShowInfoMessage(isUI, GetString("GuessImmune"));
+            return true;
+        }
+        else if (pc.RpcCheckAndMurder(target, true) == false)
+        {
+            pc.ShowInfoMessage(isUI, GetString("GuessImmune"));
+            Logger.Info($"Guess Immune target {target.PlayerId} have role {target.GetCustomRole()}", "Retributionist");
+            return true;
+        }
+
+        Logger.Info($"{pc.GetNameWithRole()} revenge {target.GetNameWithRole()}", "Retributionist");
+
+        string Name = target.GetRealName();
+
+        RetributionistRevenged[pc.PlayerId]++;
+
+        CustomSoundsManager.RPCPlayCustomSoundAll("AWP");
+
+        _ = new LateTask(() =>
+        {
+            target.SetDeathReason(PlayerState.DeathReason.Revenge);
+            if (GameStates.IsMeeting)
+            {
+                Main.PlayersDiedInMeeting.Add(target.PlayerId);
+                GuessManager.RpcGuesserMurderPlayer(target);
+                MurderPlayerPatch.AfterPlayerDeathTasks(pc, target, true);
+            }
+            else
+            {
+                target.RpcMurderPlayer(target);
+            }
+            target.SetRealKiller(pc);
+
+            _ = new LateTask(() =>
+            {
+                SendMessage(string.Format(GetString("RetributionistKillSucceed"), Name), 255, ColorString(GetRoleColor(CustomRoles.Retributionist), GetString("Retributionist").ToUpper()), true);
+            }, 0.6f, "Retributionist Kill");
+
+        }, 0.2f, "Retributionist Start Kill");
+        return true;
+    }
+
+    public override void OnMeetingHudStart(PlayerControl pc)
+    {
+        if (!pc.IsAlive())
+            AddMsg(GetString("RetributionistDeadMsg"), pc.PlayerId);
+    }
+
+    public override bool CreateAbilityButton(PlayerControl pc) => pc.Is(CustomRoles.Retributionist) && !pc.IsAlive();
+
+    public override bool ShowAbilityButtonFor(PlayerControl target) => !target.IsAlive();
+
+    public override string AbilityButtonName => "MeetingKillButton";
+
+    public override void OnClickAbilityButton(byte playerId, CustomRoles role)
+    {
+        Logger.Msg($"Click: ID {playerId}", "Retributionist UI");
+        var pc = GetPlayerById(playerId);
+        if (!pc || !pc.IsAlive() || !GameStates.IsVoting) return;
+        RoleCommand(_Player, $"/ret {playerId}", true);
+    }
+}
