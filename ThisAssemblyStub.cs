@@ -13,6 +13,6 @@ internal static class ThisAssembly
         public const string Tag = "v26.9.20";
         public const string Commits = "0";
         public const bool IsDirty = false;
-        public const string RepositoryUrl = "https://github.com/brushuproles/brushuproles";
+        public const string RepositoryUrl = "https://github.com/ColoursStick/Brush-Up-Roles";
     }
 }
