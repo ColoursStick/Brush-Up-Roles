@@ -1,0 +1,196 @@
+using AmongUs.GameOptions;
+using TONE.Modules;
+using UnityEngine;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
+
+namespace TONE.Roles.Coven;
+
+internal class Conjurer : CovenManager
+{
+    [Obfuscation(Exclude = true)]
+    private enum ConjState
+    {
+        NormalMark,
+        NormalBomb,
+        NecroMark,
+        NecroBomb
+    }
+    //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Conjurer;
+    private const int Id = 30300;
+    public override bool IsDesyncRole => true;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenKilling;
+    //==================================================================\\
+    private static OptionItem ConjureCooldown;
+    private static OptionItem ConjureRadius;
+    private static OptionItem NecroRadius;
+    private static OptionItem CovenDiesInBlast;
+    private static OptionItem KillCooldown;
+    private static OptionItem ResetTargetAfterMeeting;
+    enum OptionName
+    {
+        ConjurerCooldown,
+        ConjurerRadius,
+        ConjurerNecroRadius,
+        ConjurerCovenDies,
+        ConjurerResetTarget
+    }
+    public static byte NecroBombHolder = byte.MaxValue;
+    private static readonly Dictionary<byte, List<Vector3>> ConjPosition = [];
+    private static readonly Dictionary<byte, ConjState> state = [];
+
+
+    public override void SetupCustomOption()
+    {
+        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
+        ConjureCooldown = FloatOptionItem.Create(Role, Id + 10, OptionName.ConjurerCooldown, new(0f, 180f, 2.5f), 30f, false)
+            .SetValueFormat(OptionFormat.Seconds);
+        KillCooldown = FloatOptionItem.Create(Role, Id + 14, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 30f, false)
+            .SetValueFormat(OptionFormat.Seconds);
+        ConjureRadius = FloatOptionItem.Create(Role, Id + 11, OptionName.ConjurerRadius, new(0.5f, 100f, 0.5f), 2f, false)
+            .SetValueFormat(OptionFormat.Multiplier);
+        NecroRadius = FloatOptionItem.Create(Role, Id + 12, OptionName.ConjurerNecroRadius, new(0.5f, 100f, 0.5f), 3f, false)
+            .SetValueFormat(OptionFormat.Multiplier);
+        CovenDiesInBlast = BooleanOptionItem.Create(Role, Id + 13, OptionName.ConjurerCovenDies, false, false);
+        ResetTargetAfterMeeting = BooleanOptionItem.Create(Role, Id + 15, OptionName.ConjurerResetTarget, false, false);
+    }
+    public override void Init()
+    {
+        NecroBombHolder = byte.MaxValue;
+        ConjPosition.Clear();
+    }
+    public override void Add(byte playerId)
+    {
+        ConjPosition[playerId] = [];
+        state[playerId] = ConjState.NormalMark;
+    }
+    public override bool CanUseKillButton(PlayerControl pc) => HasNecronomicon(pc);
+    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
+    {
+        AURoleOptions.ShapeshifterCooldown = ConjureCooldown.GetFloat();
+        base.ApplyGameOptions(opt, playerId);
+    }
+    public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
+    public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
+    {
+        if (!CanUseKillButton(killer)) return false;
+        if (HasNecronomicon(killer) && !target.GetCustomRole().IsCovenTeam())
+        {
+            return true;
+        }
+        killer.Notify(GetString("CovenDontKillOtherCoven"));
+        return false;
+    }
+    public override bool OnCheckShapeshift(PlayerControl shapeshifter, PlayerControl target, ref bool resetCooldown, ref bool shouldAnimate)
+    {
+        resetCooldown = true;
+        var shapeshifterId = shapeshifter.PlayerId;
+        if (target != null && shapeshifterId == target.PlayerId) return false;
+
+        if (state[shapeshifterId] != ConjState.NecroBomb && state[shapeshifterId] != ConjState.NormalBomb)
+            state[shapeshifterId] = HasNecronomicon(shapeshifterId) ? ConjState.NecroMark : ConjState.NormalMark;
+
+        Logger.Info($"Conjurer ShapeShift, current state: {state[shapeshifterId]}", "Conjurer");
+
+        switch (state[shapeshifterId])
+        {
+            case ConjState.NormalMark:
+                ConjPosition[shapeshifterId].Add(shapeshifter.transform.position);
+                state[shapeshifterId] = ConjState.NormalBomb;
+                shapeshifter.Notify(GetString("ConjurerMark"));
+                break;
+
+            case ConjState.NormalBomb:
+                foreach (var player in Main.EnumerateAlivePlayerControls())
+                {
+                    foreach (var pos in ConjPosition[shapeshifterId].ToArray())
+                    {
+                        var dis = GetDistance(pos, player.transform.position);
+                        if (dis > ConjureRadius.GetFloat()) continue;
+                        if (player.GetCustomRole().IsCovenTeam() && !CovenDiesInBlast.GetBool()) continue;
+                        if (player.IsTransformedNeutralApocalypse()) continue;
+                        else
+                        {
+                            player.SetDeathReason(PlayerState.DeathReason.Bombed);
+                            player.RpcMurderPlayer(player);
+                            player.SetRealKiller(shapeshifter);
+                        }
+                    }
+                }
+                shapeshifter.Notify(GetString("ConjurerMeteor"));
+                state[shapeshifterId] = ConjState.NormalMark;
+                ConjPosition[shapeshifterId].Clear();
+                CustomSoundsManager.RPCPlayCustomSoundAll("Boom");
+                break;
+            case ConjState.NecroMark:
+                if (target == null)
+                {
+                    Logger.Info("target is null", "ConjState.NecroMark");
+                    return false;
+                }
+                NecroBombHolder = target.PlayerId;
+                state[shapeshifterId] = ConjState.NecroBomb;
+                shapeshifter.Notify(GetString("ConjurerNecroMark"));
+                break;
+            case ConjState.NecroBomb:
+                var necroBombHolder = NecroBombHolder.GetPlayer();
+                if (necroBombHolder == null)
+                {
+                    Logger.Info("NecroBombHolder is null", "ConjState.NecroBomb");
+                    return false;
+                }
+
+                foreach (var player in Main.EnumerateAlivePlayerControls())
+                {
+                    var dis = GetDistance(necroBombHolder.transform.position, player.transform.position);
+                    if (dis > NecroRadius.GetFloat()) continue;
+                    if (player.GetCustomRole().IsCovenTeam() && !CovenDiesInBlast.GetBool()) continue;
+                    if (player.IsTransformedNeutralApocalypse()) continue;
+                    else
+                    {
+                        player.SetDeathReason(PlayerState.DeathReason.Bombed);
+                        player.RpcMurderPlayer(player);
+                        player.SetRealKiller(shapeshifter);
+                    }
+
+                }
+                shapeshifter.Notify(GetString("ConjurerMeteor"));
+                state[shapeshifterId] = ConjState.NecroMark;
+                NecroBombHolder = byte.MaxValue;
+                CustomSoundsManager.RPCPlayCustomSoundAll("Boom");
+                break;
+        }
+        return false;
+    }
+    public override void SetAbilityButtonText(HudManager hud, byte playerId)
+    {
+        if (!state.TryGetValue(playerId, out var conjState)) return;
+
+        if (conjState is ConjState.NormalMark or ConjState.NecroMark)
+        {
+            hud.AbilityButton.OverrideText(GetString("MarkButtonText"));
+        }
+        else if (conjState is ConjState.NormalBomb or ConjState.NecroBomb)
+        {
+            hud.AbilityButton.OverrideText(GetString("ConjurerConjureShapeshift"));
+        }
+    }
+    public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
+    {
+        if (!ResetTargetAfterMeeting.GetBool()) return;
+        if (!state.TryGetValue(_Player.PlayerId, out var conjState)) return;
+        if (conjState == ConjState.NormalBomb)
+        {
+            state[_Player.PlayerId] = ConjState.NormalMark;
+            ConjPosition[_Player.PlayerId].Clear();
+        }
+        else if (conjState == ConjState.NecroBomb)
+        {
+            state[_Player.PlayerId] = ConjState.NecroMark;
+            NecroBombHolder = byte.MaxValue;
+        }
+    }
+}

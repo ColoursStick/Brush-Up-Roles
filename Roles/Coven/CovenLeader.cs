@@ -1,0 +1,155 @@
+using TONE.Modules;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.Core;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Neutral;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
+
+namespace TONE.Roles.Coven;
+
+internal class CovenLeader : CovenManager
+{
+    //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.CovenLeader;
+    private const int Id = 30900;
+    public override bool IsDesyncRole => true;
+    public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenPower;
+    //==================================================================\\
+
+    private static OptionItem RetrainCooldown;
+    public static OptionItem MaxRetrains;
+    public static OptionItem RetrainConvertsHelpers;
+    enum OptionName
+    {
+        CovenLeaderMaxRetrains,
+        CovenLeaderRetrainCooldown,
+        CovenLeaderRetrainConvertsHelpers
+    }
+    public static readonly HashSet<byte> List = [];
+    public static readonly Dictionary<byte, CustomRoles> retrainPlayer = [];
+
+    public override void SetupCustomOption()
+    {
+        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
+        MaxRetrains = IntegerOptionItem.Create(Role, Id + 10, OptionName.CovenLeaderMaxRetrains, new(1, 15, 1), 2, false)
+            .SetValueFormat(OptionFormat.Times);
+        RetrainCooldown = FloatOptionItem.Create(Role, Id + 11, OptionName.CovenLeaderRetrainCooldown, new(0f, 180f, 2.5f), 30f, false)
+                .SetValueFormat(OptionFormat.Seconds);
+        RetrainConvertsHelpers = BooleanOptionItem.Create(Role, Id + 12, OptionName.CovenLeaderRetrainConvertsHelpers, true, false);
+    }
+    public override void Init()
+    {
+        retrainPlayer.Clear();
+        List.Clear();
+    }
+    public override void Add(byte playerId)
+    {
+        List.Add(playerId);
+        playerId.SetAbilityUseLimit(MaxRetrains.GetInt());
+        GetPlayerById(playerId)?.AddDoubleTrigger();
+    }
+    public override void Remove(byte playerId)
+    {
+        List.Remove(playerId);
+    }
+    public override bool CanUseKillButton(PlayerControl pc) => true;
+    public override void SetKillCooldown(byte id) => RetrainCooldown.GetFloat();
+    public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
+    {
+        if (killer == null || target == null) return false;
+        if (killer.CheckDoubleTrigger(target, () => { Retrain(killer, target); }))
+        {
+            if (HasNecronomicon(killer) && !target.GetCustomRole().IsCovenTeam())
+            {
+                return true;
+            }
+            killer.Notify(GetString("CovenDontKillOtherCoven"));
+        }
+        return false;
+    }
+    private static void Retrain(PlayerControl killer, PlayerControl target)
+    {
+        if (killer.GetAbilityUseLimit() <= 0)
+        {
+            killer.Notify(GetString("CovenLeaderNoRetrain"));
+            return;
+        }
+        if (!HasNecronomicon(killer) && killer.IsPlayerCoven() && !target.IsPlayerCoven())
+        {
+            killer.Notify(GetString("CovenLeaderRetrainNonCoven"));
+            return;
+        }
+        if (HasNecronomicon(killer) && !IsHelper(killer, target))
+        {
+            killer.Notify(GetString("CovenLeaderRetrainNonHelper"));
+            return;
+        }
+
+        var roleList = CustomRolesHelper.AllRoles.Where(role => role.IsCoven() && role.IsEnable() && !role.RoleExist(countDead: true)).ToList();
+        retrainPlayer[target.PlayerId] = roleList.RandomElement();
+        // if every enabled coven role is already in the game then use one of them anyways
+        if (retrainPlayer[target.PlayerId] == CustomRoles.Crewmate || retrainPlayer[target.PlayerId] == CustomRoles.CrewmateTONE)
+            retrainPlayer[target.PlayerId] = CustomRolesHelper.AllRoles.Where(role => role.IsCoven() && role.IsEnable()).ToList().RandomElement();
+        killer.ResetKillCooldown();
+        killer.SetKillCooldown();
+        if (IsHelper(killer, target))
+        {
+            Logger.Info($"Coven Leader directly Retraining [{target.PlayerId}]{target.GetNameWithRole()} => {retrainPlayer[target.PlayerId]}", "CovenLeader");
+            target.Notify(string.Format(GetString("CovenLeaderRetrainInGameNotif"), CustomRoles.CovenLeader.ToColoredString(), retrainPlayer[target.PlayerId].ToColoredString()));
+            killer.Notify(string.Format(GetString("CovenLeaderRetrainInGame"), target.GetRealName(), retrainPlayer[target.PlayerId].ToColoredString()));
+            target.RpcSetCustomRoleV2(retrainPlayer[target.PlayerId], true, true);
+            retrainPlayer.Remove(target.PlayerId);
+            killer.RpcRemoveAbilityUse();
+            if (RetrainConvertsHelpers.GetBool()) PassRecruit(killer, target);
+
+            return;
+        }
+        killer.Notify(GetString("CovenLeaderRetrain"));
+    }
+    public override void OnMeetingHudStart(PlayerControl pc)
+    {
+        foreach (byte cov in retrainPlayer.Keys)
+        {
+            SendMessage(string.Format(GetString("RetrainNotification"), CustomRoles.CovenLeader.ToColoredString(), retrainPlayer[cov].ToColoredString()), cov);
+        }
+    }
+
+    public override void SetAbilityButtonText(HudManager hud, byte playerId)
+    {
+        if (!HasNecronomicon(playerId))
+        {
+            hud.KillButton.OverrideText(GetString("CovenLeaderKillButton"));
+        }
+    }
+
+    private static bool IsHelper(PlayerControl covenLeader, PlayerControl target)
+    {
+        var covenList = Main.EnumeratePlayerControls().Where(x => x.IsPlayerCovenTeam()).ToList();
+        return target.Is(CustomRoles.Enchanted) || (target.Is(CustomRoles.Romantic) && Romantic.BetPlayer.TryGetValue(target.PlayerId, out var romanticTarget) && covenList.Contains(GetPlayerById(romanticTarget))) || (target.Is(CustomRoles.Lawyer) && covenList.Where(x => Lawyer.TargetList.Contains(x.PlayerId)).Any()) || (target.Is(CustomRoles.Medic) && covenList.Where(x => Medic.IsProtected(x.PlayerId)).Any()) || covenList.Any(x => Lovers.AreLovers(x, target)) || (target.Is(CustomRoles.Monarch) && covenList.Where(x => x.Is(CustomRoles.Knighted)).Any()) || (target.Is(CustomRoles.Follower) && Follower.BetPlayer.TryGetValue(target.PlayerId, out var followerTarget) && covenList.Contains(GetPlayerById(followerTarget))) || (target.Is(CustomRoles.Crusader) && target.GetRoleClass() is Crusader crus && covenList.Where(x => crus.ForCrusade.Contains(x.PlayerId)).Any()) ||
+            /* converters */(target.Is(CustomRoles.CursedSoul) && covenLeader.Is(CustomRoles.Soulless)) || (target.Is(CustomRoles.Admirer) && covenLeader.Is(CustomRoles.Admired)) || (target.Is(CustomRoles.Cultist) && covenLeader.Is(CustomRoles.Charmed)) || (target.Is(CustomRoles.Jackal) && covenLeader.Is(CustomRoles.Recruit)) || (target.Is(CustomRoles.Gangster) && covenLeader.Is(CustomRoles.Madmate)) || (target.Is(CustomRoles.Infectious) && covenLeader.Is(CustomRoles.Infected)) || (target.Is(CustomRoles.Virus) && covenLeader.Is(CustomRoles.Contagious));
+
+    }
+
+    private static void PassRecruit(PlayerControl killer, PlayerControl target)
+    {
+        if (target.CanBeRecruitedBy(killer))
+        {
+            var addon = killer.GetBetrayalAddon(true);
+            target.RpcSetCustomRole(addon);
+
+            if (addon is CustomRoles.Admired)
+            {
+                Admirer.AdmiredList[killer.PlayerId].Add(target.PlayerId);
+                Admirer.SendRPC(killer.PlayerId, target.PlayerId); //Sync playerId list
+            }
+
+            NotifyRoles(SpecifySeer: target, SpecifyTarget: killer, ForceLoop: true);
+            NotifyRoles(SpecifySeer: killer, SpecifyTarget: target, ForceLoop: true);
+
+            Logger.Info($"{target?.Data?.PlayerName} = {target.GetCustomRole()} + {addon}", $"Assign {addon}");
+        }
+    }
+}

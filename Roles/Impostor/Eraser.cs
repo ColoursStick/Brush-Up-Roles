@@ -1,0 +1,112 @@
+using TONE.Modules;
+using TONE.Roles.Core;
+using static TONE.Translator;
+
+namespace TONE.Roles.Impostor;
+
+internal class Eraser : RoleBase
+{
+    //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Eraser;
+    private const int Id = 24200;
+    public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Eraser);
+    public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
+    //==================================================================\\
+
+    private static OptionItem EraseLimitOpt;
+    private static OptionItem CanGuessErasedPlayer;
+
+    private static readonly HashSet<byte> PlayerToErase = [];
+    public static readonly Dictionary<byte, CustomRoles> ErasedRoleStorage = [];
+
+    public override void SetupCustomOption()
+    {
+        Options.SetupRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.Eraser);
+        EraseLimitOpt = IntegerOptionItem.Create(Id + 10, "EraseLimit", new(1, 15, 1), 2, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Eraser])
+            .SetValueFormat(OptionFormat.Times);
+        CanGuessErasedPlayer = BooleanOptionItem.Create(Id + 11, "EraserCanGuessErasedPlayer", true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Eraser]);
+    }
+    public override void Init()
+    {
+        PlayerToErase.Clear();
+        ErasedRoleStorage.Clear();
+    }
+    public override void Add(byte playerId)
+    {
+        playerId.SetAbilityUseLimit(EraseLimitOpt.GetInt());
+
+        var pc = Utils.GetPlayerById(playerId);
+        pc.AddDoubleTrigger();
+    }
+    public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
+    {
+        if (killer.GetAbilityUseLimit() > 0 && !PlayerToErase.Contains(target.PlayerId) && !target.Is(CustomRoles.Stubborn))
+        {
+            return killer.CheckDoubleTrigger(target, () =>
+            {
+                killer.SetKillCooldown();
+                killer.RpcRemoveAbilityUse();
+                PlayerToErase.Add(target.PlayerId);
+                Logger.Info($"{killer.GetCustomRole()} votes for {target.GetCustomRole()}", "Vote Eraser");
+            });
+        }
+        else return true;
+    }
+    public override bool GuessCheck(bool isUI, PlayerControl guesser, PlayerControl target, CustomRoles role, ref bool guesserSuicide)
+    {
+        if (PlayerToErase.Contains(target.PlayerId) && !CanGuessErasedPlayer.GetBool() && !role.IsAdditionRole())
+        {
+            guesser.ShowInfoMessage(isUI, GetString("EraserTryingGuessErasedPlayer"));
+            return true;
+        }
+        return false;
+    }
+    public override void NotifyAfterMeeting()
+    {
+        foreach (var pc in PlayerToErase.ToArray())
+        {
+            var player = Utils.GetPlayerById(pc);
+            if (!player) continue;
+
+            player.RPCPlayCustomSound("Oiiai");
+            player.Notify(GetString("LostRoleByEraser"));
+        }
+    }
+    public override void AfterMeetingTasks()
+    {
+        foreach (var pc in PlayerToErase.ToArray())
+        {
+            var player = Utils.GetPlayerById(pc);
+            if (!player) continue;
+
+            if (!ErasedRoleStorage.ContainsKey(player.PlayerId))
+            {
+                ErasedRoleStorage.Add(player.PlayerId, player.GetCustomRole());
+                Logger.Info($"Added {player.GetNameWithRole()} to ErasedRoleStorage", "Eraser");
+            }
+            else
+            {
+                Logger.Info($"Canceled {player.GetNameWithRole()} Eraser bcz already erased.", "Eraser");
+                return;
+            }
+
+            if (player.HasGhostRole())
+            {
+                Logger.Info($"Canceled {player.GetNameWithRole()} because player have ghost role", "Eraser");
+                return;
+            }
+            CustomRoles EraserRole = player.GetCustomRole().IsImpostor() ? CustomRoles.ImpostorTONE : CustomRoles.CrewmateTONE;
+
+            player.GetRoleClass()?.OnRemove(player.PlayerId);
+            if (player.IsAlive()) player.RpcChangeRoleBasis(EraserRole);
+            player.RpcSetCustomRole(EraserRole);
+            player.GetRoleClass()?.OnAdd(player.PlayerId);
+            player.ResetKillCooldown();
+            player.SetKillCooldown();
+            Logger.Info($"{player.GetNameWithRole()} Erase by Eraser", "Eraser");
+            PlayerToErase.Clear();
+        }
+        Utils.MarkEveryoneDirtySettings();
+    }
+}

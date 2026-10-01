@@ -1,0 +1,228 @@
+using AmongUs.GameOptions;
+using TONE.Modules;
+using TONE.Roles.AddOns.Common;
+using static TONE.MeetingHudStartPatch;
+using static TONE.Options;
+using static TONE.Translator;
+
+namespace TONE.Roles.Impostor;
+
+internal class Nemesis : RoleBase
+{
+    //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Nemesis;
+    private const int Id = 3600;
+    public override CustomRoles ThisRoleBase => LegacyNemesis.GetBool() ? CustomRoles.Shapeshifter : CustomRoles.Impostor;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
+    //==================================================================\\
+
+    private static OptionItem NemesisCanKillNum;
+    public static OptionItem PreventSeeRolesBeforeSkillUsedUp;
+    public static OptionItem LegacyNemesis;
+    private static OptionItem NemesisShapeshiftCD;
+    private static OptionItem NemesisShapeshiftDur;
+
+    private static readonly Dictionary<byte, int> NemesisRevenged = [];
+
+    public override void SetupCustomOption()
+    {
+        SetupRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.Nemesis);
+        NemesisCanKillNum = IntegerOptionItem.Create(Id + 10, "NemesisCanKillNum", new(0, 15, 1), 1, TabGroup.ImpostorRoles, false)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Nemesis])
+                .SetValueFormat(OptionFormat.Players);
+        PreventSeeRolesBeforeSkillUsedUp = BooleanOptionItem.Create(Id + 14, "PreventSeeRolesBeforeSkillUsedUp", true, TabGroup.ImpostorRoles, false)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Nemesis]);
+        LegacyNemesis = BooleanOptionItem.Create(Id + 11, "UseLegacyVersion", false, TabGroup.ImpostorRoles, false)
+                .SetParent(CustomRoleSpawnChances[CustomRoles.Nemesis]);
+        NemesisShapeshiftCD = FloatOptionItem.Create(Id + 12, GeneralOption.ShapeshifterBase_ShapeshiftCooldown, new(1f, 180f, 1f), 15f, TabGroup.ImpostorRoles, false)
+                .SetParent(LegacyNemesis)
+                .SetValueFormat(OptionFormat.Seconds);
+        NemesisShapeshiftDur = FloatOptionItem.Create(Id + 13, GeneralOption.ShapeshifterBase_ShapeshiftDuration, new(1f, 180f, 1f), 30f, TabGroup.ImpostorRoles, false)
+                .SetParent(LegacyNemesis)
+                .SetValueFormat(OptionFormat.Seconds);
+    }
+    public override void Init()
+    {
+        NemesisRevenged.Clear();
+    }
+
+    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
+    {
+        AURoleOptions.ShapeshifterCooldown = NemesisShapeshiftCD.GetFloat();
+        AURoleOptions.ShapeshifterDuration = NemesisShapeshiftDur.GetFloat();
+    }
+    public static bool PreventKnowRole(PlayerControl seer)
+    {
+        if (!seer.Is(CustomRoles.Nemesis) || seer.IsAlive()) return false;
+        if (PreventSeeRolesBeforeSkillUsedUp.GetBool() && NemesisRevenged.TryGetValue(seer.PlayerId, out var killNum) && killNum < NemesisCanKillNum.GetInt())
+            return true;
+        return false;
+    }
+    public override void OnMeetingHudStart(PlayerControl player)
+    {
+        if (!player.IsAlive())
+            AddMsg(GetString("NemesisDeadMsg"), player.PlayerId);
+    }
+
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
+    {
+        if (!AmongUsClient.Instance.AmHost) return false;
+        if (!GameStates.IsInGame || pc == null) return false;
+        if (!pc.Is(CustomRoles.Nemesis)) return false;
+        msg = msg.Trim().ToLower();
+        if (msg.Length < 3 || msg[..3] != "/rv") return false;
+
+        if (NemesisCanKillNum.GetInt() < 1)
+        {
+            pc.ShowInfoMessage(isUI, GetString("NemesisKillDisable"));
+            return true;
+        }
+
+        if (pc.IsAlive())
+        {
+            pc.ShowInfoMessage(isUI, GetString("NemesisAliveKill"));
+            return true;
+        }
+
+        if (msg == "/rv")
+        {
+            bool canSeeRoles = PreventSeeRolesBeforeSkillUsedUp.GetBool();
+            string text = GetString("PlayerIdList");
+            foreach (var npc in Main.EnumerateAlivePlayerControls())
+                text += $"\n{npc.PlayerId} → " + (canSeeRoles ? $"({npc.GetDisplayRoleAndSubName(npc, false, false)}) " : string.Empty) + npc.GetRealName();
+            Utils.SendMessage(text, pc.PlayerId);
+            return true;
+        }
+
+        if (NemesisRevenged.TryGetValue(pc.PlayerId, out var killNum) && killNum >= NemesisCanKillNum.GetInt())
+        {
+            pc.ShowInfoMessage(isUI, GetString("NemesisKillMax"));
+            return true;
+        }
+
+        else
+        {
+            NemesisRevenged.Add(pc.PlayerId, 0);
+        }
+
+        int targetId;
+        PlayerControl target;
+        try
+        {
+            targetId = int.Parse(msg.Replace("/rv", string.Empty));
+            target = Utils.GetPlayerById(targetId);
+        }
+        catch
+        {
+            pc.ShowInfoMessage(isUI, GetString("NemesisKillDead"));
+            return true;
+        }
+
+        if (target == null || !target.IsAlive())
+        {
+            pc.ShowInfoMessage(isUI, GetString("NemesisKillDead"));
+            return true;
+        }
+        else if (target.IsTransformedNeutralApocalypse())
+        {
+            pc.ShowInfoMessage(isUI, GetString("ApocalypseImmune"));
+            return true;
+        }
+        else if (CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && target.PlayerId == RoundUp.Deputy)
+        {
+            pc.ShowInfoMessage(isUI, GetString("RoundUp_TryKillDeputy"));
+            return true;
+        }
+        else if (target.Is(CustomRoles.Mini) && Mini.Age < 18)
+        {
+            pc.ShowInfoMessage(isUI, GetString("GuessMini"));
+            return true;
+        }
+        else if (target.Is(CustomRoles.Solsticer))
+        {
+            pc.ShowInfoMessage(isUI, GetString("GuessSolsticer"));
+            return true;
+        }
+        else if (target.Is(CustomRoles.Jinx) || target.Is(CustomRoles.CursedWolf))
+        {
+            pc.ShowInfoMessage(isUI, GetString("GuessImmune"));
+            return true;
+        }
+        else if (pc.RpcCheckAndMurder(target, true) == false)
+        {
+            pc.ShowInfoMessage(isUI, GetString("GuessImmune"));
+            Logger.Info($"Guess Immune target {target.PlayerId} have role {target.GetCustomRole()}", "Nemesis");
+            return true;
+        }
+
+        Logger.Info($"{pc.GetNameWithRole()} revenge {target.GetNameWithRole()}", "Nemesis");
+
+        string Name = target.GetRealName();
+
+        NemesisRevenged[pc.PlayerId]++;
+
+        CustomSoundsManager.RPCPlayCustomSoundAll("AWP");
+
+        _ = new LateTask(() =>
+        {
+            target.SetDeathReason(PlayerState.DeathReason.Revenge);
+            if (GameStates.IsMeeting)
+            {
+                Main.PlayersDiedInMeeting.Add(target.PlayerId);
+                GuessManager.RpcGuesserMurderPlayer(target);
+                MurderPlayerPatch.AfterPlayerDeathTasks(pc, target, true);
+            }
+            else
+            {
+                target.RpcMurderPlayer(target);
+            }
+            target.SetRealKiller(pc);
+
+            _ = new LateTask(() => { Utils.SendMessage(string.Format(GetString("NemesisKillSucceed"), Name), 255, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Nemesis), GetString("Nemesis").ToUpper()), true); }, 0.6f, "Nemesis Kill");
+        }, 0.2f, "Nemesis Start Kill");
+        return true;
+    }
+
+    public override bool CanUseKillButton(PlayerControl pc) => true;
+
+    public static bool CheckCanUseKillButton(PlayerControl pc)
+    {
+        if (Main.PlayerStates == null) return false;
+
+        //  Number of Living Impostors excluding Nemesis
+        int LivingImpostorsNum = 0;
+        foreach (var player in Main.EnumerateAlivePlayerControls())
+        {
+            var role = player.GetCustomRole();
+            if (role != CustomRoles.Nemesis && role.IsImpostor() && !player.Is(CustomRoles.Narc)) LivingImpostorsNum++;
+        }
+
+        // if Nemesis is Narc, they can use kill buttom when all Sheriffs are dead
+        // if not, they can use kill button when LivingImpostorNum is 0
+        return pc.Is(CustomRoles.Narc) ? !CustomRoles.Sheriff.RoleExist() : LivingImpostorsNum <= 0;
+    }
+
+    public override string GetMark(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false)
+    {
+        seen ??= seer;
+
+        if (!seer.IsAlive() && seen.IsAlive())
+            return Utils.ColorString(Utils.GetRoleColor(CustomRoles.Nemesis), " " + seen.PlayerId.ToString()) + " ";
+
+        return string.Empty;
+    }
+
+    public override bool CreateAbilityButton(PlayerControl pc) => pc.Is(CustomRoles.Nemesis) && !pc.IsAlive();
+
+    public override bool ShowAbilityButtonFor(PlayerControl target) => !target.IsAlive();
+
+    public override string AbilityButtonName => "MeetingKillButton";
+
+    public override void OnClickAbilityButton(byte playerId, CustomRoles role)
+    {
+        Logger.Msg($"Click: ID {playerId}", "Nemesis UI");
+        var pc = Utils.GetPlayerById(playerId);
+        if (!pc || !pc.IsAlive() || !GameStates.IsVoting) return;
+        RoleCommand(_Player, $"/rv {playerId}", true);
+    }
+}

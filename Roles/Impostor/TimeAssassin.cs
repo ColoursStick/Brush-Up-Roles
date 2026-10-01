@@ -1,0 +1,91 @@
+using AmongUs.GameOptions;
+using TONE.Modules;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Neutral;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
+
+namespace TONE.Roles.Impostor;
+
+internal class TimeAssassin : RoleBase
+{
+    //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.TimeAssassin;
+    private const int Id = 32200;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
+    //==================================================================\\
+
+    private static OptionItem TimeAssassinSkillCooldown;
+    private static OptionItem TimeAssassinSkillDuration;
+
+    public static bool TimeStop;
+    public static HashSet<PlayerControl> PelicanList = [];
+
+    public override void SetupCustomOption()
+    {
+        SetupRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.TimeAssassin);
+        TimeAssassinSkillCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.AbilityCooldown, new(1f, 180f, 1f), 25f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.TimeAssassin])
+            .SetValueFormat(OptionFormat.Seconds);
+        TimeAssassinSkillDuration = FloatOptionItem.Create(Id + 11, GeneralOption.AbilityDuration, new(1f, 60f, 1f), 7f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.TimeAssassin])
+            .SetValueFormat(OptionFormat.Seconds);
+    }
+
+    public override void Init()
+    {
+        TimeStop = false;
+        PelicanList.Clear();
+    }
+
+    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
+    {
+        AURoleOptions.ShapeshifterCooldown = TimeAssassinSkillCooldown.GetFloat();
+    }
+
+    public override void UnShapeShiftButton(PlayerControl player)
+    {
+        if (TimeStop || TimeMaster.Rewinding) return;
+        if (AnySabotageIsActive())
+        {
+            player.Notify(ColorString(GetRoleColor(CustomRoles.TimeAssassin), GetString("TimeStopError")));
+            return;
+        }
+        foreach (var target in Main.EnumerateAlivePlayerControls())
+        {
+            if (target.Is(CustomRoles.TimeAssassin)) continue;
+
+            player.Notify(GetString("TimeStopStart"));
+            TimeStop = true;
+            Main.PlayerStates[target.PlayerId].IsBlackOut = true;
+            var tmpSpeed = Main.AllPlayerSpeed[target.PlayerId];
+            Main.AllPlayerSpeed[target.PlayerId] = Main.MinSpeed;
+            ReportDeadBodyPatch.CanReport[target.PlayerId] = false;
+            if (target.GetKillTimer() <= TimeAssassinSkillDuration.GetFloat()) target.SetKillCooldown(TimeAssassinSkillDuration.GetFloat());
+            MarkEveryoneDirtySettings();
+            _ = new LateTask(() =>
+            {
+                player.Notify(GetString("TimeStopEnd"));
+                TimeStop = false;
+                player.RpcResetAbilityCooldown();
+                if (PelicanList.Contains(target)) Main.AllPlayerSpeed[target.PlayerId] = Main.AllPlayerSpeed[target.PlayerId] - Main.MinSpeed + Pelican.originalSpeed[target.PlayerId];
+                else Main.AllPlayerSpeed[target.PlayerId] = Main.AllPlayerSpeed[target.PlayerId] - Main.MinSpeed + tmpSpeed;
+                Mini.RecoverySpeed(target);
+                Main.PlayerStates[target.PlayerId].IsBlackOut = false;
+                RPC.PlaySoundRPC(Sounds.TaskComplete, target.PlayerId);
+                ReportDeadBodyPatch.CanReport[target.PlayerId] = true;
+                MarkEveryoneDirtySettings();
+                PelicanList.Clear();
+            }, TimeAssassinSkillDuration.GetFloat(), "TimeAssassin Stop Time");
+        }
+    }
+    public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
+    {
+        if (TimeStop) TimeStop = false;
+    }
+    public override void SetAbilityButtonText(HudManager hud, byte id)
+    {
+        hud.AbilityButton.buttonLabelText.text = GetString("TimeAssassinShapeShifterButtonText");
+    }
+}

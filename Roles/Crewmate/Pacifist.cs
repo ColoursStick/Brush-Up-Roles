@@ -1,0 +1,97 @@
+using AmongUs.GameOptions;
+using TONE.Modules;
+using TONE.Roles.Core;
+using TONE.Roles.Impostor;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
+
+namespace TONE.Roles.Crewmate;
+
+internal class Pacifist : RoleBase
+{
+    //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Pacifist;
+    private const int Id = 9200;
+    public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Pacifist);
+    public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
+    public override bool BlockMoveInVent(PlayerControl pc) => true;
+    //==================================================================\\
+
+    public static OptionItem PacifistCooldown;
+    private static OptionItem PacifistMaxOfUseage;
+
+    public override void SetupCustomOption()
+    {
+        SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Pacifist);
+        PacifistCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.AbilityCooldown, new(1f, 180f, 1f), 30f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pacifist])
+            .SetValueFormat(OptionFormat.Seconds);
+        PacifistMaxOfUseage = IntegerOptionItem.Create(Id + 11, GeneralOption.SkillLimitTimes, new(0, 20, 1), 3, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pacifist])
+            .SetValueFormat(OptionFormat.Times);
+        PacifistAbilityUseGainWithEachTaskCompleted = FloatOptionItem.Create(9204, "AbilityUseGainWithEachTaskCompleted", new(0f, 5f, 0.1f), 1f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pacifist])
+            .SetValueFormat(OptionFormat.Times);
+    }
+    public override void Add(byte playerId)
+    {
+        playerId.SetAbilityUseLimit(PacifistMaxOfUseage.GetInt());
+    }
+    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
+    {
+        AURoleOptions.EngineerCooldown = PacifistCooldown.GetFloat();
+        AURoleOptions.EngineerInVentMaxTime = 1;
+    }
+    public override void OnPet(PlayerControl pc)
+    {
+        OnEnterVent(pc, null);
+    }
+    public override void OnEnterVent(PlayerControl pc, Vent vent)
+    {
+        var abilityUse = pc.GetAbilityUseLimit();
+        if (abilityUse < 1)
+        {
+            pc.Notify(GetString("OutOfAbilityUsesDoMoreTasks"));
+        }
+        else
+        {
+            pc.RpcRemoveAbilityUse();
+            abilityUse--;
+
+            if (!DisableShieldAnimations.GetBool()) pc.RpcGuardAndKill(pc);
+
+            Main.EnumerateAlivePlayerControls().Where(x =>
+            pc.Is(CustomRoles.Madmate)
+                ? (x.CanUseKillButton() && x.IsPlayerCrewmateTeam())
+                : x.CanUseKillButton()
+            ).Do(x =>
+            {
+                x.RPCPlayCustomSound("Dove");
+                x.ResetKillCooldown();
+                x.SetKillCooldown();
+
+                if (x.Is(CustomRoles.Mercenary))
+                { Mercenary.ClearSuicideTimer(); }
+
+                x.Notify(ColorString(GetRoleColor(CustomRoles.Pacifist), GetString("PacifistSkillNotify")));
+            });
+            pc.RPCPlayCustomSound("Dove");
+            pc.Notify(string.Format(GetString("PacifistOnGuard"), abilityUse));
+        }
+    }
+    public override bool CheckBootFromVent(PlayerPhysics physics, int ventId)
+        => physics.myPlayer.GetAbilityUseLimit() < 1;
+
+    public override void SetAbilityButtonText(HudManager hud, byte id)
+    {
+        hud.ReportButton.OverrideText(GetString("ReportButtonText"));
+        if (!UsePets.GetBool())
+        {
+            hud.AbilityButton.buttonLabelText.text = GetString("PacifistVentButtonText");
+            hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
+        }
+        else
+        {
+            hud.PetButton.buttonLabelText.text = GetString("PacifistVentButtonText");
+        }
+    }
+}

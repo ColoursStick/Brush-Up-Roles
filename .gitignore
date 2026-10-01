@@ -1,0 +1,13 @@
+/.vs
+/bin
+/obj
+/.editorconfig
+/.vscode
+/.idea
+*.user
+token.env
+FodyWeavers.xsd
+TONE.sln
+.vscode/settings.json
+/token.env
+token.env

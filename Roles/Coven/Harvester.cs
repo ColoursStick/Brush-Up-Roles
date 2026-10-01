@@ -1,0 +1,176 @@
+using AmongUs.GameOptions;
+using TONE.Roles.Core;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
+
+namespace TONE.Roles.Coven;
+
+internal class Harvester : CovenManager
+{
+    //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Harvester;
+    private const int Id = 31600;
+    public override bool IsDesyncRole => true;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenUtility;
+    //==================================================================\\
+
+    private static OptionItem KillCooldown;
+    private static OptionItem SwapCooldown;
+    private static OptionItem AmountStolen;
+    private static OptionItem MaxAddonsCoven;
+    private static OptionItem MaxAddonsSelf;
+    private static OptionItem CanSwapRecruiting;
+    private static OptionItem CanStealRecruiting;
+    enum OptionName
+    {
+        HarvesterSettings_SwapCooldown,
+        HarvesterSettings_AmountStolen,
+        HarvesterSettings_MaxAddonsCoven,
+        HarvesterSettings_MaxAddonsSelf,
+        HarvesterSettings_CanSwapRecruiting,
+        HarvesterSettings_CanStealRecruiting
+    }
+    private static readonly Dictionary<byte, List<byte>> SwapPlayers = [];
+
+    public override void SetupCustomOption()
+    {
+        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
+        KillCooldown = FloatOptionItem.Create(Role, Id + 10, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 30f, false)
+            .SetValueFormat(OptionFormat.Seconds);
+        SwapCooldown = FloatOptionItem.Create(Role, Id + 11, OptionName.HarvesterSettings_SwapCooldown, new(0f, 180f, 2.5f), 30f, false)
+            .SetValueFormat(OptionFormat.Seconds);
+        AmountStolen = IntegerOptionItem.Create(Role, Id + 12, OptionName.HarvesterSettings_AmountStolen, new(1, 100, 1), 1, false)
+            .SetValueFormat(OptionFormat.Times);
+        MaxAddonsCoven = IntegerOptionItem.Create(Role, Id + 13, OptionName.HarvesterSettings_MaxAddonsCoven, new(1, 100, 1), 5, false)
+            .SetValueFormat(OptionFormat.Times);
+        MaxAddonsSelf = IntegerOptionItem.Create(Role, Id + 14, OptionName.HarvesterSettings_MaxAddonsSelf, new(1, 100, 1), 5, false)
+            .SetValueFormat(OptionFormat.Times);
+        CanSwapRecruiting = BooleanOptionItem.Create(Role, Id + 15, OptionName.HarvesterSettings_CanSwapRecruiting, false, false);
+        CanStealRecruiting = BooleanOptionItem.Create(Role, Id + 16, OptionName.HarvesterSettings_CanStealRecruiting, false, false);
+    }
+    public override void Init()
+    {
+        SwapPlayers.Clear();
+        CustomRoleManager.CheckDeadBodyOthers.Add(OnPlayerDead);
+    }
+    public override void Add(byte playerId)
+    {
+        SwapPlayers[playerId] = [];
+    }
+    public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
+    public override bool CanUseKillButton(PlayerControl pc) => HasNecronomicon(pc);
+    public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
+    {
+        if (!CanUseKillButton(killer)) return false;
+        if (HasNecronomicon(killer) && !target.GetCustomRole().IsCovenTeam())
+        {
+            return true;
+        }
+        killer.Notify(GetString("CovenDontKillOtherCoven"));
+        return false;
+    }
+    public override bool OnCheckShapeshift(PlayerControl shapeshifter, PlayerControl target, ref bool resetCooldown, ref bool shouldAnimate)
+    {
+        resetCooldown = false;
+        shouldAnimate = false;
+        if (SwapPlayers[shapeshifter.PlayerId].Count >= 2)
+        {
+            shapeshifter.Notify(GetString("Harvester.SwapListFull"));
+            return false;
+        }
+        if (shapeshifter == null || target == null) return false;
+
+        if (SwapPlayers[shapeshifter.PlayerId].Count == 0)
+        {
+            SwapPlayers[shapeshifter.PlayerId].Add(target.PlayerId);
+            Logger.Info($"{target.GetRealName()} is SwapPlayer1", "Harvester");
+        }
+        else
+        {
+            SwapPlayers[shapeshifter.PlayerId].Add(target.PlayerId);
+            Logger.Info($"{target.GetRealName()} is SwapPlayer2", "Harvester");
+            resetCooldown = true;
+        }
+        shapeshifter.Notify(string.Format(GetString("Harvester.PlayerAdded"), target.GetRealName()));
+        return false;
+    }
+    private void OnPlayerDead(PlayerControl killer, PlayerControl deadPlayer, bool inMeeting)
+    {
+        if (!CustomRoles.Harvester.RoleExist()) return;
+        if (killer == null || deadPlayer == null || deadPlayer.IsDisconnected()) return;
+        var harvester = GetPlayerById(SwapPlayers.Keys.First());
+        if (harvester == null) return;
+        if (!harvester.IsAlive()) return;
+        // this code is so bad, but it works
+        bool stealRecruiting = CanStealRecruiting.GetBool();
+        if (killer.IsPlayerCoven())
+        {
+            var stolen = 0;
+            List<CustomRoles> addons = [.. deadPlayer.GetCustomSubRoles().Where(x => (CanSwapRecruiting.GetBool() || !x.IsAddonAssignedMidGame()) && !x.IsImpOnlyAddon())];
+            foreach (CustomRoles addon in addons)
+            {
+                if (stolen >= AmountStolen.GetInt()) break;
+                if (killer.GetCustomSubRoles().Count >= MaxAddonsCoven.GetInt()) break;
+                Main.PlayerStates[deadPlayer.PlayerId].RemoveSubRole(addon);
+                killer.RpcSetCustomRole(addon, false, false);
+                stolen++;
+                Logger.Info($"{addon} from {deadPlayer.GetNameWithRole()} given to {killer.GetNameWithRole()}", "Harvester");
+            }
+            Logger.Info($"{deadPlayer.GetNameWithRole()}'s addons given to {killer.GetNameWithRole()}; {stolen} addons stolen total", "Harvester");
+        }
+        else if (HasNecronomicon(harvester) && !killer.IsPlayerCoven())
+        {
+            var stolen = 0;
+            List<CustomRoles> addons = [.. deadPlayer.GetCustomSubRoles().Where(x => stealRecruiting || !x.IsBetrayalAddonV2())];
+            foreach (CustomRoles addon in addons)
+            {
+                if (stolen >= AmountStolen.GetInt()) break;
+                if (harvester.GetCustomSubRoles().Count >= MaxAddonsSelf.GetInt()) break;
+                Main.PlayerStates[deadPlayer.PlayerId].RemoveSubRole(addon);
+                harvester.RpcSetCustomRole(addon, false, false);
+                stolen++;
+                Logger.Info($"{addon} from {deadPlayer.GetNameWithRole()} given to {harvester.GetNameWithRole()}", "Harvester");
+            }
+            Logger.Info($"{deadPlayer.GetNameWithRole()}'s addons given to {harvester.GetNameWithRole()}; {stolen} addons stolen total", "Harvester");
+        }
+    }
+    public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
+    {
+        if (!CustomRoles.Harvester.RoleExist()) return;
+        if (SwapPlayers[_Player.PlayerId].Count != 2) return;
+        SwapAddons(GetPlayerById(SwapPlayers[_Player.PlayerId][0]), GetPlayerById(SwapPlayers[_Player.PlayerId][1]));
+    }
+    public override void AfterMeetingTasks()
+    {
+        SwapPlayers[_Player.PlayerId].Clear();
+    }
+    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
+    {
+        AURoleOptions.ShapeshifterCooldown = SwapCooldown.GetFloat();
+        AURoleOptions.ShapeshifterDuration = 1f;
+        base.ApplyGameOptions(opt, playerId);
+    }
+    private void SwapAddons(PlayerControl player1, PlayerControl player2)
+    {
+        if (SwapPlayers[_Player.PlayerId].Count != 2) return;
+        if (player1 == null || player2 == null) return;
+        bool swapRecruiting = CanSwapRecruiting.GetBool();
+        List<CustomRoles> addons1 = [.. player1.GetCustomSubRoles().Where(x => (swapRecruiting || !x.IsAddonAssignedMidGame()) && !x.IsImpOnlyAddon())];
+        List<CustomRoles> addons2 = [.. player2.GetCustomSubRoles().Where(x => (swapRecruiting || !x.IsAddonAssignedMidGame()) && !x.IsImpOnlyAddon())];
+        foreach (CustomRoles addon in addons1)
+        {
+            Main.PlayerStates[player1.PlayerId].RemoveSubRole(addon);
+            player2.RpcSetCustomRole(addon, false, false);
+        }
+        foreach (CustomRoles addon in addons2)
+        {
+            Main.PlayerStates[player2.PlayerId].RemoveSubRole(addon);
+            player1.RpcSetCustomRole(addon, false, false);
+        }
+        Logger.Info($"{player1.GetNameWithRole()}'s addons swapped with {player2.GetNameWithRole()}", "Harvester");
+    }
+    public override void SetAbilityButtonText(HudManager hud, byte playerId) =>
+        hud.AbilityButton.OverrideText(GetString("Harvester.ShapeshiftButton"));
+}
