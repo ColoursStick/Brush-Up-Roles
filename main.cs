@@ -183,8 +183,81 @@ public class Main : BasePlugin
         [CustomGameMode.BonfireNight] = new Color32(255, 140, 0, byte.MaxValue),
     };
 
+    /// <summary>
+    /// Android（星光 Starlight）下的数据根目录。
+    ///
+    /// ⚠️ 官方指南要求：Android 上不要用硬编码路径 / 相对路径，
+    ///    应使用环境变量 STAR_DATA_PATH（或 Unity 的 Application.persistentDataPath）。
+    ///
+    /// 实测：在 BepInEx 加载插件的那一刻，STAR_DATA_PATH 可能**尚未设置**，
+    /// 此时原写法会让 Path 变成 null，拼出 "/BrushUpRoles-DATA" —— 那是
+    /// 文件系统根目录，Android 上只读，于是插件加载直接失败：
+    ///
+    ///     System.IO.IOException: Read-only file system : '/BrushUpRoles-DATA'
+    ///
+    /// 因此这里做三级兜底，并**实测可写性**，绝不返回 null 或不可写路径。
+    /// </summary>
+    private static string ResolveAndroidDataPath()
+    {
+        var candidates = new List<string>();
+
+        // 1) 星光提供的专用数据目录（首选，官方推荐）
+        var star = Environment.GetEnvironmentVariable("STAR_DATA_PATH");
+        if (!string.IsNullOrWhiteSpace(star)) candidates.Add(star);
+
+        // 2) Unity 的持久化数据目录（官方指南给出的备选方案）
+        try
+        {
+            var persistent = UnityEngine.Application.persistentDataPath;
+            if (!string.IsNullOrWhiteSpace(persistent)) candidates.Add(persistent);
+        }
+        catch { }
+
+        // 3) BepInEx 根目录下的子目录
+        try
+        {
+            var be = Paths.BepInExRootPath;
+            if (!string.IsNullOrWhiteSpace(be)) candidates.Add(System.IO.Path.Combine(be, "BUR-data"));
+        }
+        catch { }
+
+        // 逐个验证「非空 + 不是根目录 + 可创建/可写」
+        foreach (var c in candidates)
+        {
+            try
+            {
+                var full = System.IO.Path.GetFullPath(c);
+
+                // 根目录一定不可写（这就是崩溃的那条路径）
+                if (full == "/" || full == System.IO.Path.GetPathRoot(full)) continue;
+
+                var probe = System.IO.Path.Combine(full, LANGUAGE_FOLDER_NAME);
+                Directory.CreateDirectory(probe);
+
+                // 真正写一次，确认可写
+                var testFile = System.IO.Path.Combine(probe, ".write-test");
+                File.WriteAllText(testFile, "ok");
+                File.Delete(testFile);
+
+                return full;
+            }
+            catch { /* 换下一个候选 */ }
+        }
+
+        // 4) 全部失败：用系统临时目录下的一级目录（仍保证可写）
+        try
+        {
+            var tmp = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "BUR-data");
+            Directory.CreateDirectory(tmp);
+            return tmp;
+        }
+        catch { }
+
+        return "BUR-data";
+    }
+
     public static string Star_Path = Environment.GetEnvironmentVariable("STAR_DATA_PATH");
-    public static readonly string Path = OperatingSystem.IsAndroid() ? Star_Path : ".";
+    public static readonly string Path = OperatingSystem.IsAndroid() ? ResolveAndroidDataPath() : ".";
     public const string LANGUAGE_FOLDER_NAME = "BrushUpRoles-DATA/Language";
 
     public static readonly MapNames[] MapNamesValues = Enum.GetValues<MapNames>();
