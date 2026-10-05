@@ -9,7 +9,7 @@ Among Us 模组。
 
 ## 关于本模组
 
-本模组是 TONE 的分支版本，基于 **TONE v19 官方源码**重做。在原项目基础上：
+本模组是 TONE 的分支版本，**基于 TONE v19 官方源码重做**。在原项目基础上：
 
 - **重制了职业表** —— 移除 TONE 原有的绝大部分职业，仅保留并重新打磨一部分
 - **适配 Among Us v19.0**（2026.9.29，64 位）
@@ -32,7 +32,7 @@ Among Us 模组。
 **网红**使用官方 TONE v19 的实现（`InfluencerTONE`，基于原版 `SpiritGuide`）：
 船员死亡后可成为网红，用图片卡片向存活玩家传递信息。
 
-### 职业下架机制
+### 职业下架机制（重要）
 
 原 TONE 有 385 个职业，彼此交叉引用极密（例如 `Executioner` 一个文件就调用另外 29 个职业的
 静态方法），硬删文件会产生大量编译错误。
@@ -43,14 +43,25 @@ Among Us 模组。
 // Modules/CustomRolesHelper.cs —— 列出保留的职业
 public static readonly HashSet<CustomRoles> KeepRoles = [ ... ];
 
-// Roles/Core/CustomRoleManager.cs —— 其余职业不进设置菜单
-public static bool IsOptBlackListed(this Type role)
-{
-    // 该类型对应的职业只要有一个在 KeepRoles 里就不拉黑，否则一律下架
-}
+// Roles/Core/CustomRoleManager.cs —— 其余职业判定为「下架」
+public static bool IsOptBlackListed(this Type role) { ... }
 ```
 
-下架的职业其刷新率取不到值（返回 0），分配时自动跳过 —— 功能上等同于删除。
+**关键实现细节**：被下架职业的选项**照常创建**（避免 `OptionItem` 为 null），
+只通过 `SetHidden(true)` 从设置菜单隐藏。
+
+这一点非常重要 —— 全工程有 **600+ 处**从全局路径读取这些选项
+（职业分配、每帧更新、名单颜色等）。若选项为 null 会抛 `NullReferenceException`，
+表现为**开始游戏黑屏**或**每帧刷错**。
+
+隐藏后其刷新率读不到值（自动回退 0），因此这些职业也永远不会被分配 ——
+功能上等同于删除。相关代码：
+
+```
+Modules/CustomRolesHelper.cs         KeepRoles 白名单
+Roles/Core/CustomRoleManager.cs      IsOptBlackListed / HideBlackListedOptions
+Modules/OptionHolder.cs              HideIfBlackListed（29 个选项创建点）
+```
 
 ## 支持的平台与版本
 
@@ -83,7 +94,7 @@ dotnet build -c Release -p:Platform=Windows `
 
 产物：`bin/Windows/Release/net6.0/BUR.dll`
 
-> 注意：`GameInfo`（GitInfo）已移除。本仓库无 `.git` 历史时它会算出非法的版本号
+> 注意：`GitInfo` 已移除。本仓库无 `.git` 历史时它会算出非法的版本号
 > `0.0.0+main.` 导致 NETSDK1018 编译失败；`ThisAssembly.Git.*` 改由根目录的
 > `ThisAssemblyStub.cs` 提供。
 
@@ -91,7 +102,7 @@ dotnet build -c Release -p:Platform=Windows `
 
 ```
 Roles/          职业实现
-  Core/         职业基类与管理器
+  Core/         职业基类与管理器（含下架机制）
   Vanilla/      原版职业的模组化实现
   AddOns/       附加职业
   (Ghosts)/     幽灵职业

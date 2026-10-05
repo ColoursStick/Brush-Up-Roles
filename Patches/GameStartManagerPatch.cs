@@ -385,7 +385,12 @@ public class GameStartManagerBeginGamePatch
             Main.LastGuardianAngelCooldown.Value = Options.DefaultAngelCooldown.GetFloat();
             AURoleOptions.GuardianAngelCooldown = 0f;
 
-            AURoleOptions.JudgeTaskRequirementPercentage = JudgeTONE.JudgeTaskRequirementPercentage.GetInt();
+            // ⚠️ JudgeTONE（法官）不在 KeepRoles 白名单里，它的选项从未创建，
+            //    直接读会抛 NullReferenceException。
+            //    这个异常在 BeginGame 的 Prefix 里，会让补丁提前退出，
+            //    进而导致 BeginGame 被反复调用（表现为「点击开始没反应」）。
+            //    这里做空值保护，选项不存在时用默认值 50。
+            AURoleOptions.JudgeTaskRequirementPercentage = JudgeTONE.JudgeTaskRequirementPercentage?.GetInt() ?? 50;
         }
 
         GameManager.Instance.LogicOptions.SetDirty();

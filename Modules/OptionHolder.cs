@@ -891,7 +891,7 @@ public static class Options
             .SetHeader(true)
             .SetColor(new Color32(255, 25, 25, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.ImpostorVanilla).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.ImpostorVanilla).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         if (CustomRoleManager.RoleClass.Where(x => x.Key.IsImpostor()).Any(r => r.Value.IsExperimental))
         {
@@ -899,7 +899,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(141, 70, 49, byte.MaxValue));
 
-            CustomRoleManager.GetExperimentalOptions(Custom_Team.Impostor).ForEach(r => r.SetupCustomOption());
+            CustomRoleManager.GetExperimentalOptions(Custom_Team.Impostor).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
 
         }
@@ -918,7 +918,7 @@ public static class Options
             .SetHeader(true)
             .SetColor(new Color32(255, 25, 25, byte.MaxValue));// KILLING
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.ImpostorKilling).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.ImpostorKilling).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         /*
          * SUPPORT ROLES
@@ -927,7 +927,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 25, 25, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.ImpostorSupport).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.ImpostorSupport).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         /*
          * CONCEALING ROLES
@@ -936,7 +936,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 25, 25, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.ImpostorConcealing).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.ImpostorConcealing).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         /*
          * HINDERING ROLES
@@ -945,7 +945,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 25, 25, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.ImpostorHindering).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.ImpostorHindering).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         /*
          * MADMATE ROLES
@@ -954,7 +954,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 25, 25, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.Madmate).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.Madmate).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         /*
          * Impostor Ghost Roles
@@ -963,7 +963,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 25, 25, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.ImpostorGhosts).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.ImpostorGhosts).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         #endregion
         Logger.Info("Impostor settings setup", "Load Options");
@@ -977,7 +977,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateVanilla).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateVanilla).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         if (CustomRoleManager.RoleClass.Where(x => x.Key.IsCrewmate()).Any(r => r.Value.IsExperimental))
         {
@@ -985,7 +985,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(141, 70, 49, byte.MaxValue));
 
-            CustomRoleManager.GetExperimentalOptions(Custom_Team.Crewmate).ForEach(r => r.SetupCustomOption());
+            CustomRoleManager.GetExperimentalOptions(Custom_Team.Crewmate).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
 
         }
@@ -997,7 +997,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateBasic).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateBasic).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         /*
          * MINI 
@@ -1011,7 +1011,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateSupport).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateSupport).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         /*
         *  INVESTIGATIVE ROLES
@@ -1020,7 +1020,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateInvestigative).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateInvestigative).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         /*
          * KILLING ROLES
@@ -1029,7 +1029,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateKilling).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateKilling).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         /*
          * POWER ROLES
@@ -1038,7 +1038,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmatePower).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmatePower).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         /*
          * Crewmate Ghost Roles
@@ -1047,7 +1047,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateGhosts).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateGhosts).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
 
         #endregion
@@ -1063,7 +1063,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(141, 70, 49, byte.MaxValue));
 
-            CustomRoleManager.GetExperimentalOptions(Custom_Team.Neutral).ForEach(r => r.SetupCustomOption());
+            CustomRoleManager.GetExperimentalOptions(Custom_Team.Neutral).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
 
         }
@@ -1072,25 +1072,25 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(127, 140, 141, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralBenign).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralBenign).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         TextOptionItem.Create(10000012, "RoleType.NeutralEvil", TabGroup.NeutralRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(127, 140, 141, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralEvil).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralEvil).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         TextOptionItem.Create(10000013, "RoleType.NeutralChaos", TabGroup.NeutralRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(127, 140, 141, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralChaos).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralChaos).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         TextOptionItem.Create(10000014, "RoleType.NeutralKilling", TabGroup.NeutralRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(127, 140, 141, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralKilling).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralKilling).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         TextOptionItem.Create(10000115, "RoleType.NeutralApocalypse", TabGroup.NeutralRoles)
             .SetGameMode(CustomGameMode.Standard)
@@ -1103,13 +1103,13 @@ public static class Options
         ApocCanSeeEachOthersAddOns = BooleanOptionItem.Create(60025, "ApocCanSeeEachOthersAddOns", true, TabGroup.NeutralRoles, false)
             .SetGameMode(CustomGameMode.Standard);
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralApocalypse).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralApocalypse).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         TextOptionItem.Create(10000116, "RoleType.NeutralGhost", TabGroup.NeutralRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(127, 140, 141, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralGhosts).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralGhosts).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
         #endregion
         Logger.Info("Neutral settings setup", "Load Options");
         yield return null;
@@ -1121,7 +1121,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(141, 70, 49, byte.MaxValue));
 
-            CustomRoleManager.GetExperimentalOptions(Custom_Team.Coven).ForEach(r => r.SetupCustomOption());
+            CustomRoleManager.GetExperimentalOptions(Custom_Team.Coven).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
 
         }
@@ -1130,31 +1130,31 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(172, 66, 242, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenPower).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenPower).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         TextOptionItem.Create(10000017, "RoleType.CovenKilling", TabGroup.CovenRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(172, 66, 242, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenKilling).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenKilling).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         TextOptionItem.Create(10000018, "RoleType.CovenTrickery", TabGroup.CovenRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(172, 66, 242, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenTrickery).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenTrickery).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         TextOptionItem.Create(10000019, "RoleType.CovenUtility", TabGroup.CovenRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(172, 66, 242, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenUtility).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenUtility).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
         TextOptionItem.Create(10000117, "RoleType.CovenGhost", TabGroup.CovenRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(172, 66, 242, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenGhosts).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenGhosts).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
         #endregion
         Logger.Info("Coven settings setup", "Load Options");
         yield return null;
@@ -2266,6 +2266,26 @@ public static class Options
         OptionSaver.Load();
         IsLoaded = true;
         Logger.Msg("Mod option loading eng", "Load Options");
+    }
+
+    /// <summary>
+    /// 若该职业被下架（或属于巫师阵营），则隐藏它的设置菜单项。
+    ///
+    /// 选项本身照常创建，避免运行期因 OptionItem 为 null 抛 NullReferenceException
+    /// （全工程有 600+ 处从全局路径读取这些选项）。
+    /// IsHiddenOn 会沿 Parent 级联，因此隐藏刷新率选项即隐藏其全部子选项。
+    /// </summary>
+    private static void HideIfBlackListed(RoleBase r)
+    {
+        if (r == null) return;
+
+        var role = r.Role;
+        if (!CustomRoleManager.IsOptBlackListed(r.GetType()) && !role.IsCoven()) return;
+
+        if (CustomRoleSpawnChances != null && CustomRoleSpawnChances.TryGetValue(role, out var spawn))
+            spawn.SetHidden(true);
+        if (CustomRoleCounts != null && CustomRoleCounts.TryGetValue(role, out var cnt))
+            cnt.SetHidden(true);
     }
 
     public static void SetupRoleOptions(int id, TabGroup tab, CustomRoles role, CustomGameMode customGameMode = CustomGameMode.Standard, bool zeroOne = false)
