@@ -58,16 +58,7 @@ internal class Notary : RoleBase
         if (!_Player) return;
 
         NotarizeLimitMeeting[_Player.PlayerId] = NotarizeLimitPerMeeting.GetInt();
-    }
-
-    public override bool OnRoleGuess(bool isUI, PlayerControl target, PlayerControl pc, CustomRoles role, ref bool guesserSuicide)
-    {
-        if (NotarizeList.Contains(target.PlayerId))
-        {
-            pc.ShowInfoMessage(isUI, GetString("GuessNotarize"));
-            return true;
-        }
-        return false;
+        SendRPC(byte.MaxValue);
     }
 
     public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)

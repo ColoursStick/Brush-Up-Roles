@@ -53,7 +53,7 @@ public static class CustomSoundsManager
 
         if (!File.Exists(path))
         {
-            var stream = Utils.GetResourceStream("TONE.Resources.Sounds." + sound + ".wav");
+            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("TONE.Resources.Sounds." + sound + ".wav");
             if (stream == null)
             {
                 Logger.Warn($"Sound file missing：{sound}", "CustomSounds");

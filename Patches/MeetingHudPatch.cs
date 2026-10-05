@@ -171,7 +171,7 @@ class CheckForEndVotingPatch
                     {
                         SendMessage(GetString("VoteDead"), pc.PlayerId);
                         __instance.UpdateForeground();
-                        __instance.RpcClearVoteDelay(pva.PlayerId);
+                        __instance.RpcClearVote(pva.PlayerId);
                         Swapper.CheckSwapperTarget(pva.VotedForId);
                         Balancer.CheckBalancerTarget(pva.VotedForId);
                         continue;
@@ -487,6 +487,7 @@ class CheckForEndVotingPatch
                 tie = false;
                 overruleNonce = winningOverrule.OverruleNonce;
                 exiledPlayer = overruledInfo.Object.IsPlayerCrewmateTeam() || overruledInfo.Object.Is(CustomRoles.Trickster) ? judgeInfo : overruledInfo;
+                if (judgeInfo.Object) judgeInfo.Object.RpcRemoveAbilityUse();
                 if (!judgeInfo.IsHost()) JudgeTONE.playerIdList.Add(judgeInfo.PlayerId);
                 Logger.Info($"The Judge has spoken! Exiled: {exiledPlayer.PlayerId}", "Judge");
             }
@@ -983,12 +984,6 @@ class SetJudgeOverrulePatch
             __instance.RpcClearVoteDelay(srcPlayerId);
             return false;
         }
-        if (Options.UseMeetingAbilityMethod.GetValue() == 2 && voter.Is(CustomRoles.JudgeTONE) && TasksRemaining(voter) != 0)
-        {
-            SendMessage(DestroyableSingleton<TranslationController>.Instance.GetString(StringNames.JudgeAbilityProgress, TasksRemaining(voter)), srcPlayerId, ColorString(GetRoleColor(CustomRoles.JudgeTONE), GetString("JudgeTONE").ToUpper()), noReplay: true);
-            __instance.RpcClearVoteDelay(srcPlayerId);
-            return false;
-        }
         if (Options.UseMeetingAbilityMethod.GetValue() == 2 && voter.Is(CustomRoles.JudgeTONE) && ReportDeadBodyPatch.BypassComms)
         {
             SendMessage(GetString("JudgeAffectedByComms"), srcPlayerId, ColorString(GetRoleColor(CustomRoles.JudgeTONE), GetString("JudgeTONE").ToUpper()), noReplay: true);
@@ -1043,14 +1038,6 @@ class SetJudgeOverrulePatch
             __instance.CheckForEndVoting();
             //For stuffs in check for end voting to work
         }
-    }
-
-    public static int TasksRemaining(PlayerControl voter)
-    {
-        var initialTaskCount = voter.GetPlayerTaskState().AllTasksCount;
-        var num = voter.GetPlayerTaskState().CompletedTasksCount;
-        var taskRequirementProportion = JudgeTONE.JudgeTaskRequirementPercentage.GetInt() / 100f;
-        return Mathf.Clamp(Mathf.CeilToInt(taskRequirementProportion * initialTaskCount) - num, 0, 999);
     }
 }
 static class ExtendedMeetingHud
@@ -1604,23 +1591,11 @@ class MeetingHudStartPatch
                 pva.NameText.color = Color.white;
             }
 
-            var sb = new StringBuilder();
-
             //pva.NameText.text = target.GetRealName(isMeeting: true);
             pva.NameText.text = pva.NameText.text.ApplyNameColorData(seer, target, true);
 
             //if (seer.KnowDeathReason(target))
             //    sb.Append($"『{ColorString(GetRoleColor(CustomRoles.Doctor), GetVitalText(target.PlayerId))}』");
-
-            sb.Append(seerRoleClass?.GetMark(seer, target, true));
-            sb.Append(CustomRoleManager.GetMarkOthers(seer, target, true));
-
-            if (seer.GetCustomRole().IsImpostor() && target.GetPlayerTaskState().IsTaskFinished)
-            {
-                if (target.Is(CustomRoles.Snitch) && target.Is(CustomRoles.Madmate))
-                    sb.Append(CustomRoles.Impostor.GetColoredTextByRole("★"));
-            }
-
 
             var tempNemeText = seer.GetRoleClass().PVANameText(pva, seer, target);
             if (tempNemeText != string.Empty)
@@ -1629,29 +1604,10 @@ class MeetingHudStartPatch
             }
 
             //bool isLover = false;
-            foreach (var TargetSubRole in target.GetCustomSubRoles().ToArray())
-            {
-                switch (TargetSubRole)
-                {
-                    case CustomRoles.Lovers:
-                        // if (seer.Is(CustomRoles.Lovers) || seer.Data.IsDead)
-                        // {
-                        //     sb.Append(CustomRoles.Lovers.GetColoredTextByRole("♥"));
-                        //     //isLover = true;
-                        // }
-                        sb.Append(Lovers.GetMarkOthers(seer, target));
-                        break;
-                    case CustomRoles.Mini:
-                        sb.Append(Mini.GetMarkOthers(seer, target));
-                        break;
-                    case CustomRoles.Cyber when Cyber.CyberKnown.GetBool():
-                        sb.Append(CustomRoles.Cyber.GetColoredTextByRole("★"));
-                        break;
-                }
-            }
+
             //add checks for both seer and target's subrole, maybe one day we can use them...
 
-            pva.NameText.text += sb.ToString();
+            pva.NameText.text += IconManager.GetVisibleMarks(seer, target);
             pva.ColorBlindName.transform.localPosition -= new Vector3(1.35f, 0f, 0f);
         }
 
@@ -1678,7 +1634,7 @@ class MeetingHudStartPatch
                 {
                     if (PlayerControl.LocalPlayer.GetRoleClass().UseGuessPage)
                     {
-                        GuessManager.GuesserOnClick(pva.PlayerId, __instance, true);
+                        GuessManager.GuesserOnClick(pva.PlayerId, __instance, false);
                     }
                     else
                     {

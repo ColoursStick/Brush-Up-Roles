@@ -71,13 +71,14 @@ public static class MainMenuManagerPatch
     private static PassiveButton donationButton;
     private static PassiveButton discordButton;
     private static PassiveButton websiteButton;
-    //private static PassiveButton patreonButton;
 
     // ── 主菜单进场动画用 ──
     /// <summary>进场动画要搬的面板（主菜单 UI，含按钮与 Logo）</summary>
     public static GameObject MenuPanel;
     /// <summary>面板的最终位置</summary>
     public static Vector3 MenuPanelHome;
+
+    //private static PassiveButton patreonButton;
 
     [HarmonyPatch(nameof(MainMenuManager.Start)), HarmonyPostfix, HarmonyPriority(Priority.Normal)]
     public static void Start_Postfix(MainMenuManager __instance)
@@ -139,6 +140,7 @@ public static class MainMenuManagerPatch
         // 动的是主菜单 UI（含按钮与 Logo），SplashArt 背景保持不动。
         MenuPanel = __instance.mainMenuUI;
         MenuPanelHome = MenuPanel != null ? MenuPanel.transform.position : Vector3.zero;
+
 
         if (template == null) return;
 

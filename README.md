@@ -9,7 +9,7 @@ Among Us 模组。
 
 ## 关于本模组
 
-本模组是 TONE 的分支版本。在原项目基础上：
+本模组是 TONE 的分支版本，基于 **TONE v19 官方源码**重做。在原项目基础上：
 
 - **重制了职业表** —— 移除 TONE 原有的绝大部分职业，仅保留并重新打磨一部分
 - **适配 Among Us v19.0**（2026.9.29，64 位）
@@ -29,8 +29,28 @@ Among Us 模组。
 
 **附加职业全部保留**，可与上述职业自由组合。
 
-**网红**是原版 v19 新增的幽灵职业（游戏内部名 `SpiritGuide`）：船员死亡后可成为网红，
-用图片卡片向存活玩家传递信息。
+**网红**使用官方 TONE v19 的实现（`InfluencerTONE`，基于原版 `SpiritGuide`）：
+船员死亡后可成为网红，用图片卡片向存活玩家传递信息。
+
+### 职业下架机制
+
+原 TONE 有 385 个职业，彼此交叉引用极密（例如 `Executioner` 一个文件就调用另外 29 个职业的
+静态方法），硬删文件会产生大量编译错误。
+
+因此采用**白名单下架**：
+
+```csharp
+// Modules/CustomRolesHelper.cs —— 列出保留的职业
+public static readonly HashSet<CustomRoles> KeepRoles = [ ... ];
+
+// Roles/Core/CustomRoleManager.cs —— 其余职业不进设置菜单
+public static bool IsOptBlackListed(this Type role)
+{
+    // 该类型对应的职业只要有一个在 KeepRoles 里就不拉黑，否则一律下架
+}
+```
+
+下架的职业其刷新率取不到值（返回 0），分配时自动跳过 —— 功能上等同于删除。
 
 ## 支持的平台与版本
 
@@ -38,7 +58,6 @@ Among Us 模组。
 |---|---|---|
 | Windows x64 | Among Us v19（2026.9.29） | 需 64 位 BepInEx |
 | Android arm64 | Among Us v19（2026.9.29） | 星光（Starlight）启动器 |
-| Windows x86 | Among Us v18（2026.8.18） | 旧版本，仍可构建 |
 
 平台差异全部由运行时的 `OperatingSystem.IsAndroid()` 判断处理，
 **同一个 DLL 在 PC 与 Android 上通用**，不需要分别编译。
@@ -51,35 +70,22 @@ Among Us 模组。
 - 对应版本的游戏已安装并**至少运行过一次**
   （BepInEx 会在 `<游戏目录>/BepInEx/interop` 生成 IL2CPP interop 程序集）
 
-> ⚠️ 官方 NuGet 上的 `AmongUs.GameLibs.Steam` 只有占位包，真实包未公开发布。
-> 因此本模组改为**直接引用游戏目录里的 interop**（与 Aeterna-End 项目同一做法）。
+> ⚠️ 官方 NuGet 上的 `AmongUs.GameLibs.Steam` 只有占位包（`0.0.0-placeholder.0`），
+> 真实的 `2026.9.29` 未公开发布。因此本模组改为**直接引用游戏目录里的 interop**
+> （与 Aeterna-End 项目同一做法）。
 
 ### 命令
 
 ```powershell
-# v19（64 位）
-dotnet build -c Release -p:Platform=Windows -p:GameV19=true `
+dotnet build -c Release -p:Platform=Windows `
   -p:GameLibsInteropPath="<游戏目录>\BepInEx\interop"
-
-# v18（32 位）
-dotnet build -c Release -p:Platform=Windows
 ```
 
 产物：`bin/Windows/Release/net6.0/BUR.dll`
 
-### 版本差异如何处理
-
-v18 与 v19 的 API 差异集中收敛在 `GameVersionAliases.cs`：
-
-```csharp
-#if BUR_GAME_V19
-global using NormalOptionsType = AmongUs.GameOptions.NormalGameOptionsV12;
-#else
-global using NormalOptionsType = AmongUs.GameOptions.NormalGameOptionsV11;
-#endif
-```
-
-其余代码不感知版本。
+> 注意：`GameInfo`（GitInfo）已移除。本仓库无 `.git` 历史时它会算出非法的版本号
+> `0.0.0+main.` 导致 NETSDK1018 编译失败；`ThisAssembly.Git.*` 改由根目录的
+> `ThisAssemblyStub.cs` 提供。
 
 ## 目录结构
 
@@ -93,6 +99,7 @@ Patches/        Harmony 补丁
 Modules/        基础设施（选项、翻译、RPC、日志…）
 GameModes/      自定义游戏模式
 Resources/      内嵌资源（图片、语言、音效、公告）
+assets/         仓库用图（模组图标）
 ```
 
 ## 许可
@@ -105,9 +112,9 @@ GPLv3 —— 见 [LICENSE](LICENSE)。
 ## 鸣谢
 
 - [Town of Next Edited (TONE)](https://github.com/qin-qwq/TownofNext-Edited) —— 本模组的直接上游
-- [Endless Host Roles (EHR)](https://github.com/Gurge44/EndlessHostRoles) —— 参考了 `ReallyBegin` 接管、
+- [Endless Host Roles (EHR)](https://github.com/Gurge44/EndlessHostRoles) —— 参考 `ReallyBegin` 接管、
   `StateMachineWrapper` 用法、公告排版范式
-- [Aeterna-End](https://github.com/waffle-ful/Aeterna-End-K-not) —— 参考了 `GameLibsInteropPath` 构建方式
+- [Aeterna-End](https://github.com/waffle-ful/Aeterna-End-K-not) —— 参考 `GameLibsInteropPath` 构建方式
   与 Android 适配策略
 - [Reactor](https://github.com/XtraCube/Reactor) —— `CompilerGeneratedObjectWrapper` / `StateMachineWrapper` 的来源
 

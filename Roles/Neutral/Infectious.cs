@@ -147,11 +147,7 @@ internal class Infectious : RoleBase
         }
     }
 
-    /// <summary>
-    /// ⚠️ 本模组下架了 Infectious，它的选项不会创建（TargetKnowOtherTarget 为 null）。
-    ///     这个方法被 NameColorManager 每帧调用，不加保护会持续刷 NullReferenceException。
-    /// </summary>
-    public static bool TargetKnowOtherTargets => TargetKnowOtherTarget != null && TargetKnowOtherTarget.GetBool();
+    public static bool TargetKnowOtherTargets => TargetKnowOtherTarget.GetBool();
 
     public static bool KnowRole(PlayerControl player, PlayerControl target) // Addons know each-other
     {
@@ -164,7 +160,7 @@ internal class Infectious : RoleBase
     {
         if (player.Is(CustomRoles.Infected) && target.Is(CustomRoles.Infectious)) return true;
         if (player.Is(CustomRoles.Infectious) && target.Is(CustomRoles.Infected)) return true;
-        if (TargetKnowOtherTargets && player.Is(CustomRoles.Infected) && target.Is(CustomRoles.Infected)) return true;
+        if (TargetKnowOtherTarget.GetBool() && player.Is(CustomRoles.Infected) && target.Is(CustomRoles.Infected)) return true;
         return false;
     }
     public static bool CanBeBitten(PlayerControl pc)

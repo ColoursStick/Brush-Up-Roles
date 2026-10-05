@@ -47,6 +47,7 @@ internal class ChangeRoleSettings
                     Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Detective, 0, 0);
                     Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Viper, 0, 0);
                     Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Judge, 0, 0);
+                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.SpiritGuide, 0, 0);
                 }
             }
             else if (GameStates.IsHideNSeek)
@@ -117,6 +118,7 @@ internal class ChangeRoleSettings
             ShipStatusFixedUpdatePatch.CanUseClosestVent = [];
 
             ChatManager.ResetHistory();
+            ChatCommands.NotesContent.Clear();
             ReportDeadBodyPatch.CanReport.Clear();
             ReportDeadBodyPatch.PreventEAC = false;
             ReportDeadBodyPatch.BypassComms = false;
@@ -211,6 +213,7 @@ internal class ChangeRoleSettings
                 ReportDeadBodyPatch.WaitReport[pc.PlayerId] = [];
 
                 Main.PlayerStates[pc.PlayerId].IsBlackOut = false;
+                ChatCommands.NotesContent[pc.PlayerId] = string.Empty;
 
                 VentSystemDeterioratePatch.LastClosestVent[pc.PlayerId] = 99;
                 VentSystemDeterioratePatch.PlayerHadBlockedVentLastTime[pc.PlayerId] = false;
@@ -252,22 +255,14 @@ internal class ChangeRoleSettings
                 }
                 catch (Exception ex)
                 {
-                    // 单个职业初始化失败不应该拖垮整局游戏
                     Logger.Warn($"{role}.OnInit 失败（已跳过）: {ex.Message}", "InitializeAllRoles");
                 }
             }
 
-            // Initialize all Add-ons（同样要防护，理由见上）
+            // Initialize all Add-ons
             foreach (var addOn in CustomRoleManager.AddonClasses.Values)
             {
-                try
-                {
-                    addOn?.Init();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Warn($"{addOn?.Role}.Init 失败（已跳过）: {ex.Message}", "InitializeAllAddons");
-                }
+                addOn?.Init();
             }
 
             // Initialize all GameModes
@@ -323,7 +318,7 @@ internal class StartGameHostPatch
 {
     private static AmongUsClient thiz;
 
-    private static RoleOptionsCollectionType RoleOpt => Main.NormalOptions.roleOptions;
+    private static RoleOptionsCollectionV12 RoleOpt => Main.NormalOptions.roleOptions;
     private static Dictionary<RoleTypes, int> RoleTypeNums = [];
     public static void UpdateRoleTypeNums()
     {
@@ -531,6 +526,7 @@ internal class StartGameHostPatch
                     RoleTypes.Detective => CustomRoles.Detective,
                     RoleTypes.Viper => CustomRoles.Viper,
                     RoleTypes.Judge => CustomRoles.Judge,
+                    RoleTypes.SpiritGuide => CustomRoles.Influencer,
                     _ => CustomRoles.NotAssigned
                 };
                 if (role == CustomRoles.NotAssigned) Logger.SendInGame(string.Format(GetString("Error.InvalidRoleAssignment"), pc?.Data?.PlayerName));
@@ -666,8 +662,10 @@ internal class StartGameHostPatch
 
             if (!overriden && pc.Is(CustomRoles.GM)) continue;
 
-            var message = new RpcSetRoleMessage(pc.NetId, roleType, true);
-            RpcUtils.SendMessageImmediately(message, pc.GetClientId());
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(pc.NetId, (byte)RpcCalls.SetRole, SendOption.Reliable, pc.OwnerId);
+            writer.Write((ushort)roleType);
+            writer.Write(true);
+            AmongUsClient.Instance.FinishRpcImmediately(writer);
         }
     }
 

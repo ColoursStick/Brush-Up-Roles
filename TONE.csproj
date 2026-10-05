@@ -4,14 +4,6 @@
 		<GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
 		<GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
 		<GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-		<!--
-		  ⚠️ 程序集名必须是 BUR。
-		     Resources 下的内嵌资源名 = 程序集名 + 路径，代码里一律用
-		     Assembly.GetManifestResourceStream("TONE.Resources...") 取。
-		     两者必须保持一致，否则所有图片/翻译/配置都读不到
-		     （表现为背景消失、按钮失灵）。
-		     C# 命名空间仍保留 TONE，不做无谓的大范围改动。
-		-->
 		<AssemblyName>BUR</AssemblyName>
 		<RootNamespace>TONE</RootNamespace>
 		<Description>Brush Up Roles</Description>
@@ -24,34 +16,30 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Optimize>True</Optimize>
 		<CodePage>65001</CodePage>
-		<!--
-		  目标游戏版本。
-		    v19 起 Among Us 改为 64 位，游戏选项类版本号从 V11 升到 V12
-		    （类型差异收敛在 GameVersionAliases.cs）。
-
-		  用法（照 Aeterna-End 的做法）：
-		    v18:  dotnet build -c Release -p:Platform=Windows
-		    v19:  dotnet build -c Release -p:Platform=Windows -p:GameV19=true
-		                  -p:GameLibsInteropPath="<游戏目录>\BepInEx\interop"
-
-		  ⚠️ 官方 GameLibs 尚未发布 2026.9.29（v19 对应版本），
-		     所以 v19 必须用 GameLibsInteropPath 指向游戏目录里
-		     BepInEx 生成好的 interop。有该路径时不会走 NuGet 的 GameLibs。
-		-->
-		<GameV19 Condition="'$(GameV19)' == ''">false</GameV19>
-		<GameLibsInteropPath Condition="'$(GameLibsInteropPath)' == ''"></GameLibsInteropPath>
 	</PropertyGroup>
 
-	<PropertyGroup Condition=" '$(Platform)' == 'Windows' and '$(GameV19)' == 'true' ">
-		<DefineConstants>TRACE;PC;BUR_GAME_V19</DefineConstants>
-		<GameLibsVersion>2026.9.29</GameLibsVersion>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Platform)' == 'Windows' and '$(GameV19)' != 'true' ">
+	<PropertyGroup Condition=" '$(Platform)' == 'Windows' ">
 		<DefineConstants>TRACE;PC</DefineConstants>
-		<GameLibsVersion>2026.8.18</GameLibsVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Platform)' == 'Android' ">
 		<DefineConstants>TRACE;ANDROID</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup>
+	    <Deterministic>true</Deterministic>
+	    <PathMap>$(MSBuildProjectDirectory)=/</PathMap>
+		<!--
+		  游戏更新早于 GameLibs 发包时的构建方式。
+		  官方 NuGet 上的 AmongUs.GameLibs.Steam 只有 0.0.0-placeholder.0，
+		  真实的 2026.9.29 未公开发布；GameLibs.Android 亦同。
+		  因此将 GameLibsInteropPath 指向游戏目录里 BepInEx 已生成的 interop，
+		  有该路径时不再使用 NuGet 的 GameLibs（避免两边版本不一致）。
+
+		  用法：
+		    dotnet build -c Release -p:Platform=Windows ^
+		      -p:GameLibsInteropPath="<游戏目录>\BepInEx\interop"
+		-->
+		<GameLibsInteropPath Condition="'$(GameLibsInteropPath)' == ''"></GameLibsInteropPath>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -59,17 +47,14 @@
 		<EmbeddedResource Include="token.env" />
 	</ItemGroup>
 
-	<!--
-	  游戏更新早于 GameLibs 发包时：直接引用游戏目录里 BepInEx 已生成的
-	  core / interop。此时不再使用 NuGet 的 GameLibs（避免两边版本不一致）。
-	-->
+	<!-- 直接引用游戏目录里 BepInEx 生成的 core/interop -->
 	<ItemGroup Condition="'$(GameLibsInteropPath)' != ''">
 		<Reference Include="$(GameLibsInteropPath)\*.dll" Private="false" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Condition="$(Platform)=='Windows' And '$(GameLibsInteropPath)' == ''" Include="AmongUs.GameLibs.Steam" Version="$(GameLibsVersion)" PrivateAssets="all" />
-		<PackageReference Condition="$(Platform)=='Android'" Include="AmongUs.GameLibs.Android" Version="2026.3.17" PrivateAssets="all" />
+		<PackageReference Condition="$(Platform)=='Windows' And '$(GameLibsInteropPath)' == ''" Include="AmongUs.GameLibs.Steam" Version="2026.9.29" PrivateAssets="all" />
+		<PackageReference Condition="$(Platform)=='Android' And '$(GameLibsInteropPath)' == ''" Include="AmongUs.GameLibs.Android" Version="2026.8.18" PrivateAssets="all" />
 
 		<PackageReference Include="BepInEx.IL2CPP.MSBuild" Version="2.1.0-rc.1">
 			<PrivateAssets>all</PrivateAssets>
@@ -79,12 +64,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		
 		<PackageReference Include="Costura.Fody" Version="5.8.0-alpha0098">
 			<IncludeAssets>runtime; compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
-		
+		<!--
+		  GitInfo 已移除：本仓库无 .git 历史，它算出的版本号 "0.0.0+main."
+		  非法，会导致 NETSDK1018 编译失败。
+		  ThisAssembly.Git.* 改由项目根目录的 ThisAssemblyStub.cs 提供。
+		-->
 	</ItemGroup>
 
 	<ItemGroup>

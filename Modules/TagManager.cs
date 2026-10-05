@@ -36,7 +36,7 @@ public static class TagManager
 
     private static string GetResourcesTxt(string path)
     {
-        var stream = Utils.GetResourceStream(path);
+        var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(path);
         stream.Position = 0;
         using StreamReader reader = new(stream, Encoding.UTF8);
         return reader.ReadToEnd();

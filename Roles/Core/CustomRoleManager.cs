@@ -83,12 +83,12 @@ public static class CustomRoleManager
     /// <summary>
     /// 该职业类型是否「不进设置菜单」。
     ///
-    /// 本模组只提供 <see cref="CustomRolesHelper.KeepRoles"/> 里的 10 个职业，
+    /// 本模组只提供 <see cref="CustomRolesHelper.KeepRoles"/> 里列出的职业，
     /// 所以规则是：这个类型对应的职业只要有一个在保留名单里就不拉黑，
     /// 否则一律下架（于是它的刷新率取不到值 → 返回 0 → 永不被分配）。
     ///
     /// 原项目这里的语义是屏蔽「共用同一个类的重复职业」
-    /// （靠 DuplicatedRoles.ContainsValue），这里扩展成白名单机制。
+    /// （靠 DuplicatedRoles.ContainsValue），本模组扩展成白名单机制。
     /// </summary>
     public static bool IsOptBlackListed(this Type role)
     {

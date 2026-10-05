@@ -70,7 +70,6 @@ public class dbConnect
         {
             Logger.Info("Finished Sync flow.", "dbConnect.init");
         }
-#pragma warning restore CS0162
     }
 
     private static void HandleFailure(FailedConnectReason errorReason)
@@ -104,7 +103,7 @@ public class dbConnect
          */
 
         // Read the embedded resource
-        using (Stream stream = Utils.GetResourceStream(resourceName))
+        using (Stream stream = assembly.GetManifestResourceStream(resourceName))
         {
             if (stream != null)
             {
@@ -185,6 +184,10 @@ public class dbConnect
                                 upName: userData["name"].ToString()));
                         }
                         tempUserType[userData["friendcode"].ToString()] = userData["type"].ToString(); // Store the data in the temporary dictionary
+                        if (DevManager.IsDevUser(userData["friendcode"].ToString()) && !tempUserType.ContainsKey(userData["friendcode"].ToString()))
+                        {
+                            DevManager.DevUserList.Remove(DevManager.GetDevUser(userData["friendcode"].ToString()));
+                        }
                     }
                     if (tempUserType.Count > 1)
                     {

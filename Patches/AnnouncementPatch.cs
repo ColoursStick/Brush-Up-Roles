@@ -121,7 +121,6 @@ public class ModNews
             // Use local Mod news instead
             LoadModNewsFromResources();
         }
-#pragma warning restore CS0162
     }
 
     private static void LoadModNewsFromResources()
@@ -185,6 +184,8 @@ public class ModNews
             return;
         }
 
+        // Brush Up Roles：保留原版（Innersloth）公告，只把本地 modNews 里的
+        // 上游 TONE 历史公告过滤掉（它们已在 modNews 文件中删除，这里再按编号兜底）。
         List<Announcement> finalAllNews = AllModNews.ConvertAll(n => n.ToAnnouncement());
         finalAllNews.AddRange(aRange.Where(news => AllModNews.All(x => x.Number != news.Number)));
         finalAllNews.Sort((a1, a2) => DateTime.Compare(DateTime.Parse(a2.Date), DateTime.Parse(a1.Date)));

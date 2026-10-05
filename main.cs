@@ -43,10 +43,9 @@ public class Main : BasePlugin
     public const string OriginalForkId = "OriginalTOH";
 
     public static readonly string ModName = "Brush Up Roles";
-    /// <summary>模组简称，用于空间有限的界面（标题栏、版本号等）</summary>
     public static readonly string ModShortName = "BUR";
     public static readonly string ForkId = "BrushUpRoles";
-    public static readonly string ModColor = "#8cffff";
+    public static readonly string ModColor = "#ffc0cb";
     public static readonly bool AllowPublicRoom = true;
 
     public static HashAuth DebugKeyAuth { get; private set; }
@@ -62,8 +61,7 @@ public class Main : BasePlugin
     public const int ExtraPluginVersion = 0; // Add Beta version number × 100
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
-            (2026, 8, 18, 0), // 2026.8.18 & 18.0.0
-            (2026, 9, 29, 0), // 2026.9.29 & 19.0.0  ← v19 适配
+            (2026, 9, 29, 0) // 2026.9.29 & 19
         ];
 
     // Change this to change alpha/beta/full release
@@ -72,7 +70,7 @@ public class Main : BasePlugin
 #pragma warning disable IDE1006 // Naming Styles
     public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V2.0.0 Alpha 6 Hotfix 1
     public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V2.0.0 Beta 3
-    public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V2.0.0
+    public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V2.1.0
 #pragma warning restore IDE1006 // Naming Styles
 
     public enum Release
@@ -86,12 +84,11 @@ public class Main : BasePlugin
 
     public static readonly bool ShowUpdateButton = true;
 
-    // Brush Up Roles：只要「高人私服官网」一个按钮，GitHub / Discord 都关掉
     public static readonly bool ShowGitHubButton = false;
-    public static readonly string GitHubInviteUrl = "";
+    public static readonly string GitHubInviteUrl = "https://github.com/qin-qwq/TownofNext-Edited";
 
     public static readonly bool ShowDiscordButton = false;
-    public static readonly string DiscordInviteUrl = "";
+    public static readonly string DiscordInviteUrl = "https://discord.gg/jg4a2Xqrbb";
 
     public static readonly bool ShowWebsiteButton = true;
     public static readonly string WebsiteInviteUrl = "https://gaorensifu.netlify.app/";
@@ -109,15 +106,8 @@ public class Main : BasePlugin
     public static string credentialsText;
     public Coroutines coroutines;
     public Dispatcher dispatcher;
-    // ⚠️ 必须带空值保护。
-    //    v19 上 GameOptionsManager.Instance 在大厅早期可能还没就绪，
-    //    原来直接链式访问会抛 NullReferenceException，进而让
-    //    GameStartManager.BeginGame 的补丁反复递归（表现为「无法开始游戏」）。
-    //    参考模组 Aeterna-End 同样带了这个判断。
-    public static NormalOptionsType NormalOptions =>
-        GameOptionsManager.Instance != null ? GameOptionsManager.Instance.currentNormalGameOptions : null;
-    public static HideNSeekOptionsType HideNSeekOptions =>
-        GameOptionsManager.Instance != null ? GameOptionsManager.Instance.currentHideNSeekGameOptions : null;
+    public static NormalGameOptionsV12 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
+    public static HideNSeekGameOptionsV12 HideNSeekOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
     //Client Options
     public static ConfigEntry<string> HideName { get; private set; }
     public static ConfigEntry<string> HideColor { get; private set; }
@@ -195,7 +185,6 @@ public class Main : BasePlugin
 
     public static string Star_Path = Environment.GetEnvironmentVariable("STAR_DATA_PATH");
     public static readonly string Path = OperatingSystem.IsAndroid() ? Star_Path : ".";
-    // 数据目录名（角色颜色等持久化数据）。旧版本用过 "BrushUpRoles-DATA"，读取时会自动回退。
     public const string LANGUAGE_FOLDER_NAME = "BrushUpRoles-DATA/Language";
 
     public static readonly MapNames[] MapNamesValues = Enum.GetValues<MapNames>();
@@ -420,7 +409,7 @@ public class Main : BasePlugin
             roleColors.Clear();
             var assembly = Assembly.GetExecutingAssembly();
             string resourceName = "TONE.Resources.roleColor.json";
-            using (Stream stream = Utils.GetResourceStream(resourceName))
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
             {
                 if (stream != null)
                 {
@@ -509,12 +498,6 @@ public class Main : BasePlugin
                 //{ CustomRoles.NiceMini, typeof(Mini) },
                 //{ CustomRoles.EvilMini, typeof(Mini) }
             };
-
-            // ⚠️ 本模组只提供 CustomRolesHelper.KeepRoles 里的 10 个职业。
-            //    其余职业全部「下架」：选项不创建（IsOptBlackListed）、刷新率为 0（GetMode）。
-            //    这里把保留职业之外的类型登记进黑名单——但每个职业都有自己独立的类，
-            //    逐个登记没意义，所以真正的过滤写在 IsOptBlackListed 里：
-            //    「不在 KeepRoles 里的角色一律黑名单」。
 
             foreach (var role in CustomRolesHelper.AllRoles.Where(x => x < CustomRoles.NotAssigned))
             {
@@ -664,7 +647,7 @@ public class Main : BasePlugin
         Instance = this;
 
         //Client Options
-        HideName = Config.Bind("Client Options", "Hide Game Code Name", "Brush Up Roles");
+        HideName = Config.Bind("Client Options", "Hide Game Code Name", "BUR");
         HideColor = Config.Bind("Client Options", "Hide Game Code Color", $"{ModColor}");
         DebugKeyInput = Config.Bind("Authentication", "Debug Key", "");
 
@@ -674,7 +657,7 @@ public class Main : BasePlugin
         DarkTheme = Config.Bind("Client Options", "DarkTheme", false);
         DisableLobbyMusic = Config.Bind("Client Options", "DisableLobbyMusic", false);
         ShowTextOverlay = Config.Bind("Client Options", "ShowTextOverlay", false);
-        // Brush Up Roles：默认关闭姓名上方的「模组客户端」标签（原来会一闪一闪）
+        // Brush Up Roles：默认关闭（该标签依赖 playerVersion 表，会一闪一闪）
         ShowModdedClientText = Config.Bind("Client Options", "ShowModdedClientText", false);
         HorseMode = Config.Bind("Client Options", "HorseMode", false);
         LongMode = Config.Bind("Client Options", "LongMode", false);
@@ -700,7 +683,8 @@ public class Main : BasePlugin
             // Disable Horse Mode since it cause client crash
         }
 
-        Logger = BepInEx.Logging.Logger.CreateLogSource("Brush Up Roles");
+        // 日志标签用模组名（原先是硬编码的 "TONE"）
+        Logger = BepInEx.Logging.Logger.CreateLogSource(ModName);
         coroutines = AddComponent<Coroutines>();
         dispatcher = AddComponent<Dispatcher>();
         TONE.Logger.Enable();
@@ -797,9 +781,9 @@ public class Main : BasePlugin
         ClassInjector.RegisterTypeInIl2Cpp<ShapeShifterPagingBehaviour>();
         ClassInjector.RegisterTypeInIl2Cpp<VitalsPagingBehaviour>();
 
-        NormalOptionsType.RecommendedImpostors = NormalOptionsType.MaxImpostors = Enumerable.Repeat(1, 128).ToArray();
-        NormalOptionsType.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
-        HideNSeekOptionsType.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
+        NormalGameOptionsV12.RecommendedImpostors = NormalGameOptionsV12.MaxImpostors = Enumerable.Repeat(1, 128).ToArray();
+        NormalGameOptionsV12.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
+        HideNSeekGameOptionsV12.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
         DisconnectPopup.ErrorMessages[DisconnectReasons.Hacking] = StringNames.ErrorHacking;
 
         Harmony.PatchAll(Assembly.GetExecutingAssembly());
@@ -833,6 +817,7 @@ public enum CustomRoles
     Tracker,
     Detective,
     Judge,
+    Influencer,
 
     // Impostor(Vanilla)
     Impostor,
@@ -849,6 +834,7 @@ public enum CustomRoles
     TrackerTONE,
     DetectiveTONE,
     JudgeTONE,
+    InfluencerTONE,
 
     // Impostor Vanilla Remakes
     ImpostorTONE,
@@ -1157,13 +1143,6 @@ public enum CustomRoles
     Cop,
     Robber,
     Disguiser,
-
-    /// <summary>
-    /// 网红 —— 原版 v19 新增的幽灵职业（原版内部叫 SpiritGuide）。
-    /// 只有船员死后会变成它，能用「图片卡片」给存活玩家传信息。
-    /// 卡片逻辑游戏本体自带，我们只负责把职业发出去并提供冷却设置。
-    /// </summary>
-    Influencer,
 
     // Sub-role after 500
     NotAssigned = 500,

@@ -213,10 +213,10 @@ internal static class Crowded
         }
     }
 
-    [HarmonyPatch(typeof(NormalOptionsType), nameof(NormalOptionsType.AreInvalid))]
+    [HarmonyPatch(typeof(NormalGameOptionsV12), nameof(NormalGameOptionsV12.AreInvalid))]
     public static class NormalGameOptions_AreInvalid
     {
-        public static bool Prefix(NormalOptionsType __instance, ref bool __result)
+        public static bool Prefix(NormalGameOptionsV12 __instance, ref bool __result)
         {
             __result = __instance.NumImpostors < 0 || __instance.KillDistance < 0 || __instance.KillCooldown < 0 || __instance.PlayerSpeedMod <= 0;
 
