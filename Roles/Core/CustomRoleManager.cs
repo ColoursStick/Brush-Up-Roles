@@ -44,7 +44,12 @@ public static class CustomRoleManager
         List<RoleBase> roles = [];
         foreach (var role in RoleClass.Values)
         {
-            if (IsOptBlackListed(role.GetType()) || role.IsExperimental) continue;
+            // ⚠️ 不再在此过滤黑名单。
+            //    被下架职业的 OptionItem 若从未创建就是 null，而全工程有 600+ 处
+            //    从全局路径读取这些选项（职业分配、每帧更新、名单颜色等），
+            //    会抛 NullReferenceException（表现为开始游戏黑屏 / 每帧刷错）。
+            //    改为「照常创建选项，但把菜单项隐藏」——见 HideBlackListedOptions。
+            if (role.IsExperimental) continue;
 
             if (role.ThisRoleType == type)
             {
@@ -80,6 +85,34 @@ public static class CustomRoleManager
         }
         return roles;
     }
+
+    /// <summary>
+    /// 把「被下架职业」的设置菜单项隐藏起来。
+    ///
+    /// 下架职业的选项照常创建（避免 OptionItem 为 null 引发 NRE），
+    /// 但通过 SetHidden(true) 让它们在界面上不可见。
+    /// IsHiddenOn 会沿 Parent 级联，所以隐藏刷新率选项即隐藏其全部子选项。
+    /// </summary>
+    public static void HideBlackListedOptions(IEnumerable<RoleBase> roles)
+    {
+        foreach (var r in roles)
+        {
+            var role = r.Role;
+
+            // 巫师阵营：本模组不提供
+            var hide = IsOptBlackListed(r.GetType()) || role.IsCoven();
+            if (!hide) continue;
+
+            if (Options.CustomRoleSpawnChances != null
+                && Options.CustomRoleSpawnChances.TryGetValue(role, out var spawn))
+                spawn.SetHidden(true);
+
+            if (Options.CustomRoleCounts != null
+                && Options.CustomRoleCounts.TryGetValue(role, out var cnt))
+                cnt.SetHidden(true);
+        }
+    }
+
     /// <summary>
     /// 该职业类型是否「不进设置菜单」。
     ///
