@@ -17,6 +17,7 @@ public static class CustomRolesHelper
     public static readonly CustomRoles[] AllRoles = EnumHelper.GetAllValues<CustomRoles>();
     public static Dictionary<CustomRoles, Type> DuplicatedRoles = [];
 
+
     /// <summary>
     /// 「保留职业」白名单 —— 本模组只提供这里列出的职业。
     ///
@@ -43,7 +44,7 @@ public static class CustomRolesHelper
         CustomRoles.Knight,          // 侠客
         CustomRoles.SuperStar,       // 大明星
         CustomRoles.NiceGuesser,     // 正义赌怪
-        CustomRoles.Influencer,      // 网红（原版 v19 幽灵职业 SpiritGuide）
+        CustomRoles.InfluencerTONE,      // 网红（原版 v19 幽灵职业，SpiritGuide）
 
         // ───────── 内鬼阵营 ─────────
         CustomRoles.BountyHunter,    // 赏金猎人
@@ -106,7 +107,6 @@ public static class CustomRolesHelper
         CustomRoles.Unlucky, CustomRoles.Unreportable, CustomRoles.VoidBallot, CustomRoles.Watcher,
         CustomRoles.Workhorse, CustomRoles.Youtuber,
     ];
-
     public static readonly Custom_Team[] AllRoleTypes = EnumHelper.GetAllValues<Custom_Team>();
     public static bool OnlySpawnsWithPetsRole(this CustomRoles role)
     {
@@ -151,6 +151,7 @@ public static class CustomRolesHelper
             CustomRoles.DetectiveTONE => CustomRoles.Detective,
             CustomRoles.ViperTONE => CustomRoles.Viper,
             CustomRoles.JudgeTONE => CustomRoles.Judge,
+            CustomRoles.InfluencerTONE => CustomRoles.Influencer,
             _ => role.IsImpostor() ? CustomRoles.Impostor : CustomRoles.Crewmate,
         };
     }
@@ -161,7 +162,7 @@ public static class CustomRolesHelper
         if (role.IsImpostor() && NarcManager.IsNarcAssigned()) // When Narc is in a game,make all Impostor roles desync roles so imps will be able to kill each other
             return role.GetStaticRoleClass().ThisRoleBase.GetRoleTypes();
 
-        return (role.HasImpBasis(ForDesyncRole: false)) && !role.IsImpostor()
+        return role.HasImpBasis(ForDesyncRole: false) && !role.IsImpostor()
             ? role.GetStaticRoleClass().ThisRoleBase.GetRoleTypes()
             : RoleTypes.GuardianAngel;
     }
@@ -1477,6 +1478,7 @@ public static class CustomRolesHelper
             CustomRoles.Detective => RoleTypes.Detective,
             CustomRoles.Viper => RoleTypes.Viper,
             CustomRoles.Judge => RoleTypes.Judge,
+            CustomRoles.Influencer => RoleTypes.SpiritGuide,
             _ => role.IsImpostor() ? RoleTypes.Impostor : RoleTypes.Crewmate,
         };
 
@@ -1496,6 +1498,7 @@ public static class CustomRolesHelper
             CustomRoles.Detective => RoleTypes.Detective,
             CustomRoles.Viper => RoleTypes.Viper,
             CustomRoles.Judge => RoleTypes.Judge,
+            CustomRoles.Influencer => RoleTypes.SpiritGuide,
             _ => role.IsImpostor() ? RoleTypes.Impostor : RoleTypes.Crewmate,
         };
     }
@@ -1542,7 +1545,8 @@ public static class CustomRolesHelper
             CustomRoles.Tracker or
             CustomRoles.Detective or
             CustomRoles.Viper or
-            CustomRoles.Judge;
+            CustomRoles.Judge or
+            CustomRoles.Influencer;
     }
     public static Custom_Team GetCustomRoleTeam(this CustomRoles role)
     {
@@ -1577,6 +1581,7 @@ public static class CustomRolesHelper
                 CustomRoles.Detective => roleOpt.GetNumPerGame(RoleTypes.Detective),
                 CustomRoles.Viper => roleOpt.GetNumPerGame(RoleTypes.Viper),
                 CustomRoles.Judge => roleOpt.GetNumPerGame(RoleTypes.Judge),
+                CustomRoles.Influencer => roleOpt.GetNumPerGame(RoleTypes.SpiritGuide),
                 _ => 0
             };
         }
@@ -1604,6 +1609,7 @@ public static class CustomRolesHelper
                 CustomRoles.Detective => roleOpt.GetChancePerGame(RoleTypes.Detective),
                 CustomRoles.Viper => roleOpt.GetChancePerGame(RoleTypes.Viper),
                 CustomRoles.Judge => roleOpt.GetChancePerGame(RoleTypes.Judge),
+                CustomRoles.Influencer => roleOpt.GetChancePerGame(RoleTypes.SpiritGuide),
                 _ => 0
             } / 100f;
         }

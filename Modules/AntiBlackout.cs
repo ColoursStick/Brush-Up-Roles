@@ -326,7 +326,7 @@ public static class AntiBlackout
             var seer = seerId.GetPlayer();
             var target = targetId.GetPlayer();
 
-            if (seer == null || target == null) continue;
+            if (!seer || !target) continue;
 
             var isSelf = seerId == targetId;
             var isDead = target.Data.IsDead;
@@ -338,7 +338,7 @@ public static class AntiBlackout
                 {
                     selfExiled.Add(seer);
 
-                    if (target.HasGhostRole()) changedRoleType = RoleTypes.GuardianAngel;
+                    if (target.HasGhostRole()) changedRoleType = target.GetCustomRole().GetRoleTypes();
                     else if (target.Is(Custom_Team.Impostor) || target.HasDesyncRole()) changedRoleType = RoleTypes.ImpostorGhost;
                     else changedRoleType = RoleTypes.CrewmateGhost;
                 }
@@ -396,6 +396,7 @@ public static class AntiBlackout
             {
                 if (pc.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.Phantom or RoleTypes.Viper)
                 {
+                    pc.ResetKillCooldown();
                     if (Main.AllPlayerKillCooldown.TryGetValue(pc.PlayerId, out var killTimer) && killTimer > 0f)
                     {
                         pc.SetKillCooldown(killTimer);

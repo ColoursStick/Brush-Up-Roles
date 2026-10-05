@@ -80,10 +80,6 @@ public static class Utils
     {
         if (GameStates.IsHideNSeek) return false;
 
-        // ⚠️ 游戏刚开始时 ShipStatus 还没生成，ShipStatus.Instance 为 null。
-        //    本方法在 FixedUpdate 里每帧被调用，不加保护会持续刷 NullReferenceException。
-        if (ShipStatus.Instance == null) return false;
-
         // if ShipStatus not have current SystemTypes, return false
         if (!ShipStatus.Instance.Systems.ContainsKey(type))
         {
@@ -268,6 +264,7 @@ public static class Utils
 
         _ = new LateTask(() =>
         {
+            if (TimeAssassin.TimeStop) return;
             Main.PlayerStates[player.PlayerId].IsBlackOut = false; //Remove black out for player
             player.MarkDirtySettings();
         }, Options.KillFlashDuration.GetFloat(), "Remove Kill Flash");
@@ -868,7 +865,7 @@ public static class Utils
             sb.Clear().Append(text.RemoveHtmlTags());
         }
 
-        SendMessage(sb.ToString(), PlayerId);
+        SendMessage(sb.ToString(), PlayerId, ShouldSplit: true);
     }
 
     public static void ShowAllActiveSettings(byte PlayerId = byte.MaxValue)
@@ -2827,6 +2824,7 @@ public static class Utils
             {
                 if (!playerState.Player) continue;
                 if (playerState.RoleClass == null) continue;
+                if (!playerState.RoleClass._Player) continue;
                 if (Balancer.Choose2)
                 {
                     Balancer.BalancerAfterMeetingTasks();
@@ -2977,7 +2975,6 @@ public static class Utils
     }
     public static void DumpLog(bool open = true)
     {
-        // 日志目录与文件名统一用 BUR，不再出现 TONE
         string f = OperatingSystem.IsAndroid() ? $"{Main.Path}/BUR-logs/" : $"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}/BUR-logs/";
         string t = DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss");
         string filename = $"{f}BUR-v{Main.PluginVersion}-{t}.log";
@@ -3115,7 +3112,7 @@ public static class Utils
 
         // 2) 只把「资源根之后」的目录分隔点换成反斜杠。
         //    ⚠️ 不能整体替换：TONE.Resources 这一段必须保持点号，
-        //       否则会得到 BUR\Resources\... 这种查不到的名字。
+        //       否则会得到 TONE\Resources\... 这种查不到的名字。
         const string root = "TONE.Resources.";
         if (path.StartsWith(root, StringComparison.Ordinal))
         {

@@ -131,7 +131,6 @@ class VersionShowerStartPatch
     static TextMeshPro SpecialEventText;
     private static void Postfix(VersionShower __instance)
     {
-        // 抬头只显示模组名，不再附带简称 (BUR)
         Main.credentialsText = $"<color={Main.ModColor}>{Main.ModName}</color> - {Main.PluginDisplayVersion}";
         var buildtype = "";
 

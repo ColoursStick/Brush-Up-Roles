@@ -1,7 +1,6 @@
 using AmongUs.GameOptions;
 using AmongUs.InnerNet.GameDataMessages;
 using Hazel;
-using Il2CppInterop.Runtime.InteropTypes;
 using InnerNet;
 using System;
 using System.Text;
@@ -1747,46 +1746,15 @@ class FixedUpdateInNormalGamePatch
         }
     }
 }
-[HarmonyPatch]
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Start))]
 class PlayerStartPatch
 {
-    // 协程状态机的类名形如 _Start_d__82，数字由编译器决定，
-    // 每个游戏版本都可能变（v18 是 82，v19 是 85）。按模式查找，不写死。
-    private const string StateMachinePrefix = "_Start_d__";
-
-    public static MethodBase TargetMethod()
+    public static void Postfix(PlayerControl __instance)
     {
-        return Utils.GetStateMachineMoveNext<PlayerControl>(StateMachinePrefix);
-    }
-
-    /// <summary>
-    /// ⚠️ 参数必须声明成具体的 IL2CPP 基类（Il2CppObjectBase），不能用泛型 T。
-    ///    Harmony 无法把状态机实例绑到泛型参数上，会抛
-    ///    InvalidProgramException（表现为一堆 IL2CPP trampoline 异常 + 补丁静默失效）。
-    ///    取值走 TONE 自带的 StateMachineWrapper（它用 AccessTools.Property 取 __4__this，
-    ///    因为 IL2CPP 把该字段变成了属性）。
-    /// </summary>
-    public static void Postfix(Il2CppObjectBase __instance, ref bool __result)
-    {
-        if (__result) return;
-
-        PlayerControl instance;
-        try
-        {
-            instance = new StateMachineWrapper<PlayerControl>(__instance).Instance;
-        }
-        catch (Exception ex)
-        {
-            Logger.Warn($"取状态机所属 PlayerControl 失败: {ex.Message}", "PlayerStartPatch");
-            return;
-        }
-
-        if (instance == null) return;
-
         if (GameStates.IsHideNSeek) return;
 
-        var roleText = Object.Instantiate(instance.cosmetics.nameText);
-        roleText.transform.SetParent(instance.cosmetics.nameText.transform);
+        var roleText = Object.Instantiate(__instance.cosmetics.nameText);
+        roleText.transform.SetParent(__instance.cosmetics.nameText.transform);
         roleText.fontMaterial.SetFloat("_StencilComp", 7f);
         roleText.fontMaterial.SetFloat("_Stencil", 2f);
         roleText.transform.localPosition = new Vector3(0f, 0.2f, 0f);
@@ -2365,7 +2333,7 @@ class PlayerControlSetRolePatch
 
                 if (target.HasGhostRole())
                 {
-                    GhostRoles[seer] = RoleTypes.GuardianAngel;
+                    GhostRoles[seer] = target.GetCustomRole().GetRoleTypes();
                 }
                 else if ((self && targetIsKiller) || (!seerIsKiller && target.Is(Custom_Team.Impostor)))
                 {
@@ -2375,6 +2343,19 @@ class PlayerControlSetRolePatch
                 {
                     GhostRoles[seer] = RoleTypes.CrewmateGhost;
                 }
+            }
+            // If all players see player as Influencer
+            if (GhostRoles.All(kvp => kvp.Value == RoleTypes.SpiritGuide))
+            {
+                roleType = RoleTypes.SpiritGuide;
+                __instance.RpcSetRoleDesync(RoleTypes.SpiritGuide, __instance.GetClientId());
+                foreach (var seer in Main.EnumeratePlayerControls())
+                {
+                    if (seer.PlayerId == __instance.PlayerId) continue;
+                    __instance.RpcSetRoleDesync(RoleTypes.CrewmateGhost, seer.GetClientId());
+                }
+                GhostRoleAssign.CreateGAMessage(__instance);
+                return false;
             }
             // If all players see player as Guardian Angel
             if (GhostRoles.All(kvp => kvp.Value == RoleTypes.GuardianAngel))
@@ -2455,6 +2436,7 @@ class PlayerControlLocalSetRolePatch
                 RoleTypes.Detective => CustomRoles.DetectiveTONE,
                 RoleTypes.Viper => CustomRoles.ViperTONE,
                 RoleTypes.Judge => CustomRoles.JudgeTONE,
+                RoleTypes.SpiritGuide => CustomRoles.InfluencerTONE,
                 _ => CustomRoles.NotAssigned,
             };
             if (modRole != CustomRoles.NotAssigned)

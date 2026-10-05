@@ -304,28 +304,8 @@ public class GameStartManagerPatch
 [HarmonyPatch(typeof(GameStartManager), nameof(GameStartManager.BeginGame))]
 public class GameStartManagerBeginGamePatch
 {
-    /// <summary>
-    /// 重入保护。
-    ///
-    /// v19 上 <c>ReallyBegin</c> 的内部实现会再次触发 <c>BeginGame</c>，
-    /// 于是形成 BeginGame.Prefix → ReallyBegin → BeginGame → Prefix 的死循环
-    /// （日志里 DoTasksForBeginGame 刷屏，表现为「无法开始游戏」）。
-    /// v18 上 ReallyBegin 不回调 BeginGame，所以不会触发 —— 这是 v19 才暴露的问题。
-    ///
-    /// 真正断开循环的是下面 <see cref="GameStartManagerReallyBeginPatch"/>
-    /// （接管 ReallyBegin，不让原生实现跑）。这个标志位只是额外保险：
-    /// 万一还有别的路径重入，直接放行原生逻辑，不再重复接管。
-    /// </summary>
-    private static bool _beginning;
-
     public static bool Prefix(GameStartManager __instance)
     {
-        if (_beginning)
-        {
-            Logger.Warn("检测到 BeginGame 重入，放行原生逻辑以避免死循环", "GameStartManager");
-            return true;
-        }
-
         var invalidColor = Main.EnumeratePlayerControls().Where(p => p.Data.DefaultOutfit.ColorId < 0 || Palette.PlayerColors.Length <= p.Data.DefaultOutfit.ColorId).ToArray();
         if (invalidColor.Any())
         {
@@ -344,34 +324,9 @@ public class GameStartManagerBeginGamePatch
             return false;
         }
 
-        // ⚠️ 必须包 try/catch。
-        //    v19 上大厅早期部分游戏对象还没就绪，DoTasksForBeginGame 里
-        //    任何一处 NRE 都会顺着 Harmony 补丁向上抛，
-        //    直接破坏 BeginGame 流程（表现为「无法开始游戏」）。
-        //    这里失败也要保证开局能继续。
-        try
-        {
-            _beginning = true;
-            DoTasksForBeginGame();
-        }
-        catch (Exception ex)
-        {
-            Logger.Warn($"开局前设置失败（已忽略，不影响开始游戏）: {ex.Message}", "GameStartManager");
-        }
-        finally
-        {
-            _beginning = false;
-        }
+        DoTasksForBeginGame();
 
-        try
-        {
-            __instance.ReallyBegin(false);
-        }
-        catch (Exception ex)
-        {
-            Logger.Error($"ReallyBegin 调用失败: {ex.Message}", "GameStartManager");
-        }
-
+        __instance.ReallyBegin(false);
         return false;
     }
     public static void DoTasksForBeginGame()
@@ -437,57 +392,6 @@ public class GameStartManagerBeginGamePatch
         OptionItem.SyncAllOptions();
         //RPC.RpcVersionCheck();
     }
-
-    /// <summary>
-    /// 接管 <c>ReallyBegin</c>，让原生实现不再执行。
-    ///
-    /// 为什么必须这样（v19 适配关键）：
-    ///   v19 的原生 ReallyBegin 内部会回调 BeginGame，
-    ///   而 BeginGame.Prefix 里又调 ReallyBegin → 无限递归，游戏无法开始。
-    ///   EHR 在 v18 时代就已经用这个补丁规避了同类问题（见其
-    ///   Patches/GameStartManagerPatch.cs 的 GameStartManagerStartPatch），
-    ///   这里照它的做法移植。
-    ///
-    /// 行为对齐 EHR：
-    ///   · 非房主 → 不干预
-    ///   · 已在倒计时 → 取消倒计时（ReallyBegin 被再次触发即为取消）
-    ///   · 否则 → 直接进入倒计时状态
-    /// </summary>
-    [HarmonyPatch(typeof(GameStartManager), nameof(GameStartManager.ReallyBegin))]
-    public static class GameStartManagerReallyBeginPatch
-    {
-        public static bool Prefix(GameStartManager __instance)
-        {
-            if (!AmongUsClient.Instance.AmHost) return true;
-
-            try
-            {
-                if (__instance.startState == GameStartManager.StartingStates.Countdown)
-                {
-                    __instance.ResetStartState();
-                    return false;
-                }
-
-                __instance.startState = GameStartManager.StartingStates.Countdown;
-                if (__instance.GameSizePopup != null) __instance.GameSizePopup.SetActive(false);
-                DataManager.Player.Onboarding.ViewedMinPlayerWarning = true;
-                DataManager.Player.Save();
-                if (__instance.StartButton != null) __instance.StartButton.gameObject.SetActive(false);
-                if (__instance.StartButtonClient != null) __instance.StartButtonClient.gameObject.SetActive(false);
-                if (__instance.GameStartTextParent != null) __instance.GameStartTextParent.SetActive(false);
-                __instance.countDownTimer = 5.0001f;
-                AmongUsClient.Instance.KickNotJoinedPlayers();
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn($"ReallyBegin 接管失败，放行原生实现: {ex.Message}", "GameStartManager");
-                return true;
-            }
-
-            return false;
-        }
-    }
-
     private static byte SelectRandomMap()
     {
         var rand = IRandom.Instance;

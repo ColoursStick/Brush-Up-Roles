@@ -38,7 +38,7 @@ public static class Translator
             foreach (string jsonFileName in jsonFileNames)
             {
                 // Read the JSON file content
-                using Stream resourceStream = Utils.GetResourceStream(jsonFileName);
+                using Stream resourceStream = assembly.GetManifestResourceStream(jsonFileName);
 
                 if (resourceStream != null)
                 {

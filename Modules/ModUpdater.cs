@@ -19,7 +19,7 @@ public class ModUpdater
 {
     //private static readonly string URL_2018k = "http://api.tohre.dev";
     // Brush Up Roles：不使用上游 TONE 的发布源（更新检查已在 Start_Postfix 里停用）
-    private static readonly string URL_Github = "https://api.github.com/repos/brushuproles/brushuproles";
+    private static readonly string URL_Github = "https://api.github.com/repos/ColoursStick/Brush-Up-Roles";
     //public static readonly string downloadTest = "https://github.com/Pietrodjaowjao/TONEN-Contributions/releases/download/v123123123/TONE.dll";
     public static bool hasUpdate = false;
     private static bool firstNotify = true;
@@ -40,23 +40,14 @@ public class ModUpdater
     [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.Start)), HarmonyPostfix, HarmonyPriority(Priority.VeryLow)]
     public static void Start_Postfix(/*MainMenuManager __instance*/)
     {
-        ResetUpdateButton();
-
-        // ⚠️ Brush Up Roles：本模组是独立模组，更新源仍然是上游 TONE 的仓库，
-        //    联网检查会弹出「更新来啦！TONE v2.0.0」并可能引导玩家下载 TONE。
-        //    这里直接停掉整个更新检查（同时省掉一次联网请求）。
-        hasUpdate = false;
-        forceUpdate = false;
-        isBroken = false;
-        isChecked = true;
+        // ⚠️ Brush Up Roles：本模组是独立模组，更新源仍是上游 TONE 的仓库，
+        //    联网检查会弹出「更新来啦！TONE ...」并引导下载 TONE，必须停用。
         return;
-
-#pragma warning disable CS0162
+        ResetUpdateButton();
         if (isChecked) return;
         //If we are not using it for now, just freaking disable it.
 
         Main.Instance.StartCoroutine(PrefixCoroutine());
-#pragma warning restore CS0162
     }
 
     public static IEnumerator PrefixCoroutine()
@@ -115,7 +106,8 @@ public class ModUpdater
         foreach (var region in regions)
         {
             if (region.Name.Contains("Niko233(NA_US)", StringComparison.OrdinalIgnoreCase) || region.Name.Contains("NikoCat233", StringComparison.OrdinalIgnoreCase) ||
-                region.Name.Contains("帆船服[广东广州]"))
+                region.Name.Contains("帆船服[广东广州]", StringComparison.OrdinalIgnoreCase) || region.Name.Contains("Niko233(EU)", StringComparison.OrdinalIgnoreCase) ||
+                region.Name.Contains("Niko233(CN1)", StringComparison.OrdinalIgnoreCase))
             {
                 forceUpdate = true;
                 break;
@@ -139,7 +131,7 @@ public class ModUpdater
         static void MoveFile()
         {
             var assembly = Assembly.GetExecutingAssembly();
-            using Stream resourceStream = Utils.GetResourceStream(RegionConfigResource);
+            using Stream resourceStream = assembly.GetManifestResourceStream(RegionConfigResource);
             if (resourceStream == null)
             {
                 Logger.Error($"Resource {RegionConfigResource} not found in assembly.", "MoveRegionConfig");
@@ -152,7 +144,7 @@ public class ModUpdater
 
             if (!File.Exists(MiniRegionInstallPath))
             {
-                using Stream miniResourceStream = Utils.GetResourceStream(MiniRegionInstallResource);
+                using Stream miniResourceStream = assembly.GetManifestResourceStream(MiniRegionInstallResource);
                 if (miniResourceStream == null)
                 {
                     Logger.Error($"Resource {MiniRegionInstallResource} not found in assembly.", "MoveRegionConfig");
@@ -262,7 +254,7 @@ public class ModUpdater
             for (int i = 0; i < assets.Count; i++)
             {
                 string assetName = assets[i]["name"].ToString();
-                if (assetName.ToLower() == "bur.dll")
+                if (assetName.ToLower() == "tone.dll")
                 {
                     downloadUrl = assets[i]["browser_download_url"].ToString();
                     Logger.Info($"Github downloadUrl is set to {downloadUrl}", "CheckRelease");
@@ -357,11 +349,11 @@ public class ModUpdater
         try
         {
             var fileName = Assembly.GetExecutingAssembly().Location;
-            if (Directory.Exists("TOH_DATA") && File.Exists(@$"{Main.Path}/BrushUpRoles-DATA/BanWords.txt"))
+            if (Directory.Exists("BUR_DATA") && File.Exists(@$"{Main.Path}/BrushUpRoles-DATA/BanWords.txt"))
             {
-                DirectoryInfo di = new("TOH_DATA");
+                DirectoryInfo di = new("BUR_DATA");
                 di.Delete(true);
-                Logger.Warn("Deleting old data：TOH_DATA", "NewVersionCheck");
+                Logger.Warn("Deleting old data：BUR_DATA", "NewVersionCheck");
             }
         }
         catch (Exception ex)
@@ -393,7 +385,7 @@ public class ModUpdater
     public static void DeleteOldFiles()
     {
         string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        string searchPattern = "BUR.dll*";
+        string searchPattern = "TONE.dll*";
         string[] files = Directory.GetFiles(path, searchPattern);
         try
         {
@@ -416,7 +408,7 @@ public class ModUpdater
 
     private static async Task DownloadDLLAsync(string url)
     {
-        var savePath = "BepInEx/plugins/BUR.dll.temp";
+        var savePath = "BepInEx/plugins/TONE.dll.temp";
 
         // Delete the temporary file if it exists
         DeleteOldFiles();

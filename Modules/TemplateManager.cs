@@ -11,7 +11,6 @@ namespace TONE;
 
 public static class TemplateManager
 {
-    // Brush Up Roles：数据目录改名
     private static readonly string TEMPLATE_FILE_PATH = @$"{Main.Path}/BrushUpRoles-DATA/template.txt";
 
     private static readonly Dictionary<string, Func<string>> _replaceDictionaryNormalOptions = new()
@@ -109,7 +108,6 @@ public static class TemplateManager
                 };
             else fileName = "English";
 
-            // Brush Up Roles：数据目录改名为 BrushUpRoles-DATA（原本硬编码 BrushUpRoles-DATA）
             string dataDirectory = @$"{Main.Path}/BrushUpRoles-DATA";
             string defaultTemplatePath = @$"{Main.Path}/BrushUpRoles-DATA/Default_Teamplate.txt";
 
@@ -123,19 +121,20 @@ public static class TemplateManager
             }
             File.WriteAllText(defaultTemplatePath, defaultTemplateMsg);
 
-            // ⚠️ 关键修复：template.dat 之前是「已存在就不覆盖」，
-            //    导致模组更新后欢迎语永远是第一次运行时写下的旧内容。
-            //    这里改成每次都从内嵌资源重建，磁盘文件只作为玩家自行改写的备份。
-            if (File.Exists(TEMPLATE_FILE_PATH))
+            if (!File.Exists(TEMPLATE_FILE_PATH))
             {
-                var backup = @$"{Main.Path}/BrushUpRoles-DATA/template.player-backup.txt";
-                if (!File.Exists(backup))
+                if (File.Exists(@"./template.txt")) File.Move(@"./template.txt", TEMPLATE_FILE_PATH);
+                else
                 {
-                    try { File.Copy(TEMPLATE_FILE_PATH, backup); } catch { /* 备份失败不影响主流程 */ }
+                    Logger.Warn($"Creating a new Template file from: {fileName}", "TemplateManager");
+                    File.WriteAllText(TEMPLATE_FILE_PATH, defaultTemplateMsg);
                 }
             }
-            Logger.Warn($"Regenerating Template file from: {fileName}", "TemplateManager");
-            File.WriteAllText(TEMPLATE_FILE_PATH, defaultTemplateMsg);
+            else
+            {
+                var text = File.ReadAllText(TEMPLATE_FILE_PATH, Encoding.GetEncoding("UTF-8"));
+                File.WriteAllText(TEMPLATE_FILE_PATH, text.Replace("5PNwUaN5", "hkk2p9ggv4"));
+            }
         }
         catch (Exception ex)
         {
@@ -145,7 +144,7 @@ public static class TemplateManager
 
     private static string GetResourcesTxt(string path)
     {
-        var stream = Utils.GetResourceStream(path);
+        var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(path);
         stream.Position = 0;
         using StreamReader reader = new(stream, Encoding.UTF8);
         return reader.ReadToEnd();
