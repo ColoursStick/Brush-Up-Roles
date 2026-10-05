@@ -75,6 +75,7 @@ internal class SplashLogoAnimatorPatch
         }
     }
 }
+#if Windows
 [HarmonyPatch(typeof(EOSManager), nameof(EOSManager.IsAllowedOnline))]
 internal class RunLoginPatch
 {
@@ -114,6 +115,7 @@ internal class RunLoginPatch
         }
     }
 }
+#endif
 [HarmonyPatch(typeof(BanMenu), nameof(BanMenu.SetVisible))]
 internal class BanMenuSetVisiblePatch
 {
