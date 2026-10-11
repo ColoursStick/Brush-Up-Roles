@@ -184,18 +184,34 @@ internal class AuthTimeoutPatch
 {
     // From Reactor.gg
     // https://github.com/NuclearPowered/Reactor/blob/master/Reactor/Patches/Miscellaneous/CustomServersPatch.cs
-    /*[HarmonyPatch(typeof(AuthManager), nameof(AuthManager.CoConnect))]
-    [HarmonyPrefix]
-    public static bool CoConnect_Prefix()
-    {
-        return GameStates.IsVanillaServer || GameStates.IsFreePlay || GameStates.IsLocalGame || GameStates.IsNotJoined;
-    }
+    //
+    // ⚠️ Brush Up Roles：把这一段从注释状态恢复为启用。
+    //
+    //    原项目把这两个 Prefix 注释掉了，导致「本地游戏 / 自由游玩 / 原版服务器」也会
+    //    走进服务器的认证握手：
+    //        AuthManager.CoConnect(...)        ← 连目标服务器要 nonce
+    //        AuthManager.CoWaitForNonce(5f)    ← 等服务器回 nonce，默认超时 5 秒
+    //    本地游戏根本没有服务器回 nonce，于是必然超时，认证状态不完整，
+    //    随后构造连接数据时就崩：
+    //
+    //        Waiting for time stamp × N          （CoWaitForNonce 在不断重试）
+    //        → GetConnectionData → NullReferenceException
+    //        → Disconnect (Reason:IncorrectGame)
+    //
+    //    这正是管理员手机上「本地开房必断连」的原因。
+    //
+    //    参考实现：Aeterna-End 的 Patches/ClientPatch.cs 里 AuthTimeoutPatch 是**启用**的
+    //    （它用 GameStates.CurrentServerTypeInCreateMenu 判断，本工程没有该枚举，
+    //      但 GameStates.IsVanillaServer 已包含本地游戏，语义等价）。
+    //
+    //    注意守卫条件：自定义（HTTP）服务器不在其中，仍会正常走认证握手，不受影响。
+    [HarmonyPatch(typeof(AuthManager), nameof(AuthManager.CoConnect))]
     [HarmonyPatch(typeof(AuthManager), nameof(AuthManager.CoWaitForNonce))]
     [HarmonyPrefix]
     public static bool CoWaitforNonce_Prefix()
     {
         return GameStates.IsVanillaServer || GameStates.IsFreePlay || GameStates.IsLocalGame || GameStates.IsNotJoined;
-    }*/
+    }
 
     // If you dont patch this, u still need to wait for 5s
     // I have no idea why this is happening

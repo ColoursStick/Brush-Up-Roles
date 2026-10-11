@@ -93,8 +93,15 @@ public static class PlayerPurchasesDataPatch
 {
     public static bool Prefix(ref bool __result)
     {
+#if PC
+        // ⚠️ RunLoginPatch（绕过 EOS 登录）只在 PC 端编译（见 ClientPatch.cs 的 #if Windows）。
+        //    安卓端该类型不存在，所以这段必须一并排除，否则安卓平台编译失败。
         if (RunLoginPatch.ClickCount < 20) return true;
         __result = true;
         return false;
+#else
+        // 安卓端不做「绕过购买校验」，保持游戏原行为。
+        return true;
+#endif
     }
 }

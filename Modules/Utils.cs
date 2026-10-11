@@ -80,6 +80,21 @@ public static class Utils
     {
         if (GameStates.IsHideNSeek) return false;
 
+        // ⚠️ Brush Up Roles：补空值保护。
+        //
+        //    原写法直接访问 ShipStatus.Instance.Systems。若 ShipStatus.Instance 为 null
+        //    （已离开飞船场景、切回大厅、或联机时与对手端状态不同步），会抛 NullReferenceException。
+        //    该方法被 FixedUpdateInNormalGamePatch 每帧调用，于是变成每帧刷错。实测日志：
+        //
+        //        [Error][FixedUpdateInNormalGamePatch] Error for <玩家名>:
+        //        System.NullReferenceException
+        //           at TONE.Utils.IsActive(SystemTypes type)
+        //           at TONE.FixedUpdateInNormalGamePatch.DoPostfix(PlayerControl __instance)
+        //
+        //    注：官方 TONE 同样存在此问题，这里顺手修掉。
+        if (ShipStatus.Instance == null) return false;
+        if (ShipStatus.Instance.Systems == null) return false;
+
         // if ShipStatus not have current SystemTypes, return false
         if (!ShipStatus.Instance.Systems.ContainsKey(type))
         {
