@@ -66,6 +66,13 @@ public static class GameOptionsMenuPatch
         {
             var modTab = (TabGroup)(ModGameOptionsMenu.TabIndex - 3);
 
+            // ⚠️ Brush Up Roles：先在渲染前建立「分类标题 → 该分类下的选项」映射。
+            //
+            //    原因：option.Header 原本只在下面的渲染循环里赋值（见本方法末尾的
+            //    `option.Header = header`），而 CategoryHasVisibleOptions 需要在**创建
+            //    分类标题时**就判断该分类是否为空 —— 那时 Header 还全是 null，
+            //    会导致所有分类都被误判为空而全部隐藏。
+            EnsureHeaderMap(modTab);
 
             float num = 2.0f;
             const float posX = 0.952f;
@@ -99,13 +106,19 @@ public static class GameOptionsMenuPatch
                     chmButton.ClickSound = __instance.BackButton.GetComponent<PassiveButton>().ClickSound;
                     chmButton.OnMouseOver = new();
                     chmButton.OnMouseOut = new();
-                    chmButton.OnClick.AddListener((UnityAction)(() =>
-                    {
-                        toi.CollapsesSection = !toi.CollapsesSection;
-                        ReCreateSettings(__instance);
-                    }));
+                    // ⚠️ Brush Up Roles：已移除「点击分类标题收起/展开该分类」的功能。
+                    //    原代码：
+                    //        chmButton.OnClick.AddListener((UnityAction)(() =>
+                    //        {
+                    //            toi.CollapsesSection = !toi.CollapsesSection;
+                    //            ReCreateSettings(__instance);
+                    //        }));
+                    //    CollapsesSection 会经 OptionItem.IsHiddenOn 把整个分类的选项隐藏起来，
+                    //    本模组希望分类始终展开显示，故不再绑定点击事件。
                     chmButton.SetButtonEnableState(true);
-                    categoryHeaderMasked.gameObject.SetActive(enabled);
+                    // ⚠️ Brush Up Roles：若该分类下没有任何可见选项，则连分类标题一起隐藏。
+                    //    例：本模组移除了巫师阵营，「内鬼帮助类身份」等分类会变成空分类。
+                    categoryHeaderMasked.gameObject.SetActive(enabled && CategoryHasVisibleOptions(toi, modTab));
                     ModGameOptionsMenu.CategoryHeaderList.TryAdd(index, categoryHeaderMasked);
 
                     if (enabledOrNotCollapsed) num -= 0.63f;
@@ -349,7 +362,8 @@ public static class GameOptionsMenuPatch
             if (ModGameOptionsMenu.CategoryHeaderList.TryGetValue(index, out var categoryHeaderMasked))
             {
                 categoryHeaderMasked.transform.localPosition = new(-0.903f, num, -2f);
-                categoryHeaderMasked.gameObject.SetActive(enabled);
+                // ⚠️ Brush Up Roles：空分类连标题一起隐藏（与上面创建时一致）
+                categoryHeaderMasked.gameObject.SetActive(enabled && CategoryHasVisibleOptions(option as TextOptionItem, modTab));
                 if (enabledOrNotCollapsed) num -= 0.63f;
             }
             else if (option.IsHeader && enabledOrNotCollapsed) num -= 0.3f;
@@ -367,6 +381,69 @@ public static class GameOptionsMenuPatch
             __instance.ControllerSelectable.Add(x);
         __instance.scrollBar.SetYBoundsMax(-num - 1.65f);
     }
+
+    /// <summary>
+    /// 该分类下是否还有「可见的选项」。
+    ///
+    /// ⚠️ Brush Up Roles 新增：用于隐藏空分类。
+    ///    例：本模组移除了巫师阵营，原 TONE 的「内鬼帮助类身份」等分类会变成空分类，
+    ///    此前会留下一个只有标题、下面什么都没有的分类条，这里让它整条不显示。
+    ///
+    /// 依赖 <see cref="EnsureHeaderMap"/> 预先建立的映射（不能直接用 option.Header，
+    /// 那是在渲染循环里才赋值的）。
+    /// </summary>
+    private static bool CategoryHasVisibleOptions(TextOptionItem header, TabGroup tab)
+    {
+        if (header == null) return true;   // 拿不到标题就不做隐藏，避免误伤
+        if (!HeaderOptionsMap.TryGetValue(header, out var list)) return true;  // 没有映射信息，保守显示
+
+        int visible = 0;
+        foreach (var option in list)
+        {
+            if (option == null) continue;
+            if (!option.IsHiddenOn(Options.CurrentGameMode, checkCollapsedSection: false)
+                && option.Parent?.GetBool() is null or true)
+                visible++;
+        }
+
+        return visible > 0;
+    }
+
+    /// <summary>
+    /// 分类标题 → 该分类下的选项列表。由 <see cref="EnsureHeaderMap"/> 建立。
+    /// </summary>
+    private static readonly Dictionary<TextOptionItem, List<OptionItem>> HeaderOptionsMap = [];
+    private static readonly HashSet<TextOptionItem> HeaderMapLogged = [];
+
+    /// <summary>
+    /// 按 <see cref="OptionItem.AllOptions"/> 的顺序，为每个分类标题收集其后的选项
+    /// （直到下一个同页签的分类标题为止）。
+    ///
+    /// 顺序即创建顺序，分类标题总是先于其选项被创建，因此这个区间划分是可靠的。
+    /// </summary>
+    private static void EnsureHeaderMap(TabGroup tab)
+    {
+        HeaderOptionsMap.Clear();
+        HeaderMapLogged.Clear();
+
+        TextOptionItem current = null;
+        foreach (var option in OptionItem.AllOptions)
+        {
+            if (option == null || option.Tab != tab) continue;
+
+            if (option is TextOptionItem toi)
+            {
+                current = toi;
+                HeaderOptionsMap[current] = [];
+                continue;
+            }
+
+            if (current != null) HeaderOptionsMap[current].Add(option);
+        }
+
+        Logger.Info($"EnsureHeaderMap: tab={tab} 分类数={HeaderOptionsMap.Count}", "CategoryVisibility");
+    }
+
     public static BaseGameSetting GetSetting(OptionItem item)
     {
         static TSetting CreateAndInvoke<TSetting>(Func<TSetting> func) where TSetting : BaseGameSetting

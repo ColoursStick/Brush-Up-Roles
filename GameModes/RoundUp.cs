@@ -36,9 +36,11 @@ internal class RoundUp : Standard
         NeutralCanBecomeDeputy = BooleanOptionItem.Create(Id + 3, "RoundUp_NeutralCanBecomeDeputy", true, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.RoundUp)
             .SetColor(new Color32(248, 216, 110, byte.MaxValue));
+        // BUR: 本模组已移除巫师阵营，该选项无意义
         CovenCanBecomeDeputy = BooleanOptionItem.Create(Id + 4, "RoundUp_CovenCanBecomeDeputy", true, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.RoundUp)
-            .SetColor(new Color32(248, 216, 110, byte.MaxValue));
+            .SetColor(new Color32(248, 216, 110, byte.MaxValue))
+            .SetHidden(true);
     }
 
     public override void Init()

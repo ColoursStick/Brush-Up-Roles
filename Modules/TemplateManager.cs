@@ -89,24 +89,7 @@ public static class TemplateManager
 
         try
         {
-            string fileName;
-            string name = CultureInfo.CurrentCulture.Name;
-            if (name.Length >= 2)
-                fileName = name switch // https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-lcid/a9eac961-e77d-41a6-90a5-ce1a8b0cdb9c
-                {
-                    var lang when lang.StartsWith("ru") => "Russian",
-                    "zh-Hans" or "zh" or "zh-CN" or "zn-SG" => "SChinese",
-                    "zh-Hant" or "zh-HK" or "zh-MO" or "zh-TW" => "TChinese",
-                    "pt-BR" => "Brazilian",
-                    "es-419" => "Latam",
-                    var lang when lang.StartsWith("es") => "Spanish",
-                    var lang when lang.StartsWith("fr") => "French",
-                    "ja" or "ja-JP" => "Japanese",
-                    var lang when lang.StartsWith("nl") => "Dutch",
-                    var lang when lang.StartsWith("it") => "Italian",
-                    _ => "English"
-                };
-            else fileName = "English";
+            string fileName = GetTemplateLanguageName();
 
             string dataDirectory = @$"{Main.Path}/BrushUpRoles-DATA";
             string defaultTemplatePath = @$"{Main.Path}/BrushUpRoles-DATA/Default_Teamplate.txt";
@@ -133,7 +116,24 @@ public static class TemplateManager
             else
             {
                 var text = File.ReadAllText(TEMPLATE_FILE_PATH, Encoding.GetEncoding("UTF-8"));
-                File.WriteAllText(TEMPLATE_FILE_PATH, text.Replace("5PNwUaN5", "hkk2p9ggv4"));
+
+                // ⚠️ Brush Up Roles：修复「手机上进房看到英文欢迎语」。
+                //
+                //    旧版本按**系统区域设置**挑模板。手机常见「系统英文 + 游戏内简体中文」，
+                //    于是生成了 English 模板并一直沿用，游戏内却显示英文欢迎语。
+                //
+                //    这里做一次自愈：如果现存模板与本次应当使用的语言不一致，
+                //    但内容仍**等同于某个内嵌默认模板**（说明玩家没有自己改过），
+                //    就换成正确语言的模板。玩家改过的模板一律不动。
+                if (IsEqualToOtherLanguageTemplate(text, fileName))
+                {
+                    Logger.Info($"模板语言已切换为 {fileName}", "TemplateManager");
+                    File.WriteAllText(TEMPLATE_FILE_PATH, defaultTemplateMsg);
+                }
+                else
+                {
+                    File.WriteAllText(TEMPLATE_FILE_PATH, text.Replace("5PNwUaN5", "hkk2p9ggv4"));
+                }
             }
         }
         catch (Exception ex)
@@ -148,6 +148,100 @@ public static class TemplateManager
         stream.Position = 0;
         using StreamReader reader = new(stream, Encoding.UTF8);
         return reader.ReadToEnd();
+    }
+
+    /// <summary>所有内嵌欢迎语模板（对应 Resources/Config/template/*.txt）</summary>
+    private static readonly string[] TemplateLanguages =
+    [
+        "English", "SChinese", "TChinese", "Japanese", "Russian",
+        "Spanish", "Latam", "Brazilian", "French", "Italian", "Dutch"
+    ];
+
+    /// <summary>
+    /// 现存模板是否**等同于其它语言**的内嵌默认模板（即玩家没改过，只是语言不对）。
+    /// </summary>
+    private static bool IsEqualToOtherLanguageTemplate(string currentText, string keepLanguage)
+    {
+        var normalized = currentText.Replace("hkk2p9ggv4", "5PNwUaN5");
+
+        foreach (var lang in TemplateLanguages)
+        {
+            if (lang == keepLanguage) continue;
+
+            string embedded;
+            try { embedded = GetResourcesTxt($"TONE.Resources.Config.template.{lang}.txt"); }
+            catch { continue; }
+            if (string.IsNullOrEmpty(embedded)) continue;
+
+            if (normalized.Replace("\r\n", "\n") == embedded.Replace("\r\n", "\n"))
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 决定用哪一份内嵌欢迎语模板。
+    ///
+    /// ⚠️ Brush Up Roles：原实现只看 <see cref="CultureInfo.CurrentCulture"/>（**系统区域设置**），
+    ///    不看游戏内语言。手机上常见「系统是英文、游戏内选简体中文」的组合，
+    ///    此时会取到 English.txt，玩家看到英文欢迎语。
+    ///
+    ///    现在改为**以游戏内语言为准**，系统区域仅在游戏语言取不到时兜底。
+    /// </summary>
+    private static string GetTemplateLanguageName()
+    {
+        // 1) 优先用游戏内语言
+        try
+        {
+            if (TranslationController.InstanceExists)
+            {
+                var name = TranslationController.Instance.currentLanguage.languageID switch
+                {
+                    SupportedLangs.Russian => "Russian",
+                    SupportedLangs.SChinese => "SChinese",
+                    SupportedLangs.TChinese => "TChinese",
+                    SupportedLangs.Brazilian => "Brazilian",
+                    SupportedLangs.Latam => "Latam",
+                    SupportedLangs.Spanish => "Spanish",
+                    SupportedLangs.French => "French",
+                    SupportedLangs.Japanese => "Japanese",
+                    SupportedLangs.Dutch => "Dutch",
+                    SupportedLangs.Italian => "Italian",
+                    SupportedLangs.English => "English",
+                    _ => null
+                };
+                if (name != null) return name;
+            }
+        }
+        catch { /* 取不到就退回系统区域 */ }
+
+        // 2) 兜底：系统区域设置
+        try
+        {
+            var culture = CultureInfo.CurrentCulture.Name;
+            if (!string.IsNullOrEmpty(culture))
+            {
+                var name = culture switch
+                {
+                    var lang when lang.StartsWith("ru") => "Russian",
+                    "zh-Hans" or "zh" or "zh-CN" or "zn-SG" => "SChinese",
+                    "zh-Hant" or "zh-HK" or "zh-MO" or "zh-TW" => "TChinese",
+                    "pt-BR" => "Brazilian",
+                    "es-419" => "Latam",
+                    var lang when lang.StartsWith("es") => "Spanish",
+                    var lang when lang.StartsWith("fr") => "French",
+                    "ja" or "ja-JP" => "Japanese",
+                    var lang when lang.StartsWith("nl") => "Dutch",
+                    var lang when lang.StartsWith("it") => "Italian",
+                    _ => null
+                };
+                if (name != null) return name;
+            }
+        }
+        catch { }
+
+        return "English";
     }
 
     public static void SendTemplate(string str = "", byte playerId = 0xff, bool noErr = false, SendOption sendOption = SendOption.Reliable)

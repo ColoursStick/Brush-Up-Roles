@@ -1096,12 +1096,20 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(127, 140, 141, byte.MaxValue));
 
+        // ⚠️ Brush Up Roles：这两个选项是「灾厄阵营」专属的。
+        //    灾厄职业已全部下架（见 CustomRolesHelper.KeepRoles），因此它们永远不会生效，
+        //    却仍会显示在「中立阵营职业」页签里（例：查看面板中出现的
+        //    「可以猜测转变后的灾厄中立」「中立灾厄职业可以看到对方的附加职业」）。
+        //    这里直接隐藏，代码引用点保持不变（读取到各自的默认值即可）。
+        //    注：分类标题 RoleType.NeutralApocalypse 因为已无职业，会被
+        //    CategoryHasVisibleOptions 判为空分类而整条不显示。
         TransformedNeutralApocalypseCanBeGuessed = BooleanOptionItem.Create(60024, "TNACanBeGuessed", false, TabGroup.NeutralRoles, false)
             .SetGameMode(CustomGameMode.Standard)
-            .SetHeader(true);
+            .SetHidden(true);
 
         ApocCanSeeEachOthersAddOns = BooleanOptionItem.Create(60025, "ApocCanSeeEachOthersAddOns", true, TabGroup.NeutralRoles, false)
-            .SetGameMode(CustomGameMode.Standard);
+            .SetGameMode(CustomGameMode.Standard)
+            .SetHidden(true);
 
         CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralApocalypse).ForEach(r => { r.SetupCustomOption(); HideIfBlackListed(r); });
 
@@ -1252,7 +1260,9 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard);
         ShowCovenInLeftCommand = BooleanOptionItem.Create(60044, "ShowCovenInLeftCommand", true, TabGroup.SystemSettings, false)
             .SetParent(EnableKillerLeftCommand)
-            .SetGameMode(CustomGameMode.Standard);
+            .SetGameMode(CustomGameMode.Standard)
+            // BUR: Coven option hidden
+            .SetHidden(true);
 
         KickLowLevelPlayer = IntegerOptionItem.Create(60050, "KickLowLevelPlayer", new(0, 100, 1), 0, TabGroup.SystemSettings, false)
             .SetValueFormat(OptionFormat.Level)
@@ -1468,7 +1478,9 @@ public static class Options
         ShowCovenRemainOnEject = BooleanOptionItem.Create(60447, "ShowCovenRemainOnEject", true, TabGroup.ModSettings, false)
             .SetParent(ShowImpRemainOnEject)
             .SetGameMode(CustomGameMode.Standard)
-            .SetColor(new Color32(255, 238, 232, byte.MaxValue));
+            .SetColor(new Color32(255, 238, 232, byte.MaxValue))
+            // BUR: Coven option hidden
+            .SetHidden(true);
         ShowTeamNextToRoleNameOnEject = BooleanOptionItem.Create(60443, "ShowTeamNextToRoleNameOnEject", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 238, 232, byte.MaxValue));
@@ -1520,10 +1532,14 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard);
         CovenCanGuess = BooleanOptionItem.Create(60693, "CovenCanGuess", false, TabGroup.ModSettings, false)
             .SetParent(GuesserMode)
-            .SetGameMode(CustomGameMode.Standard);
+            .SetGameMode(CustomGameMode.Standard)
+            // BUR: Coven option hidden
+            .SetHidden(true);
         CovenCanGuessCoven = BooleanOptionItem.Create(60692, "CovenCanGuessCoven", false, TabGroup.ModSettings, false)
             .SetParent(CovenCanGuess)
-            .SetGameMode(CustomGameMode.Standard);
+            .SetGameMode(CustomGameMode.Standard)
+            // BUR: Coven option hidden
+            .SetHidden(true);
         CanGuessAddons = BooleanOptionItem.Create(60685, "CanGuessAddons", true, TabGroup.ModSettings, false)
             .SetParent(GuesserMode)
             .SetGameMode(CustomGameMode.Standard);
@@ -1853,7 +1869,9 @@ public static class Options
             .SetParent(DisableDevicesIgnoreConditions);
         //.SetGameMode(CustomGameMode.Standard);
         DisableDevicesIgnoreCoven = BooleanOptionItem.Create(60694, "IgnoreCoven", false, TabGroup.ModSettings, false)
-            .SetParent(DisableDevicesIgnoreConditions);
+            .SetParent(DisableDevicesIgnoreConditions)
+            // BUR: Coven option hidden
+            .SetHidden(true);
         DisableDevicesIgnoreCrewmates = BooleanOptionItem.Create(60592, "IgnoreCrewmates", false, TabGroup.ModSettings, false)
             .SetParent(DisableDevicesIgnoreConditions);
         //.SetGameMode(CustomGameMode.Standard);
@@ -2206,7 +2224,9 @@ public static class Options
         MaxCovenGhost = IntegerOptionItem.Create(60862, "MaxCovenGhostRole", new(0, 15, 1), 15, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetValueFormat(OptionFormat.Players)
-            .SetColor(new Color32(217, 218, 255, byte.MaxValue));
+            .SetColor(new Color32(217, 218, 255, byte.MaxValue))
+            // BUR: Coven option hidden
+            .SetHidden(true);
         DefaultAngelCooldown = FloatOptionItem.Create(60870, "DefaultAngelCooldown", new(2.5f, 120f, 2.5f), 35f, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetValueFormat(OptionFormat.Seconds)
@@ -2238,7 +2258,9 @@ public static class Options
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
         EnableCovenChannel = BooleanOptionItem.Create(61105, "EnableCovenChannel", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
-            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue))
+            // BUR: Coven option hidden
+            .SetHidden(true);
         ShowExileMsgAfterMeeting = BooleanOptionItem.Create(61106, "ShowExileMsgAfterMeeting", true, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
@@ -2344,9 +2366,12 @@ public static class Options
                 .SetGameMode(customGameMode)
                 .AddReplacement(("{role}", role.ToColoredString()));
 
+            // ⚠️ Brush Up Roles：本模组已移除巫师阵营，该选项无意义且不应显示。
             var covenOption = BooleanOptionItem.Create(id + 6, "CovenCanBeRole", true, tab, false)
                 .SetParent(spawnOption)
                 .SetGameMode(customGameMode)
+                // BUR: Coven option hidden
+                .SetHidden(true)
                 .AddReplacement(("{role}", role.ToColoredString()));
 
             AddonCanBeSettings.Add(role, (impOption, neutralOption, crewOption, covenOption));

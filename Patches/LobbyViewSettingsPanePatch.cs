@@ -658,13 +658,10 @@ public static class LobbyViewSettingsPanePatch
                     chmButton.OnMouseOver = new();
                     chmButton.OnMouseOut = new();
                     chmButton.OnClick = new();
-                    chmButton.OnClick.AddListener((UnityAction)(() =>
-                    {
-                        toi.CollapsesSection = !toi.CollapsesSection;
-                        viewSettings.ReDrawTab(LastTabPressed);
-                    }));
+                    // ⚠️ Brush Up Roles：已移除「点击分类标题收起/展开」的功能（同 GameOptionsMenuPatch）
                     chmButton.SetButtonEnableState(true);
-                    categoryHeaderMasked.gameObject.SetActive(enabledOrNotCollapsed);
+                    // ⚠️ Brush Up Roles：空分类连标题一起隐藏
+                    categoryHeaderMasked.gameObject.SetActive(enabledOrNotCollapsed && CategoryHasVisibleOptions(toi, tabName));
 
                     viewSettings.settingsInfo.Add(categoryHeaderMasked.gameObject);
                     if (enabledOrNotCollapsed)
@@ -835,13 +832,10 @@ public static class LobbyViewSettingsPanePatch
                     chmButton.OnMouseOver = new();
                     chmButton.OnMouseOut = new();
                     chmButton.OnClick = new();
-                    chmButton.OnClick.AddListener((UnityAction)(() =>
-                    {
-                        toi.CollapsesSection = !toi.CollapsesSection;
-                        viewSettings.ReDrawTab(LastTabPressed);
-                    }));
+                    // ⚠️ Brush Up Roles：已移除「点击分类标题收起/展开」的功能（同 GameOptionsMenuPatch）
                     chmButton.SetButtonEnableState(true);
-                    categoryHeaderRoleVariant.gameObject.SetActive(enabled);
+                    // ⚠️ Brush Up Roles：空分类连标题一起隐藏
+                    categoryHeaderRoleVariant.gameObject.SetActive(enabled && CategoryHasVisibleOptions(toi, tabName));
 
                     viewSettings.settingsInfo.Add(categoryHeaderRoleVariant.gameObject);
                     if (enabled)
@@ -1159,6 +1153,31 @@ public static class LobbyViewSettingsPanePatch
             if (o.IsHiddenOn(Options.CurrentGameMode, true, checkCollapsedSection) || !o.GetBool()) return false;
             o = o.Parent;
         }
+    }
+    /// <summary>
+    /// 该分类下是否还有「可见的选项」。
+    ///
+    /// ⚠️ Brush Up Roles 新增：用于隐藏空分类。
+    ///    例：本模组移除了巫师阵营，原 TONE 的「内鬼帮助类身份」等分类会变成空分类，
+    ///    此前会留下一个只有标题、下面什么都没有的分类条，这里让它整条不显示。
+    /// </summary>
+    private static bool CategoryHasVisibleOptions(TextOptionItem header, TabGroup tab)
+    {
+        if (header == null) return true;   // 拿不到标题就不做隐藏，避免误伤
+
+        foreach (var option in OptionItem.AllOptions)
+        {
+            if (option == null || option.Tab != tab) continue;
+            if (ReferenceEquals(option, header)) continue;
+            if (!ReferenceEquals(option.Header, header)) continue;
+
+            // 该选项可见 → 分类非空
+            if (!option.IsHiddenOn(Options.CurrentGameMode, true, checkCollapsedSection: false)
+                && option.Parent?.GetBool() is null or true)
+                return true;
+        }
+
+        return false;
     }
     public static Sprite GetRoleIcon(CustomRoles role, bool color = false)
     {
