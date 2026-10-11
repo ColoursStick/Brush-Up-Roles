@@ -56,8 +56,8 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.brushuproles.amongus";
-    public const string PluginVersion = "1.0.0";
-    public const string PluginDisplayVersion = "1.0.0";
+    public const string PluginVersion = "1.1.0";
+    public const string PluginDisplayVersion = "1.1.0";
     public const int ExtraPluginVersion = 0; // Add Beta version number × 100
     public static readonly List<(int year, int month, int day)> SupportedVersionAU =
         [

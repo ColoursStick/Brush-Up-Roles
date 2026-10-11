@@ -68,8 +68,10 @@ internal class Doomsayer : RoleBase
             .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
         DCanGuessNeutrals = BooleanOptionItem.Create(Id + 14, "DCanGuessNeutrals", true, TabGroup.NeutralRoles, true)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
+        // BUR: 本模组已移除巫师阵营，该选项无意义
         DCanGuessCoven = BooleanOptionItem.Create(Id + 26, "DCanGuessCoven", true, TabGroup.NeutralRoles, true)
-            .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer])
+            .SetHidden(true);
         DCanGuessAdt = BooleanOptionItem.Create(Id + 15, "DCanGuessAdt", false, TabGroup.NeutralRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
 
