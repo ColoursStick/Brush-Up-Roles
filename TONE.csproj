@@ -19,9 +19,12 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Platform)' == 'Windows' ">
-		<DefineConstants>TRACE;PC</DefineConstants>
+		<!-- 电脑端。Windows 符号供上游 PR #1 的 #if Windows 使用
+		     （它把「绕过 EOS 登录」的 RunLoginPatch 排除在安卓之外）。 -->
+		<DefineConstants>TRACE;PC;Windows</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Platform)' == 'Android' ">
+		<!-- 手机端。HandshakePatch 由 Patches/HandshakePatch.cs 的 #if !ANDROID 排除。 -->
 		<DefineConstants>TRACE;ANDROID</DefineConstants>
 	</PropertyGroup>
 

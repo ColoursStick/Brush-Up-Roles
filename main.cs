@@ -59,10 +59,17 @@ public class Main : BasePlugin
     public const string PluginVersion = "1.0.0";
     public const string PluginDisplayVersion = "1.0.0";
     public const int ExtraPluginVersion = 0; // Add Beta version number × 100
-    public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
+    public static readonly List<(int year, int month, int day)> SupportedVersionAU =
         [
-            (2026, 9, 29, 0) // 2026.9.29 & 19
-        ];
+        /// 受支持的 Among Us 版本（语义版本，按年月日比较）。
+        ///
+        /// VersionChecker 会优先拿 Application.version（如 "2026.9.29"）与这里逐项比对，
+        /// 而不是拿 Constants 的分量 —— 后者与语义版本对不上，且各 build 之间还会变，
+        /// 会导致玩家被误判为「不支持的版本」而无法联机。
+        ///
+        /// 新增支持的版本时，在这里加一行即可。
+        (2026, 9, 29) // 2026.9.29（Among Us v19）
+    ];
 
     // Change this to change alpha/beta/full release
     public static readonly Release RELEASE = Release.RELEASE;

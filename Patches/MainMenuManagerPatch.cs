@@ -50,6 +50,9 @@ class MainMenuManagerLateUpdatePatch
         lateUpdate = 0;
 
         var PlayOnlineButton = __instance.PlayOnlineButton;
+#if PC
+        // ⚠️ RunLoginPatch（绕过 EOS 登录）只在 PC 端编译（见 ClientPatch.cs 的 #if Windows）。
+        //    安卓端该类型不存在，所以这段必须一并排除，否则安卓平台编译失败。
         if (PlayOnlineButton != null)
         {
             if (RunLoginPatch.isAllowedOnline && !Main.hasAccess)
@@ -61,6 +64,7 @@ class MainMenuManagerLateUpdatePatch
                 DisconnectPopup.Instance.ShowCustom(GetString("NoAccess"));
             }
         }
+#endif
     }
 }
 [HarmonyPatch(typeof(MainMenuManager))]
