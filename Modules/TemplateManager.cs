@@ -132,7 +132,8 @@ public static class TemplateManager
                 }
                 else
                 {
-                    File.WriteAllText(TEMPLATE_FILE_PATH, text.Replace("5PNwUaN5", "hkk2p9ggv4"));
+                    var updated = MigrateOldDomains(text.Replace("5PNwUaN5", "hkk2p9ggv4"));
+                    File.WriteAllText(TEMPLATE_FILE_PATH, updated);
                 }
             }
         }
@@ -148,6 +149,47 @@ public static class TemplateManager
         stream.Position = 0;
         using StreamReader reader = new(stream, Encoding.UTF8);
         return reader.ReadToEnd();
+    }
+
+    /// <summary>官网地址（欢迎语里展示的完整地址）</summary>
+    private const string SiteUrl = "https://au.yunsack.top/";
+
+    /// <summary>
+    /// 历史上出现过的旧写法，加载时统一换成 <see cref="SiteUrl"/>。
+    ///
+    /// 玩家的 template.txt 一旦生成就不会被覆盖（尊重玩家自定义），
+    /// 所以改官网后旧文件里仍是旧链接。这里在加载时做定点替换，
+    /// 只动这几个地址片段，不影响玩家改过的其它内容。
+    /// </summary>
+    private static readonly string[] LegacySiteUrls =
+    [
+        "gaorensifu.netlify.app",   // 1.0.0 / 1.1.0
+        "au.yunsack.top",           // 早期 1.2.0 写成裸域名
+    ];
+
+    private static string MigrateOldDomains(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return text;
+
+        const char mark = '\u0001';
+
+        // 先把已经是完整地址的片段占位，避免被下面的裸域名替换二次命中
+        text = text.Replace(SiteUrl, mark.ToString(), StringComparison.Ordinal);
+
+        bool changed = false;
+        foreach (var legacy in LegacySiteUrls)
+        {
+            if (!text.Contains(legacy, StringComparison.Ordinal)) continue;
+            text = text.Replace(legacy, mark.ToString(), StringComparison.Ordinal);
+            changed = true;
+        }
+
+        text = text.Replace(mark.ToString(), SiteUrl, StringComparison.Ordinal);
+
+        if (changed)
+            Logger.Info($"模板中的旧地址已更新为 {SiteUrl}", "TemplateManager");
+
+        return text;
     }
 
     /// <summary>所有内嵌欢迎语模板（对应 Resources/Config/template/*.txt）</summary>

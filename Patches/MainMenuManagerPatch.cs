@@ -75,6 +75,8 @@ public static class MainMenuManagerPatch
     private static PassiveButton donationButton;
     private static PassiveButton discordButton;
     private static PassiveButton websiteButton;
+    private static PassiveButton backgroundButton;
+    private static PassiveButton qqButton;
 
     // ── 主菜单进场动画用 ──
     /// <summary>进场动画要搬的面板（主菜单 UI，含按钮与 Logo）</summary>
@@ -127,18 +129,14 @@ public static class MainMenuManagerPatch
         leftPanel.GetComponentsInChildren<SpriteRenderer>(true).Where(r => r.name == "Shine").ToList().ForEach(r => r.enabled = false);
 
         GameObject splashArt = new("SplashArt");
-        splashArt.transform.position = new Vector3(0, 0f, 600f); //= new Vector3(0, 0.40f, 600f);
+        splashArt.transform.position = new Vector3(0, 0f, 600f); //= new Vector3(0, 0.4f, 600f);
         var spriteRenderer = splashArt.AddComponent<SpriteRenderer>();
-        string folder = "TONE.Resources.Background.";
-        folder += "CurrentArtWinner";
-        IRandom rand = IRandom.Instance;
-        //if (rand.Next(0, 100) < 30) folder += "PrevArtWinner";
-        //else folder += "CurrentArtWinner";
-        var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-        string[] fileNames = assembly.GetManifestResourceNames().Where(resourceName => resourceName.StartsWith(folder) && resourceName.EndsWith(".png")).ToArray();
-        int choice = rand.Next(0, fileNames.Length);
 
-        spriteRenderer.sprite = Utils.LoadSprite(fileNames[choice], OperatingSystem.IsAndroid() ? 119f : 150f);
+        // ⚠️ Brush Up Roles：背景改为「玩家目录优先」。
+        //    玩家可把任意图片放进 BrushUpRoles-DATA/Backgrounds/，随机挑一张作为背景；
+        //    目录为空或全部读取失败时，自动退回内嵌的默认背景。
+        var bgSprite = BackgroundManager.LoadRandomSprite();
+        if (bgSprite != null) spriteRenderer.sprite = bgSprite;
 
         // 交给 MainMenuIntroAnimationPatch 做「面板从下往上滑入」的进场动画。
         // 动的是主菜单 UI（含按钮与 Logo），SplashArt 背景保持不动。
@@ -188,6 +186,20 @@ public static class MainMenuManagerPatch
         }
         discordButton.gameObject.SetActive(Main.ShowDiscordButton);
 
+        // QQ Group Button
+        // 放在官网按钮上方（原本 donation / github / discord 的位置，那三个默认关闭）
+        if (qqButton == null)
+        {
+            qqButton = CreateButton(
+                "QQGroupButton",
+                new(-1.8f, -1.9f, 1f),
+                new(18, 148, 231, byte.MaxValue),
+                new(74, 176, 245, byte.MaxValue),
+                (UnityEngine.Events.UnityAction)(() => Constants.OpenURL(Main.QQGroupInviteUrl)),
+                "QQ群");
+        }
+        qqButton.gameObject.SetActive(Main.ShowQQButton);
+
         // Website Button
         if (websiteButton == null)
         {
@@ -197,9 +209,23 @@ public static class MainMenuManagerPatch
                 new(251, 81, 44, byte.MaxValue),
                 new(211, 77, 48, byte.MaxValue),
                 (UnityEngine.Events.UnityAction)(() => Constants.OpenURL(Main.WebsiteInviteUrl)),
-                "高人私服官网");   // 原为 GetString("Website")
+                "刷牙私服官网");
         }
         websiteButton.gameObject.SetActive(Main.ShowWebsiteButton);
+
+        // Background Folder Button
+        // 点开 BrushUpRoles-DATA/Backgrounds/，往里面放图片即可替换主菜单背景
+        if (backgroundButton == null)
+        {
+            backgroundButton = CreateButton(
+                "BackgroundButton",
+                new(-1.8f, -2.7f, 1f),
+                new(156, 89, 209, byte.MaxValue),
+                new(186, 130, 232, byte.MaxValue),
+                (UnityEngine.Events.UnityAction)(() => BackgroundManager.OpenFolder()),
+                "背景图片");
+        }
+        backgroundButton.gameObject.SetActive(Main.ShowBackgroundButton);
 
         var howToPlayButton = __instance.howToPlayButton;
         var freeplayButton = howToPlayButton.transform.parent.Find("FreePlayButton");

@@ -56,8 +56,8 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.brushuproles.amongus";
-    public const string PluginVersion = "1.1.0";
-    public const string PluginDisplayVersion = "1.1.0";
+    public const string PluginVersion = "1.2.0";
+    public const string PluginDisplayVersion = "1.2.0";
     public const int ExtraPluginVersion = 0; // Add Beta version number × 100
     public static readonly List<(int year, int month, int day)> SupportedVersionAU =
         [
@@ -98,7 +98,14 @@ public class Main : BasePlugin
     public static readonly string DiscordInviteUrl = "https://discord.gg/jg4a2Xqrbb";
 
     public static readonly bool ShowWebsiteButton = true;
-    public static readonly string WebsiteInviteUrl = "https://gaorensifu.netlify.app/";
+    public static readonly string WebsiteInviteUrl = "https://au.yunsack.top/";
+
+    /// <summary>主菜单上的「背景图片」按钮：点开玩家背景目录。</summary>
+    public static readonly bool ShowBackgroundButton = true;
+
+    public static readonly bool ShowQQButton = true;
+    public static readonly string QQGroupInviteUrl =
+        "https://qun.qq.com/universal-share/share?ac=1&authKey=O32KIgEuq5z%2BMZ3rX4dHt69ke4UN0U8z7Wf%2BiIC6uOjeFC9Qb%2BYM/8hA2L4A7QYF&busi_data=eyJncm91cENvZGUiOiIxMDkxNjc3OTk1IiwidG9rZW4iOiJmTEsyZCtoUktMMVVWc3l0a1puKzh2WkhnL0FZd2RHRGkwOUJycHM3R3dVQXRPWjJWUXJxdXE4RENMZzdaR0lBIiwidWluIjoiMzA0MDE1OTg5MiJ9&data=vJDoHvthv-YK4gHQBW2z_RhmETLx4SpuyPCdOxptebScUwbqN1dXeWdEc8L0go7iqhKKOKl4v_yJbrA5pmS01ALiq0fDM_0_q1Hb0qG33Ew&svctype=5&tempid=h5_group_info";
 
     public static readonly bool ShowDonationButton = false;
     public static readonly string DonationInviteUrl = "https://afdian.com/a/dolly1016";
@@ -835,6 +842,9 @@ public class Main : BasePlugin
         TagManager.Init();
         //SpamManager.Init();
         Cloud.Init();
+
+        // 主菜单自定义背景目录（内部已 try/catch，失败不影响加载）
+        BackgroundManager.Init();
 
         if (EnableClientControlGUI.Value) AddComponent<ClientControlGUI>();
 
