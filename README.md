@@ -32,37 +32,6 @@ Among Us 模组
 **网红**使用官方 TONE v19 的实现（`InfluencerTONE`，基于原版 `SpiritGuide`）：
 船员死亡后可成为网红，用图片卡片向存活玩家传递信息
 
-### 职业下架机制（重要）
-
-原 TONE 有 385 个职业，彼此交叉引用极密（例如 `Executioner` 一个文件就调用另外 29 个职业的
-静态方法），硬删文件会产生大量编译错误
-
-因此采用**白名单下架**：
-
-```csharp
-// Modules/CustomRolesHelper.cs —— 列出保留的职业
-public static readonly HashSet<CustomRoles> KeepRoles = [ ... ];
-
-// Roles/Core/CustomRoleManager.cs —— 其余职业判定为「下架」
-public static bool IsOptBlackListed(this Type role) { ... }
-```
-
-**关键实现细节**：被下架职业的选项**照常创建**（避免 `OptionItem` 为 null），
-只通过 `SetHidden(true)` 从设置菜单隐藏
-
-这一点非常重要 —— 全工程有 **600+ 处**从全局路径读取这些选项
-（职业分配、每帧更新、名单颜色等），若选项为 null 会抛 `NullReferenceException`，
-表现为**开始游戏黑屏**或**每帧刷错**
-
-隐藏后其刷新率读不到值（自动回退 0），因此这些职业也永远不会被分配 ——
-功能上等同于删除，相关代码：
-
-```
-Modules/CustomRolesHelper.cs         KeepRoles 白名单
-Roles/Core/CustomRoleManager.cs      IsOptBlackListed / HideBlackListedOptions
-Modules/OptionHolder.cs              HideIfBlackListed（29 个选项创建点）
-```
-
 ## 支持的平台与版本
 
 | 平台 | 游戏版本 | 说明 |
@@ -73,36 +42,11 @@ Modules/OptionHolder.cs              HideIfBlackListed（29 个选项创建点�
 平台差异全部由运行时的 `OperatingSystem.IsAndroid()` 判断处理，
 **同一个 DLL 在 PC 与 Android 上通用**，不需要分别编译
 
-## 构建
-
-### 前置
-
-- .NET 6 SDK
-- 对应版本的游戏已安装并**至少运行过一次**
-  （BepInEx 会在 `<游戏目录>/BepInEx/interop` 生成 IL2CPP interop 程序集）
-
-> ⚠️ 官方 NuGet 上的 `AmongUs.GameLibs.Steam` 只有占位包（`0.0.0-placeholder.0`），
-> 真实的 `2026.9.29` 未公开发布，因此本模组改为**直接引用游戏目录里的 interop**
-> （与 Aeterna-End 项目同一做法）
-
-### 命令
-
-```powershell
-dotnet build -c Release -p:Platform=Windows `
-  -p:GameLibsInteropPath="<游戏目录>\BepInEx\interop"
-```
-
-产物：`bin/Windows/Release/net6.0/BUR.dll`
-
-> 注意：`GitInfo` 已移除，本仓库无 `.git` 历史时它会算出非法的版本号
-> `0.0.0+main.` 导致 NETSDK1018 编译失败；`ThisAssembly.Git.*` 改由根目录的
-> `ThisAssemblyStub.cs` 提供
-
 ## 目录结构
 
 ```
 Roles/          职业实现
-  Core/         职业基类与管理器（含下架机制）
+  Core/         职业基类与管理器
   Vanilla/      原版职业的模组化实现
   AddOns/       附加职业
   (Ghosts)/     幽灵职业
