@@ -8,13 +8,12 @@ namespace TONE.Roles._Ghosts_.Impostor;
 
 internal class Possessor : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Possessor;
     private const int Id = 28900;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Possessor);
     public override CustomRoles ThisRoleBase => CustomRoles.GuardianAngel;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorGhosts;
-    //==================================================================\\
 
     private static bool controllingPlayer = false;
     private static byte controllingTargetId = byte.MaxValue;
@@ -42,7 +41,7 @@ internal class Possessor : RoleBase
     {
         CustomRoleManager.OnFixedUpdateOthers.Add(OnFixedUpdateOther);
     }
-    // EAC bans players when GA uses sabotage
+
     public override bool CanUseSabotage(PlayerControl pc) => false;
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
@@ -140,7 +139,7 @@ internal class Possessor : RoleBase
 
         if (!controllingPlayer)
         {
-            // Cancel if Target is around other players
+
             foreach (var allPlayers in Main.EnumerateAlivePlayerControls().Where(pc => pc != target))
             {
                 if (Utils.GetDistance(target.GetCustomPosition(), allPlayers.GetCustomPosition()) < AlertRange.GetFloat())

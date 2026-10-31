@@ -12,12 +12,11 @@ namespace TONE.Roles.Crewmate;
 
 internal class Transporter : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Transporter;
     private const int Id = 7400;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
-    //==================================================================\\
 
     public static OptionItem TransporterConstructCooldown;
     private static OptionItem TransporterTeleportCooldown;
@@ -56,8 +55,8 @@ internal class Transporter : RoleBase
         var writer = MessageWriter.Get(SendOption.Reliable);
 
         int length = TransporterLocation.Count;
-        writer.Write(TransporterLocation.ElementAt(length - 1).Key.x); //x coordinate
-        writer.Write(TransporterLocation.ElementAt(length - 1).Key.y); //y coordinate
+        writer.Write(TransporterLocation.ElementAt(length - 1).Key.x);
+        writer.Write(TransporterLocation.ElementAt(length - 1).Key.y);
 
         RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
     }

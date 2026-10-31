@@ -7,12 +7,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Undertaker : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Undertaker;
     private const int Id = 4900;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
-    //==================================================================\\
 
     private static OptionItem SSCooldown;
     private static OptionItem KillCooldown;
@@ -135,4 +134,3 @@ internal class Undertaker : RoleBase
         hud.AbilityButton?.OverrideText(Translator.GetString("MarkButtonText"));
     }
 }
-

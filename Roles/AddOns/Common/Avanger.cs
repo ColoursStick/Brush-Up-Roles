@@ -2,7 +2,6 @@ using TONE.Roles.Crewmate;
 using TONE.Roles.Neutral;
 using static TONE.Options;
 
-
 namespace TONE.Roles.AddOns.Common;
 
 public class Avanger : IAddon
@@ -36,4 +35,3 @@ public class Avanger : IAddon
         }
     }
 }
-

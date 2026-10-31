@@ -4,16 +4,14 @@ namespace TONE.Roles.Impostor;
 
 internal class Lurker : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Lurker;
     private const int Id = 1900;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem DefaultKillCooldown;
     private static OptionItem ReduceKillCooldown;
-
 
     public override void SetupCustomOption()
     {

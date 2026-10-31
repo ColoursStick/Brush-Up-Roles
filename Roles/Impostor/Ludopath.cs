@@ -2,12 +2,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Ludopath : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Ludopath;
     private const int Id = 1800;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem LudopathRandomKillCD;
 

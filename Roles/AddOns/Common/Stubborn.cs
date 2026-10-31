@@ -19,4 +19,3 @@ public class Stubborn : IAddon
     public void Remove(byte playerId)
     { }
 }
-

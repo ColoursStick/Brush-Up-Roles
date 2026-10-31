@@ -9,13 +9,12 @@ namespace TONE.Roles.Impostor;
 
 internal class Mastermind : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Mastermind;
     private const int Id = 4100;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     public override bool IsExperimental => true;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem TimeLimit;
@@ -49,7 +48,6 @@ internal class Mastermind : RoleBase
     {
         ManipulateCD = KillCooldown.GetFloat() + (TimeLimit.GetFloat() / 2) + (Delay.GetFloat() / 2);
 
-        // Double Trigger
         var pc = GetPlayerById(playerId);
         pc.AddDoubleTrigger();
     }
@@ -163,7 +161,6 @@ internal class Mastermind : RoleBase
         {
             killer.Notify(GetString("SurvivedManipulation"));
         }, target.Is(CustomRoles.Burst) ? Burst.BurstKillDelay.GetFloat() : 0f, "BurstKillCheck");
-
 
         if (target.Is(CustomRoles.Pestilence) || target.Is(CustomRoles.Mastermind))
         {

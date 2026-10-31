@@ -5,8 +5,6 @@ using UnityEngine;
 
 namespace TONE;
 
-// Thanks to https://github.com/TownOfNext/TownOfNext/blob/TONX-unofficial/TONX/Patches/MapBehaviourPatch.cs
-// Thanks to https://github.com/AU-Avengers/TOU-Mira/blob/main/TownOfUs/Patches/Misc/MapBehaviourPatch.cs
 [HarmonyPatch]
 public class MapBehaviourPatch
 {
@@ -40,7 +38,7 @@ public class MapBehaviourPatch
 
     public static void InitializeMapVentIcon(MapBehaviour __instance)
     {
-        // 删除旧图标
+
         foreach (var icon in VentIcons.Values.Where(x => x))
         {
             Object.Destroy(icon);
@@ -48,7 +46,6 @@ public class MapBehaviourPatch
         VentIcons.Clear();
         VentNetworks.Clear();
 
-        // 创建新图标
         if (Main.EnableMapVentIcon.Value)
         {
             var task = PlayerControl.LocalPlayer.myTasks.ToArray()
@@ -126,7 +123,7 @@ public class MapBehaviourPatch
 
     public static void InitializeCustomHerePoints(MapBehaviour __instance)
     {
-        // 删除旧图标
+
         foreach (var oldHerePoint in herePoints)
         {
             if (oldHerePoint.Value == null) continue;
@@ -134,7 +131,6 @@ public class MapBehaviourPatch
         }
         herePoints.Clear();
 
-        // 创建新图标
         if (GameModeBase.GetGameMode() == CustomGameMode.TagMode)
         {
             foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.TZombie)))
@@ -172,14 +168,10 @@ public class MapBehaviourPatch
             if (pc == null || __instance.countOverlay.gameObject.active) continue;
             herePoint.gameObject.SetActive(true);
 
-            // Thanks to https://github.com/scp222thj/MalumMenu/blob/main/src/Cheats/MinimapHandler.cs
-
-            // 设置图标颜色
             herePoint.material.SetColor(PlayerMaterial.BodyColor, pc.Data.Color);
             herePoint.material.SetColor(PlayerMaterial.BackColor, pc.Data.ShadowColor);
             herePoint.material.SetColor(PlayerMaterial.VisorColor, Palette.VisorColor);
 
-            // 设置图标位置
             var vector = GameStates.IsMeeting && preMeetingPostions.TryGetValue(pc, out var pmp) ? pmp : pc.transform.position;
             vector /= ShipStatus.Instance.MapScale;
             vector.x *= Mathf.Sign(ShipStatus.Instance.transform.localScale.x);
@@ -208,7 +200,7 @@ public class MapBehaviourPatch
         {
             if (!pc.AmOwner && pc != null)
             {
-                // 记录玩家在开会前的位置
+
                 preMeetingPostions.Add(pc, pc.transform.position);
             }
         }

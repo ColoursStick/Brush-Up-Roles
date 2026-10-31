@@ -1,24 +1,3 @@
-// Copyright(c) 2015 vpmedia
-// Released under the MIT license
-
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
 
@@ -26,7 +5,7 @@ namespace TONE;
 
 public class MersenneTwister : IRandom
 {
-    // 参考元
+
     public const string REFERENCE_HOMEPAGE = "http://www.math.sci.hiroshima-u.ac.jp/m-mat/MT/mt.html";
     public const string REFERENCE_SOURCE_CODE = "https://github.com/vpmedia/template-unity/blob/master/Framework/Assets/Frameworks/URandom/MersenneTwister.cs";
 
@@ -36,10 +15,6 @@ public class MersenneTwister : IRandom
         Init((UInt32)seed);
     }
 
-    /// <summary>
-    /// 数値の上限を設定
-    /// これより下の値の一部は参考元のソースより拝借
-    /// </summary>
     private const Int32 N = 624;
     private const Int32 M = 397;
     private const UInt32 MatrixA = 0x9908b0df;
@@ -87,8 +62,7 @@ public class MersenneTwister : IRandom
     {
         UInt32 y;
 
-        /* _mag01[x] = x * MatrixA  for x=0,1 */
-        if (_mtItems >= N) /* generate N words at one time */
+        if (_mtItems >= N)
         {
             Int16 kk = 0;
 

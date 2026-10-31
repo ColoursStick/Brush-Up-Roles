@@ -8,12 +8,11 @@ namespace TONE.Roles.Crewmate;
 
 internal class President : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.President;
     private const int Id = 12300;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
-    //==================================================================\\
 
     private static OptionItem PresidentAbilityUses;
     private static OptionItem PresidentCanBeGuessedAfterRevealing;
@@ -138,7 +137,7 @@ internal class President : RoleBase
             {
                 if (msg.StartsWith("/" + comList[i]))
                 {
-                    //msg = msg.Replace("/" + comList[i], string.Empty);
+
                     return true;
                 }
             }

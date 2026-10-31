@@ -8,14 +8,14 @@ namespace TONE;
 
 public static class NarcManager
 {
-    //===========================SETUP================================\\
+
     public static CustomRoles RoleForNarcToSpawnAs;
     public static bool IsNarcAssigned() => RoleForNarcToSpawnAs != CustomRoles.NotAssigned;
-    //==================================================================\\
+
     private static OptionItem NarcSpawnChance;
     private static OptionItem NarcCanUseSabotage;
     private static OptionItem NarcHasCrewVision;
-    //public static OptionItem MadmateCanBeNarc;
+
     public static OptionItem ImpsCanKillEachOther;
 
     public static void SetUpOptionsForNarc(int id = 31400, CustomRoles role = CustomRoles.Narc, CustomGameMode customGameMode = CustomGameMode.Standard, TabGroup tab = TabGroup.Addons)
@@ -37,14 +37,9 @@ public static class NarcManager
             .SetParent(spawnOption)
             .SetGameMode(customGameMode);
 
-        //MadmateCanBeNarc = BooleanOptionItem.Create(id + 5, "MadmateCanBeNarc", false, tab, false)
-        //    .SetParent(spawnOption)
-        //    .SetGameMode(customGameMode);
-
         ImpsCanKillEachOther = BooleanOptionItem.Create(id + 6, "ImpsCanKillEachOther", false, tab, false)
             .SetParent(spawnOption)
             .SetGameMode(customGameMode);
-
 
         var countOption = IntegerOptionItem.Create(id + 1, "Maximum", new(1, 1, 1), 1, tab, false)
             .SetParent(spawnOption)
@@ -64,13 +59,13 @@ public static class NarcManager
         if (value <= NarcSpawnChance.GetInt() && CustomRoles.Narc.IsEnable())
         {
             List<CustomRoles> RolesEnabled = CustomRolesHelper.AllRoles
-                                        .Where(r => r.IsEnable() && (r.IsImpostor() /*|| r.IsMadmate()*/) && !r.IsVanilla() && !r.IsGhostRole())
+                                        .Where(r => r.IsEnable() && (r.IsImpostor() ) && !r.IsVanilla() && !r.IsGhostRole())
                                         .ToList();
             var RolesToSelect = new List<CustomRoles>();
             foreach (var improle in RolesEnabled)
             {
                 if (RoleAssign.SetRoles.ContainsValue(improle)) continue;
-                //if (improle.IsMadmate() && !MadmateCanBeNarc.GetBool()) continue;
+
                 if (improle is CustomRoles.PhantomTONE) continue;
                 RolesToSelect.Add(improle);
             }
@@ -80,7 +75,6 @@ public static class NarcManager
             RoleForNarcToSpawnAs = RolesToSelect.RandomElement();
         }
     }
-
 
     public static void ApplyGameOptions(IGameOptions opt, PlayerControl player)
     {

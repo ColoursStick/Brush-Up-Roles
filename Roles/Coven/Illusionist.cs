@@ -12,13 +12,12 @@ namespace TONE.Roles.Coven;
 
 internal class Illusionist : CovenManager
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Illusionist;
     private const int Id = 30400;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenTrickery;
-    //==================================================================\\
 
     private static OptionItem IllusionCooldown;
     private static OptionItem MaxIllusions;
@@ -34,7 +33,6 @@ internal class Illusionist : CovenManager
         IllusionistClearIllusionsWhenDead
     }
     private static readonly Dictionary<byte, HashSet<byte>> IllusionedPlayers = [];
-
 
     public override void SetupCustomOption()
     {
@@ -107,7 +105,7 @@ internal class Illusionist : CovenManager
         int randomIndex = random.Next(deathReasons.Length);
         return deathReasons[randomIndex];
     }
-    // Affects the following roles: Snitch, Witness, Psychic, Inspector, Oracle, Investigator
+
     public static bool IsNonCovIllusioned(byte target)
     {
         if (IllusionedPlayers.Count < 1) return false;
@@ -141,7 +139,6 @@ internal class Illusionist : CovenManager
             if (deadPlayer.PlayerId == player) IllusionedPlayers[player].Clear();
         }
     }
-
 
     public override string GetMark(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false) => (IllusionedPlayers.TryGetValue(seer.PlayerId, out var Targets) && Targets.Contains(seen.PlayerId)) ? ColorString(GetRoleColor(CustomRoles.Illusionist), "ø") : string.Empty;
     public override string GetMarkOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)

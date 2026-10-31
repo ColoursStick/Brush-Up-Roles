@@ -18,7 +18,7 @@ public class Influenced : IAddon
     { }
     public static void ChangeVotingData(Dictionary<byte, int> VotingData)
     {
-        //The incoming votedata does not count influenced votes
+
         HashSet<byte> influencedPlayerIds = [];
 
         Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Influenced))

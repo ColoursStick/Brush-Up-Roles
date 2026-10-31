@@ -8,12 +8,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Dictator : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Dictator;
     private const int Id = 11600;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
-    //==================================================================\\
+
     public static OptionItem ChangeCommandToExpel;
     public override void SetupCustomOption()
     {
@@ -31,7 +31,7 @@ internal class Dictator : RoleBase
         if (MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.Animating or MeetingHud.MeetingStates.Results) return false;
         if (!pc.IsAlive()) return false;
         if (!pc.Is(CustomRoles.Dictator)) return false;
-        int operate = 0; // 1:ID 2:猜测
+        int operate = 0;
         msg = msg.ToLower().TrimStart().TrimEnd();
         if (ChatManager.CheckCommond(ref msg, "id|guesslist|gl编号|玩家编号|玩家id|id列表|玩家列表|列表|所有id|全部id||編號|玩家編號")) operate = 1;
         else if (ChatManager.CheckCommond(ref msg, "exp|expel|独裁|獨裁", false)) operate = 2;
@@ -42,8 +42,7 @@ internal class Dictator : RoleBase
         if (operate == 1)
         {
             SendMessage(GuessManager.GetFormatString(), pc.PlayerId);
-            // GuessManager.TryHideMsg();
-            // ChatManager.SendPreviousMessagesToAll();
+
             return true;
         }
         if (operate == 2)

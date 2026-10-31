@@ -13,22 +13,20 @@ class CheckMurderInHidenSeekPatch
         if (!AmongUsClient.Instance.AmHost) return false;
         if (GameStates.IsNormalGame) return true;
 
-        var killer = __instance; // Alternative variable
+        var killer = __instance;
 
         Logger.Info($"{killer.GetNameWithRole().RemoveHtmlTags()} => {target.GetNameWithRole().RemoveHtmlTags()}", "CheckMurder H&S");
 
-        // Killer is already dead
         if (!killer.IsAlive())
         {
             Logger.Info($"{killer.GetNameWithRole().RemoveHtmlTags()} was cancelled because it is dead", "CheckMurder H&S");
             return false;
         }
 
-        // Is the target in a killable state?
-        if (target.Data == null // Check if PlayerData is not null
-                                // Check target status
+        if (target.Data == null
+
             || target.inVent
-            || target.inMovingPlat // Moving Platform on Airhip and Zipline on Fungle
+            || target.inMovingPlat
             || target.MyPhysics.Animations.IsPlayingEnterVentAnimation()
             || target.MyPhysics.Animations.IsPlayingAnyLadderAnimation()
         )
@@ -36,13 +34,13 @@ class CheckMurderInHidenSeekPatch
             Logger.Info("The target is in an unkillable state and the kill is canceled", "CheckMurder H&S");
             return false;
         }
-        // Target Is Dead?
+
         if (!target.IsAlive())
         {
             Logger.Info("The target is in a dead state and the kill is canceled", "CheckMurder H&S");
             return false;
         }
-        // Checking during the meeting
+
         if (MeetingHud.Instance != null)
         {
             Logger.Info("In the meeting, the kill was canceled", "CheckMurder H&S");
@@ -56,7 +54,7 @@ class CheckMurderInHidenSeekPatch
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.MurderPlayer))]
 class MurderPlayerInHidenSeekPatch
 {
-    public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target/*, [HarmonyArgument(1)] MurderResultFlags resultFlags*/)
+    public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
     {
         if (!AmongUsClient.Instance.AmHost || GameStates.IsNormalGame) return;
         if (!target.Data.IsDead) return;

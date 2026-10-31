@@ -7,13 +7,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Mole : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Mole;
     private const int Id = 26000;
     public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
-    //==================================================================\\
 
     public static OptionItem VentCooldown;
 

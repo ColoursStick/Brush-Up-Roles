@@ -9,14 +9,13 @@ namespace TONE.Roles.Crewmate;
 
 internal class Monarch : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Monarch;
     private const int Id = 12100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Monarch);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
-    //==================================================================\\
 
     private static OptionItem KnightCooldown;
     private static OptionItem KnightMax;

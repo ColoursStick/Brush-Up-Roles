@@ -10,14 +10,13 @@ namespace TONE.Roles.Neutral;
 
 internal class SoulCollector : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.SoulCollector;
     private const int Id = 15300;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.SoulCollector);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralApocalypse;
-    //==================================================================\\
 
     private static OptionItem SoulCollectorPointsOpt;
     private static OptionItem GetPassiveSouls;
@@ -162,13 +161,12 @@ internal class SoulCollector : RoleBase
 }
 internal class Death : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Death;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Death);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralApocalypse;
-    //==================================================================\\
 
     public override bool CanUseImpostorVentButton(PlayerControl pc) => SoulCollector.SoulCollectorCanVent.GetBool();
     public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target) => false;

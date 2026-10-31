@@ -7,11 +7,10 @@ namespace TONE.Roles.AddOns.Common;
 
 public class Randomizer : IAddon
 {
-    //===========================SETUP================================\\
+
     public CustomRoles Role => CustomRoles.Randomizer;
     private const int Id = 7500;
     public AddonTypes Type => AddonTypes.Helpful;
-    //==================================================================\\
 
     public static OptionItem BecomeBaitDelayNotify;
     public static OptionItem BecomeBaitDelayMin;

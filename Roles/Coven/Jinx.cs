@@ -9,19 +9,17 @@ namespace TONE.Roles.Coven;
 
 internal class Jinx : CovenManager
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Jinx;
     private const int Id = 16800;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenKilling;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
-    //private static OptionItem CanVent;
-    //private static OptionItem HasImpostorVision;
+
     private static OptionItem JinxSpellTimes;
-    //private static OptionItem killAttacker;
+
     private static OptionItem CovenCanDieToJinx;
     enum OptionName
     {
@@ -35,11 +33,10 @@ internal class Jinx : CovenManager
         SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
         KillCooldown = FloatOptionItem.Create(Role, Id + 10, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 20f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        //CanVent = BooleanOptionItem.Create(Id + 11, GeneralOption.CanVent, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Jinx]);
-        //HasImpostorVision = BooleanOptionItem.Create(Id + 13, GeneralOption.ImpostorVision, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Jinx]);
+
         JinxSpellTimes = IntegerOptionItem.Create(Role, Id + 14, OptionName.JinxSpellTimes, new(1, 100, 1), 10, false)
         .SetValueFormat(OptionFormat.Times);
-        //killAttacker = BooleanOptionItem.Create(Id + 15, GeneralOption.KillAttackerWhenAbilityRemaining, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Jinx]);
+
         CovenCanDieToJinx = BooleanOptionItem.Create(Role, Id + 16, OptionName.JinxCovenCanDieToJinx, true, false);
 
     }
@@ -53,29 +50,7 @@ internal class Jinx : CovenManager
         JinxedPlayers[playerId] = [];
         playerId.GetPlayer()?.AddDoubleTrigger();
     }
-    /*
-    public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)
-    {
-        if (AbilityLimit <= 0) return true;
-        if (killer.IsTransformedNeutralApocalypse()) return true;
-        if (killer == target) return true;
-        
-        killer.RpcGuardAndKill(target);
-        target.RpcGuardAndKill(target);
-       
-        AbilityLimit -= 1;
-        SendSkillRPC();
 
-        if (killAttacker.GetBool() && target.RpcCheckAndMurder(killer, true))
-        {
-            Logger.Info($"{target.GetNameWithRole()}: ability left {AbilityLimit}", "Jinx");
-            killer.SetDeathReason(PlayerState.DeathReason.Jinx);
-            killer.RpcMurderPlayer(killer);
-            killer.SetRealKiller(target);
-        }
-        return false;
-    }
-    */
     private static bool IsJinxed(byte target)
     {
         if (JinxedPlayers.Count < 1) return false;
@@ -136,7 +111,7 @@ internal class Jinx : CovenManager
         if (!jinx.IsAlive() || jinx.PlayerId == target.PlayerId) return false;
 
         var killerRole = killer.GetCustomRole();
-        // Not should kill
+
         if (killerRole is CustomRoles.Taskinator
             or CustomRoles.Bodyguard
             or CustomRoles.Veteran
@@ -168,7 +143,6 @@ internal class Jinx : CovenManager
             JinxedPlayers[jinx.PlayerId].Remove(target.PlayerId);
             return false;
         }
-
 
         return false;
     }

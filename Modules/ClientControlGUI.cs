@@ -6,7 +6,6 @@ using static TONE.Translator;
 
 namespace TONE;
 
-// 参考：https://github.com/Gurge44/EndlessHostRoles/blob/main/Modules/ClientControlGUI.cs
 public class ClientControlGUI : MonoBehaviour
 {
     public static ClientControlGUI Instance;
@@ -399,7 +398,7 @@ public class ClientControlGUI : MonoBehaviour
                     var invalidColor = Main.EnumeratePlayerControls().Where(p => p.Data.DefaultOutfit.ColorId < 0 || Palette.PlayerColors.Length <= p.Data.DefaultOutfit.ColorId).ToArray();
                     if (invalidColor.Any())
                     {
-                        GameStartManager.Instance.ResetStartState(); //Hope this works
+                        GameStartManager.Instance.ResetStartState();
                         Logger.SendInGame(GetString("Error.InvalidColorPreventStart"));
                         Logger.Info("Invalid Color Detected on force start!", "ClientControlGUI");
                     }

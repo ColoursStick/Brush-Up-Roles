@@ -5,7 +5,7 @@ using System;
 
 namespace TONE.Patches
 {
-    // Originally from Town of Us Rewritten, by Det
+
     [HarmonyPatch(typeof(ActivityManager), nameof(ActivityManager.UpdateActivity))]
     public class DiscordRPC
     {

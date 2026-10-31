@@ -6,13 +6,12 @@ namespace TONE.Roles.Impostor;
 
 internal class CursedWolf : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.CursedWolf;
     private const int Id = 1100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.CursedWolf);
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem GuardSpellTimes;
     private static OptionItem KillAttacker;

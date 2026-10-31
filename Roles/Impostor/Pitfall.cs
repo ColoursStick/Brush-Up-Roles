@@ -10,12 +10,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Pitfall : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Pitfall;
     private const int Id = 5600;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
-    //==================================================================\\
 
     private static OptionItem ShapeshiftCooldown;
     private static OptionItem MaxTrapCount;
@@ -85,15 +84,12 @@ internal class Pitfall : RoleBase
         hud.AbilityButton.OverrideText(GetString("PitfallButtonText"));
         hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
     }
-    // public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Set Trap");
 
     public override void UnShapeShiftButton(PlayerControl shapeshifter)
     {
-        //if (!CheckUnshapeshift) return;
+
         Logger.Info($"Triggered Pitfall Ability!!!", "Pitfall");
 
-
-        // Remove inactive traps so there is room for new traps
         Traps = Traps.Where(a => a.IsActive).ToHashSet();
 
         Vector2 position = shapeshifter.transform.position;

@@ -5,12 +5,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Instigator : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Instigator;
     private const int Id = 1700;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem AbilityLimitt;

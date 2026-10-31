@@ -13,13 +13,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Chameleon : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Chameleon;
     private const int Id = 7600;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Chameleon);
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
-    //==================================================================\\
 
     private static OptionItem ChameleonCooldown;
     private static OptionItem ChameleonDuration;
@@ -194,7 +193,7 @@ internal class Chameleon : RoleBase
             }
             else
             {
-                //__instance.myPlayer.MyPhysics.RpcBootFromVent(ventId);
+
                 chameleon.Notify(GetString("ChameleonInvisInCooldown"));
             }
         }, 0.8f, "Chameleon Vent");
@@ -212,7 +211,7 @@ internal class Chameleon : RoleBase
     }
     public override string GetLowerText(PlayerControl pc, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
     {
-        // Only for modded
+
         if (pc == null || !isForHud || isForMeeting || !pc.IsAlive()) return string.Empty;
 
         var str = new StringBuilder();

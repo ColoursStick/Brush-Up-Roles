@@ -32,7 +32,7 @@ internal class ChangeRoleSettings
 
         try
         {
-            // Note: No positions are set at this time
+
             if (GameStates.IsNormalGame)
             {
                 Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.GuardianAngel, 0, 0);
@@ -137,14 +137,12 @@ internal class ChangeRoleSettings
                 Main.DefaultImpostorVision = Main.RealOptionsData.GetFloat(FloatOptionNames.ImpostorLightMod);
             }
 
-            // Clear last exiled
             ExileControllerWrapUpPatch.AntiBlackout_LastExiled = null;
 
             IRandom.SetInstanceById(Options.RoleAssigningAlgorithm.GetValue());
 
             Main.DoBlockNameChange = true;
 
-            // Sync Player Names
             RPC.SyncAllPlayerNames();
 
             GhostRoleAssign.Init();
@@ -185,7 +183,7 @@ internal class ChangeRoleSettings
                     else
                     {
                         string realName = Main.AllPlayerNames.GetValueOrDefault(pc.PlayerId, string.Empty);
-                        //Logger.Info($"player id: {pc.PlayerId} {realName}", "FinallyBegin");
+
                         if (realName == string.Empty) continue;
 
                         currentName = realName;
@@ -234,15 +232,6 @@ internal class ChangeRoleSettings
                 Main.RefixCooldownDelay = 0;
             }
 
-            // Initialize all Roles
-            //
-            // ⚠️ 必须跳过被下架的职业。
-            //    不在 CustomRolesHelper.KeepRoles 里的职业不会执行 SetupCustomOption()
-            //    （见 CustomRoleManager.GetNormalOptions 里的 IsOptBlackListed 过滤），
-            //    它们的 OptionItem 字段全是 null。
-            //    而 OnInit() 里往往直接读这些选项（例如 EvilHacker.OnInit 读
-            //    OptionCanSeeDeadMark.GetBool()），一旦执行就是 NullReferenceException，
-            //    会被 CriticalErrorManager 判定为「Anti-black」致命错误 → 开始游戏后黑屏。
             foreach (var role in EnumHelper.GetAllValues<CustomRoles>().Where(role => role < CustomRoles.NotAssigned).ToArray())
             {
                 var RoleClass = role.GetStaticRoleClass();
@@ -259,13 +248,11 @@ internal class ChangeRoleSettings
                 }
             }
 
-            // Initialize all Add-ons
             foreach (var addOn in CustomRoleManager.AddonClasses.Values)
             {
                 addOn?.Init();
             }
 
-            // Initialize all GameModes
             foreach (var gm in CustomGameModeManager.GameModeClass.Values)
             {
                 gm?.Init();
@@ -359,22 +346,7 @@ internal class StartGameHostPatch
         if (!ShipStatus.Instance)
         {
             int num = Mathf.Clamp(GameOptionsManager.Instance.CurrentGameOptions.MapId, 0, Constants.MapNames.Length - 1);
-            // Don't need this because Dleks map sets in settings
-            /* try
-            {
-                if (num == 0 && AprilFoolsMode.ShouldFlipSkeld())
-                {
-                    num = 3;
-                }
-                else if (num == 3 && !AprilFoolsMode.ShouldFlipSkeld())
-                {
-                    num = 0;
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError(ex.Message);
-            }*/
+
             thiz.ShipLoadingAsyncHandle = thiz.ShipPrefabs[num].InstantiateAsync(null, false);
             yield return thiz.ShipLoadingAsyncHandle;
             GameObject result = thiz.ShipLoadingAsyncHandle.Result;
@@ -433,12 +405,11 @@ internal class StartGameHostPatch
             timer += Time.deltaTime;
         }
         thiz.SendClientReady();
-        //yield return new WaitForSecondsRealtime(2f);
+
         yield return AssignRoles();
 
         LoadingBarManager.Instance.ToggleLoadingBar(false);
 
-        //ShipStatus.Instance.Begin(); // Tasks sets in IntroPatch
         yield break;
     }
 
@@ -448,13 +419,11 @@ internal class StartGameHostPatch
 
         try
         {
-            // Initialize for Narc
+
             NarcManager.InitForNarc();
 
-            // Block "RpcSetRole" for set Desync Roles for some players
             RpcSetRoleReplacer.Initialize();
 
-            // Select custom Roles/Add-ons
             EAC.OriginalRoles = [];
 
             if (Options.DraftMode.GetBool())
@@ -470,11 +439,10 @@ internal class StartGameHostPatch
             RoleAssign.StartSelect();
             AddonAssign.StartSelect();
 
-            // Set count Vanilla Roles
             RoleAssign.CalculateVanillaRoleCount();
 
             UpdateRoleTypeNums();
-            // Set rate for Vanilla Roles
+
             foreach (var roleType in RoleTypeNums)
             {
                 int roleNum = Options.DisableVanillaRoles.GetBool() ? 0 : RoleOpt.GetNumPerGame(roleType.Key);
@@ -484,7 +452,6 @@ internal class StartGameHostPatch
 
             Logger.Msg("Is Started", "AssignRoles");
 
-            //Start CustomRpcSender
             RpcSetRoleReplacer.StartReplace();
 
             RpcSetRoleReplacer.BuildInitialRoleMap();
@@ -497,15 +464,7 @@ internal class StartGameHostPatch
             yield break;
         }
 
-        /*if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
-        {
-            yield return RpcSetRoleReplacer.ReleaseVanilla();
-        }
-        else
-        {*/
-        // Send all RPC for modded region
         RpcSetRoleReplacer.Release();
-        //}
 
         try
         {
@@ -555,7 +514,7 @@ internal class StartGameHostPatch
                 {
                     AddonAssign.StartAssigningNarc();
                     AddonAssign.StartAssigningGuesser();
-                    //AddonAssign.InitAndStartAssignLovers();
+
                     AddonAssign.StartSortAndAssign();
                 }
             }
@@ -564,13 +523,11 @@ internal class StartGameHostPatch
                 Logger.Warn($"Error after addons assign - error: {error}", "AddonAssign");
             }
 
-            // Sync for non-host modded clients by RPC
             foreach (var pair in Main.PlayerStates)
             {
                 var message = new RpcSetCustomRole(PlayerControl.LocalPlayer.NetId, pair.Key, pair.Value.MainRole);
                 RpcUtils.SendMessageImmediately(message);
 
-                // Set Add-ons
                 foreach (var subRole in pair.Value.SubRoles.ToArray())
                 {
                     var message2 = new RpcSetCustomRole(PlayerControl.LocalPlayer.NetId, pair.Key, subRole);
@@ -592,7 +549,6 @@ internal class StartGameHostPatch
 
                 roleClass?.OnAdd(pc.PlayerId);
 
-                // If based role is Shapeshifter
                 if (roleClass?.ThisRoleBase.GetRoleTypes() == RoleTypes.Shapeshifter) Main.CheckShapeshift[pc.PlayerId] = false;
             }
 
@@ -601,7 +557,6 @@ internal class StartGameHostPatch
             foreach (var pc in PlayerControl.AllPlayerControls.GetFastEnumerator())
                 pc.ResetKillCooldown();
 
-            // Role types
             foreach (var roleType in RoleTypeNums)
             {
                 int roleNum = Options.DisableVanillaRoles.GetBool() ? 0 : RoleOpt.GetNumPerGame(roleType.Key);
@@ -612,7 +567,6 @@ internal class StartGameHostPatch
             GameModeBase.GetGameMode().GetGameModeClass().SetPredicate();
 
             EAC.LogAllRoles();
-            //Utils.CountAlivePlayers(sendLog: true, checkGameEnd: false);
 
             Logger.Msg("Ended", "AssignRoles");
         }
@@ -676,7 +630,7 @@ internal class StartGameHostPatch
         {
             if (disconnected)
             {
-                // If player left the game, remember current data
+
                 DataDisconnected[playerInfo.PlayerId] = playerInfo.Disconnected;
 
                 playerInfo.Disconnected = true;
@@ -776,7 +730,7 @@ public static class RpcSetRoleReplacer
     public static bool BlockSetRole = false;
     public static Dictionary<int, CustomRpcSender> Senders = [];
     public static Dictionary<(byte seerId, byte targetId), (RoleTypes roleType, CustomRoles customRole)> RoleMap = [];
-    // List of Senders that do not require additional writing because SetRoleRpc has already been written by another process such as Position Desync
+
     public static void Initialize()
     {
         BlockSetRole = true;
@@ -929,7 +883,7 @@ public static class RpcSetRoleReplacer
         foreach (var target in Main.PlayerStates.Values)
         {
             var MainRole = target.MainRole;
-            var RoleClass = target.RoleClass; // Can be DefaultSetup for rare cases
+            var RoleClass = target.RoleClass;
 
             RoleTypes selfRoleTypes;
 

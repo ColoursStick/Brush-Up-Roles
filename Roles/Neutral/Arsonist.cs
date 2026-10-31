@@ -13,13 +13,12 @@ namespace TONE.Roles.Neutral;
 
 internal class Arsonist : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Arsonist;
     private const int id = 15900;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => CanIgniteAnytime() ? Custom_RoleType.NeutralKilling : Custom_RoleType.NeutralEvil;
-    //==================================================================\\
 
     private static OptionItem ArsonistDouseTime;
     private static OptionItem ArsonistCooldown;
@@ -241,7 +240,7 @@ internal class Arsonist : RoleBase
             else if (CanIgniteAnytime())
             {
                 var douseCount = GetDousedPlayerCount(__instance.myPlayer.PlayerId).Item1;
-                if (douseCount >= ArsonistMinPlayersToIgnite.GetInt()) // Don't check for max, since the player would not be able to ignite at all if they somehow get more players doused than the max
+                if (douseCount >= ArsonistMinPlayersToIgnite.GetInt())
                 {
                     if (douseCount > ArsonistMaxPlayersToIgnite.GetInt()) Logger.Warn("Arsonist Ignited with more players doused than the maximum amount in the settings", "Arsonist Ignite");
                     foreach (var pc in Main.EnumerateAlivePlayerControls())

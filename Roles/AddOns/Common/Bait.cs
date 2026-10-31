@@ -95,4 +95,3 @@ public class Bait : IAddon
         }, 0.01f);
     }
 }
-

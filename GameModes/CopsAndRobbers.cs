@@ -69,7 +69,6 @@ internal class CopsAndRobbers : GameModeBase
             .SetGameMode(CustomGameMode.CopsAndRobbers)
             .SetColor(new Color32(135, 206, 250, byte.MaxValue));
 
-        /*********** Cops ***********/
         TextOptionItem.Create(Id + 10, "MenuTitle.Cop", TabGroup.ModSettings)
             .SetGameMode(CustomGameMode.CopsAndRobbers)
             .SetColor(new Color32(0, 123, 255, byte.MaxValue));
@@ -102,7 +101,6 @@ internal class CopsAndRobbers : GameModeBase
             .SetColor(new Color32(0, 123, 255, byte.MaxValue))
             .SetValueFormat(OptionFormat.Seconds);
 
-        /*********** Robbers ***********/
         TextOptionItem.Create(Id + 20, "MenuTitle.Robber", TabGroup.ModSettings)
             .SetGameMode(CustomGameMode.CopsAndRobbers)
             .SetColor(new Color32(255, 140, 0, byte.MaxValue));
@@ -540,10 +538,10 @@ public class Cop : RoleBase
         target.RpcTeleport(CopsAndRobbers.Prison.Position);
         var CapturedSkin = new NetworkedPlayerInfo.PlayerOutfit();
         CapturedSkin.Set(target.GetRealName(isMeeting: true),
-                    5, //yellow
-                    "hat_tombstone", //hat
-                    "skin_prisoner", //skin 
-                    "visor_pk01_DumStickerVisor", //visor
+                    5,
+                    "hat_tombstone",
+                    "skin_prisoner",
+                    "visor_pk01_DumStickerVisor",
                     target.CurrentOutfit.PetId,
                     target.CurrentOutfit.NamePlateId);
         killer.SetKillCooldown(CopsAndRobbers.CaptureCooldown.GetFloat(), target, true);

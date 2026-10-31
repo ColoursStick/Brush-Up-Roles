@@ -10,7 +10,7 @@ namespace TONE.Roles.Neutral;
 
 internal class PlagueBearer : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.PlagueBearer;
     private const int Id = 17600;
     public static readonly HashSet<byte> playerIdList = [];
@@ -19,7 +19,6 @@ internal class PlagueBearer : RoleBase
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralApocalypse;
-    //==================================================================\\
 
     private static OptionItem PlagueBearerCooldownOpt;
     public static OptionItem PestilenceCooldownOpt;
@@ -126,7 +125,6 @@ internal class PlagueBearer : RoleBase
                 needCheck = true;
             }
 
-            // Remove itself
             PlaguedList[plagueBearerId].Remove(plagueBearerId);
         }
         if (needCheck)
@@ -162,7 +160,6 @@ internal class PlagueBearer : RoleBase
             {
                 playerIdList.Remove(PlagueId);
 
-                // Set Pestilence
                 plagueBearer.RpcSetCustomRole(CustomRoles.Pestilence);
                 plagueBearer.GetRoleClass()?.OnAdd(PlagueId);
 
@@ -236,13 +233,12 @@ internal class PlagueBearer : RoleBase
 
 internal class Pestilence : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Pestilence;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Pestilence);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralApocalypse;
-    //==================================================================\\
 
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = PlagueBearer.PestilenceCooldownOpt.GetFloat();
     public override void ApplyGameOptions(IGameOptions opt, byte playerId) => opt.SetVision(PlagueBearer.PestilenceHasImpostorVision.GetBool());

@@ -5,13 +5,12 @@ namespace TONE.Roles.Vanilla;
 
 internal class JudgeTONE : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.JudgeTONE;
     private const int Id = 34600;
     public static readonly HashSet<byte> playerIdList = [];
     public override CustomRoles ThisRoleBase => CustomRoles.Judge;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateVanilla;
-    //==================================================================\\
 
     public static OptionItem JudgeTaskRequirementPercentage;
 

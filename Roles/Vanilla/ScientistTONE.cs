@@ -5,12 +5,11 @@ namespace TONE.Roles.Vanilla;
 
 internal class ScientistTONE : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.ScientistTONE;
     private const int Id = 6200;
     public override CustomRoles ThisRoleBase => CustomRoles.Scientist;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateVanilla;
-    //==================================================================\\
 
     private static OptionItem BatteryCooldown;
     private static OptionItem BatteryDuration;

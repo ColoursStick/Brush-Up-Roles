@@ -29,7 +29,6 @@ public class FloatOptionItem(int id, string name, float defaultValue, TabGroup t
         return opt;
     }
 
-    // Getter
     public override int GetInt() => (int)Rule.GetValueByIndex(CurrentValue);
     public override float GetFloat() => Rule.GetValueByIndex(CurrentValue);
     public override string GetString()
@@ -39,7 +38,6 @@ public class FloatOptionItem(int id, string name, float defaultValue, TabGroup t
     public override int GetValue()
         => Rule.RepeatIndex(base.GetValue());
 
-    // Setter
     public override void SetValue(int value, bool doSync = true)
     {
         base.SetValue(Rule.RepeatIndex(value), doSync);

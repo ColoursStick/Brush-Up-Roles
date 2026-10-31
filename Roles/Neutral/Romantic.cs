@@ -7,19 +7,17 @@ using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
 
-
 namespace TONE.Roles.Neutral;
 
 internal class Romantic : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Romantic;
     private const int Id = 13500;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Romantic);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
-    //==================================================================\\
 
     public static bool isProtect = false;
     public static bool isRomanticAlive = true;
@@ -294,10 +292,10 @@ internal class Romantic : RoleBase
             {
                 Logger.Info($"Crew/nnk Romantic Partner Died changing {pc.GetNameWithRole().RemoveHtmlTags()} to Vengeful romantic", "Romantic");
                 var killer = player.GetRealKiller();
-                if (killer == null //if no killer
-                    || Main.PlayerStates[player.PlayerId].deathReason == PlayerState.DeathReason.Vote //or if partner is ejected
-                    || killer == player //or if partner dies by suicide
-                    || !killer.IsAlive()) //or if killer is dead,romantic will become ruthless romantic
+                if (killer == null
+                    || Main.PlayerStates[player.PlayerId].deathReason == PlayerState.DeathReason.Vote
+                    || killer == player
+                    || !killer.IsAlive())
                 {
                     pc.GetRoleClass()?.OnRemove(pc.PlayerId);
                     pc.RpcSetCustomRole(CustomRoles.RuthlessRomantic);
@@ -325,12 +323,10 @@ internal class Romantic : RoleBase
 internal class VengefulRomantic : RoleBase
 {
 
-    //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.VengefulRomantic;
     public override bool IsDesyncRole => new Romantic().IsDesyncRole;
     public override CustomRoles ThisRoleBase => new Romantic().ThisRoleBase;
     public override Custom_RoleType ThisRoleType => new Romantic().ThisRoleType;
-    //==================================================================\\
 
     public static bool hasKilledKiller = false;
     public static Dictionary<byte, byte> VengefulTarget = [];
@@ -349,7 +345,7 @@ internal class VengefulRomantic : RoleBase
 
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
-        if (killer.PlayerId == target.PlayerId) return true; //set it to true coz Shaman can do this, and killer should die
+        if (killer.PlayerId == target.PlayerId) return true;
 
         if (VengefulTarget.TryGetValue(killer.PlayerId, out var PartnerKiller) && target.PlayerId == PartnerKiller)
         {
@@ -377,7 +373,7 @@ internal class VengefulRomantic : RoleBase
     }
     public void SendRPC(byte playerId)
     {
-        var writer = MessageWriter.Get(SendOption.Reliable); //SyncVengefulRomanticTarget
+        var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(playerId);
         writer.Write(VengefulTarget.TryGetValue(playerId, out var player) ? player : byte.MaxValue);
         RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
@@ -396,12 +392,12 @@ internal class VengefulRomantic : RoleBase
 
 internal class RuthlessRomantic : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.RuthlessRomantic;
     public override bool IsDesyncRole => new Romantic().IsDesyncRole;
     public override CustomRoles ThisRoleBase => new Romantic().ThisRoleBase;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;
-    //==================================================================\\
+
     public override void Init()
     {
 

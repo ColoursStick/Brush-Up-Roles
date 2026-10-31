@@ -2,14 +2,13 @@ using AmongUs.GameOptions;
 
 namespace TONE.Roles.Impostor;
 
-internal class ShapeMaster : RoleBase // Should be deleted tbh, because it's litteraly vanilla shapeshifter
+internal class ShapeMaster : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.ShapeMaster;
     private const int Id = 4500;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
-    //==================================================================\\
 
     private static OptionItem ShapeMasterShapeshiftDuration;
 

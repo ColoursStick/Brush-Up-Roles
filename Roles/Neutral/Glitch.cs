@@ -11,14 +11,13 @@ namespace TONE.Roles.Neutral;
 
 internal class Glitch : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Glitch;
     private const int Id = 16300;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Glitch);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;
-    //==================================================================\\
 
     private static readonly Dictionary<byte, long> hackedIdList = [];
 
@@ -69,7 +68,6 @@ internal class Glitch : RoleBase
         LastHack = ts;
         LastRpcSend = ts;
 
-        // Double Trigger
         var pc = Utils.GetPlayerById(playerId);
         pc.AddDoubleTrigger();
     }
@@ -161,7 +159,7 @@ internal class Glitch : RoleBase
             var Pname = Utils.ColorString(Utils.GetRoleColor(CustomRoles.Glitch), player.GetRealName(isMeeting: true));
             if (!NameNotifyManager.Notice.TryGetValue(player.PlayerId, out var a) || a.Any()) player.Notify(Pname, 1.1f);
         }
-        if (player.IsNonHostModdedClient()) // For mooded non host players, sync kcd per second
+        if (player.IsNonHostModdedClient())
         {
             if (LastRpcSend < nowTime)
             {

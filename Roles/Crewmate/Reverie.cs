@@ -7,14 +7,13 @@ namespace TONE.Roles.Crewmate;
 
 internal class Reverie : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Reverie;
     private const int Id = 11100;
 
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
-    //==================================================================\\
 
     private static OptionItem DefaultKillCooldown;
     private static OptionItem ReduceKillCooldown;
@@ -76,7 +75,7 @@ internal class Reverie : RoleBase
         if (killer == null || target == null) return true;
 
         float kcd;
-        if ((!target.IsPlayerCrewmateTeam() && !target.Is(CustomRoles.Trickster)) || (ConvertedReverieRogue.GetBool() && !killer.IsPlayerCrewmateTeam())) // if killed non crew or if converted
+        if ((!target.IsPlayerCrewmateTeam() && !target.Is(CustomRoles.Trickster)) || (ConvertedReverieRogue.GetBool() && !killer.IsPlayerCrewmateTeam()))
             kcd = NowCooldown[killer.PlayerId] - ReduceKillCooldown.GetFloat();
         else kcd = NowCooldown[killer.PlayerId] + IncreaseKillCooldown.GetFloat();
         NowCooldown[killer.PlayerId] = Math.Clamp(kcd, MinKillCooldown.GetFloat(), MaxKillCooldown.GetFloat());

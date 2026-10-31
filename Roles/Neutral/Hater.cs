@@ -6,7 +6,7 @@ namespace TONE.Roles.Neutral;
 
 internal class Hater : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Hater;
     private const int Id = 12900;
     public static readonly HashSet<byte> playerIdList = [];
@@ -14,7 +14,6 @@ internal class Hater : RoleBase
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
-    //==================================================================\\
 
     private static OptionItem ChooseConverted;
     private static OptionItem MisFireKillTarget;
@@ -28,7 +27,7 @@ internal class Hater : RoleBase
     private static OptionItem CanKillContagious;
     private static OptionItem CanKillEnchanted;
 
-    public static bool isWon = false; // There's already a playerIdList, so replaced this with a boolean value
+    public static bool isWon = false;
 
     public override void SetupCustomOption()
     {
@@ -61,14 +60,14 @@ internal class Hater : RoleBase
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
         if (killer == null || target == null) return false;
-        if (killer.PlayerId == target.PlayerId) return true;  // Return true to allow suicides
+        if (killer.PlayerId == target.PlayerId) return true;
 
         if (target.GetCustomSubRoles().Any(addOn => addOn.IsConverted() || addOn is CustomRoles.Admired or CustomRoles.Lovers)
             || IsConvertedMainRole(target.GetCustomRole()))
         {
             if (!ChooseConverted.GetBool())
             {
-                isWon = true; // Only win if target can be killed - this kills the target if they can be killed
+                isWon = true;
                 Logger.Info($"{killer.GetRealName()} killed right target case 1", "Hater");
                 return true;
             }
@@ -87,7 +86,7 @@ internal class Hater : RoleBase
                 || ((target.Is(CustomRoles.Enchanted) || target.Is(CustomRoles.Ritualist)) && CanKillEnchanted.GetBool())
                 )
             {
-                isWon = true; // Only win if target can be killed - this kills the target if they can be killed
+                isWon = true;
                 Logger.Info($"{killer.GetRealName()} killed right target case 2", "Hater");
                 return true;
             }
@@ -95,7 +94,7 @@ internal class Hater : RoleBase
         if (MisFireKillTarget.GetBool())
         {
             target.SetDeathReason(PlayerState.DeathReason.Misfire);
-            killer.RpcMurderPlayer(target); // Murder the target only if the setting is on and the target can be killed
+            killer.RpcMurderPlayer(target);
         }
 
         killer.SetDeathReason(PlayerState.DeathReason.Sacrifice);
@@ -112,7 +111,7 @@ internal class Hater : RoleBase
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = 1f;
     private static bool IsConvertedMainRole(CustomRoles role)
     {
-        return role switch  // Use the switch expression whenever possible instead of the switch statement to improve performance
+        return role switch
         {
             CustomRoles.Gangster or
             CustomRoles.Cultist or

@@ -32,7 +32,4 @@ internal class DialogueBoxPatch
         }
     }
 
-    /*
-     * Lets add a <size=0%>tone</size> at where you will use the dialogue box.
-     */
 }

@@ -9,13 +9,12 @@ namespace TONE.Roles._Ghosts_.Crewmate;
 
 internal class Warden : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Warden;
     private const int Id = 27800;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Warden);
     public override CustomRoles ThisRoleBase => CustomRoles.GuardianAngel;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateGhosts;
-    //==================================================================\\
 
     private static OptionItem AbilityCooldown;
     private static OptionItem IncreaseSpeed;
@@ -46,13 +45,12 @@ internal class Warden : RoleBase
         var getTargetRole = target.GetCustomRole();
         if (killer.GetAbilityUseLimit() > 0)
         {
-            if (getTargetRole.IsSpeedRole() || target.IsAnySubRole(x => x.IsSpeedRole()) || IsAffected.Contains(target.PlayerId)) goto Notifiers; // Incompactible speed-roles 
+            if (getTargetRole.IsSpeedRole() || target.IsAnySubRole(x => x.IsSpeedRole()) || IsAffected.Contains(target.PlayerId)) goto Notifiers;
 
             IsAffected.Add(target.PlayerId);
             target.MarkDirtySettings();
             var tmpSpeed = Main.AllPlayerSpeed[target.PlayerId];
             Main.AllPlayerSpeed[target.PlayerId] = Main.AllPlayerSpeed[target.PlayerId] + IncreaseSpeed.GetFloat();
-
 
             _ = new LateTask(() =>
             {

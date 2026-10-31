@@ -11,13 +11,12 @@ namespace TONE.Roles.Neutral;
 
 internal class Solsticer : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Solsticer;
     private const int Id = 26200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Solsticer);
     public override CustomRoles ThisRoleBase => SolsticerCanVent.GetBool() ? CustomRoles.Engineer : CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralChaos;
-    //==================================================================\\
 
     private static OptionItem EveryOneKnowSolsticer;
     private static OptionItem SolsticerCanVent;
@@ -75,7 +74,7 @@ internal class Solsticer : RoleBase
         AURoleOptions.EngineerCooldown = 1f;
         AURoleOptions.EngineerInVentMaxTime = 0f;
         AURoleOptions.PlayerSpeedMod = !patched ? SolsticerSpeed.GetFloat() : 0.5f;
-    } //Enabled Solsticer can vent
+    }
 
     public override bool HasTasks(NetworkedPlayerInfo player, CustomRoles role, bool ForRecompute) => !ForRecompute;
 
@@ -83,7 +82,6 @@ internal class Solsticer : RoleBase
     {
         if (player == null) return true;
 
-        // Sycn for modded clients
         SendRPC();
 
         if (patched)
@@ -153,8 +151,8 @@ internal class Solsticer : RoleBase
                 MurderMessage = string.Format(GetString("SolsticerMurderMessage"), killer.GetRealName(), GetString(killer.GetCustomRole().ToString()));
             else MurderMessage = "";
         }
-        return false; //should be patched before every others
-    } //My idea is to encourage everyone to kill Solsticer and won't waste shoots on it, only resets cd.
+        return false;
+    }
     public override void AfterMeetingTasks()
     {
         foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Solsticer)).ToArray())
@@ -198,7 +196,7 @@ internal class Solsticer : RoleBase
     }
     private void SendRPC()
     {
-        var writer = MessageWriter.Get(SendOption.Reliable); //SyncSolsticerNotify
+        var writer = MessageWriter.Get(SendOption.Reliable);
         var taskState = Utils.GetPlayerById(playerid).GetPlayerTaskState();
         if (taskState != null)
         {
@@ -236,7 +234,7 @@ internal class Solsticer : RoleBase
     public void ResetTasks(PlayerControl pc)
     {
         SetShortTasksToAdd();
-        pc.RpcResetTasks(); //Let taskassign patch decide the tasks
+        pc.RpcResetTasks();
         pc.RpcGuardAndKill();
         pc.Notify(GetString("SolsticerTasksReset"));
         Main.EnumeratePlayerControls().Do(x => TargetArrow.Remove(x.PlayerId, pc.PlayerId));

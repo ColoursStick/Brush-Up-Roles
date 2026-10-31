@@ -117,14 +117,6 @@ public static class TemplateManager
             {
                 var text = File.ReadAllText(TEMPLATE_FILE_PATH, Encoding.GetEncoding("UTF-8"));
 
-                // ⚠️ Brush Up Roles：修复「手机上进房看到英文欢迎语」。
-                //
-                //    旧版本按**系统区域设置**挑模板。手机常见「系统英文 + 游戏内简体中文」，
-                //    于是生成了 English 模板并一直沿用，游戏内却显示英文欢迎语。
-                //
-                //    这里做一次自愈：如果现存模板与本次应当使用的语言不一致，
-                //    但内容仍**等同于某个内嵌默认模板**（说明玩家没有自己改过），
-                //    就换成正确语言的模板。玩家改过的模板一律不动。
                 if (IsEqualToOtherLanguageTemplate(text, fileName))
                 {
                     Logger.Info($"模板语言已切换为 {fileName}", "TemplateManager");
@@ -151,20 +143,12 @@ public static class TemplateManager
         return reader.ReadToEnd();
     }
 
-    /// <summary>官网地址（欢迎语里展示的完整地址）</summary>
     private const string SiteUrl = "https://au.yunsack.top/";
 
-    /// <summary>
-    /// 历史上出现过的旧写法，加载时统一换成 <see cref="SiteUrl"/>。
-    ///
-    /// 玩家的 template.txt 一旦生成就不会被覆盖（尊重玩家自定义），
-    /// 所以改官网后旧文件里仍是旧链接。这里在加载时做定点替换，
-    /// 只动这几个地址片段，不影响玩家改过的其它内容。
-    /// </summary>
     private static readonly string[] LegacySiteUrls =
     [
-        "gaorensifu.netlify.app",   // 1.0.0 / 1.1.0
-        "au.yunsack.top",           // 早期 1.2.0 写成裸域名
+        "gaorensifu.netlify.app",
+        "au.yunsack.top",
     ];
 
     private static string MigrateOldDomains(string text)
@@ -173,7 +157,6 @@ public static class TemplateManager
 
         const char mark = '\u0001';
 
-        // 先把已经是完整地址的片段占位，避免被下面的裸域名替换二次命中
         text = text.Replace(SiteUrl, mark.ToString(), StringComparison.Ordinal);
 
         bool changed = false;
@@ -192,16 +175,12 @@ public static class TemplateManager
         return text;
     }
 
-    /// <summary>所有内嵌欢迎语模板（对应 Resources/Config/template/*.txt）</summary>
     private static readonly string[] TemplateLanguages =
     [
         "English", "SChinese", "TChinese", "Japanese", "Russian",
         "Spanish", "Latam", "Brazilian", "French", "Italian", "Dutch"
     ];
 
-    /// <summary>
-    /// 现存模板是否**等同于其它语言**的内嵌默认模板（即玩家没改过，只是语言不对）。
-    /// </summary>
     private static bool IsEqualToOtherLanguageTemplate(string currentText, string keepLanguage)
     {
         var normalized = currentText.Replace("hkk2p9ggv4", "5PNwUaN5");
@@ -222,18 +201,9 @@ public static class TemplateManager
         return false;
     }
 
-    /// <summary>
-    /// 决定用哪一份内嵌欢迎语模板。
-    ///
-    /// ⚠️ Brush Up Roles：原实现只看 <see cref="CultureInfo.CurrentCulture"/>（**系统区域设置**），
-    ///    不看游戏内语言。手机上常见「系统是英文、游戏内选简体中文」的组合，
-    ///    此时会取到 English.txt，玩家看到英文欢迎语。
-    ///
-    ///    现在改为**以游戏内语言为准**，系统区域仅在游戏语言取不到时兜底。
-    /// </summary>
     private static string GetTemplateLanguageName()
     {
-        // 1) 优先用游戏内语言
+
         try
         {
             if (TranslationController.InstanceExists)
@@ -256,9 +226,8 @@ public static class TemplateManager
                 if (name != null) return name;
             }
         }
-        catch { /* 取不到就退回系统区域 */ }
+        catch {  }
 
-        // 2) 兜底：系统区域设置
         try
         {
             var culture = CultureInfo.CurrentCulture.Name;
@@ -350,9 +319,9 @@ public static class TemplateManager
             }
             return text;
         }
-        catch //(Exception ex)
+        catch
         {
-            //Logger.Exception(ex, "TemplateManager.ApplyReplaceDictionary");
+
             return text;
         }
     }
@@ -371,7 +340,6 @@ public static class TemplateManager
             title = title.Replace("</title>", "");
 
         }
-
 
         return title;
     }

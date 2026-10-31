@@ -11,14 +11,13 @@ namespace TONE.Roles.Neutral;
 
 internal class Baker : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Baker;
     private const int Id = 28600;
 
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => BTOS2Baker.GetBool() ? CustomRoles.Shapeshifter : CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralApocalypse;
-    //==================================================================\\
 
     private static OptionItem BreadNeededToTransform;
     public static OptionItem FamineStarveCooldown;
@@ -127,8 +126,7 @@ internal class Baker : RoleBase
     public override string GetProgressText(byte playerId, bool comms) => ColorString(GetRoleColor(CustomRoles.Baker).ShadeColor(0.25f), $"({BreadedPlayerCount(playerId).Item1}/{BreadedPlayerCount(playerId).Item2})");
     public override bool KnowRoleTarget(PlayerControl seer, PlayerControl target)
     {
-        // if (target.IsNeutralApocalypse() && seer.IsNeutralApocalypse()) return true;
-        // i swear this isn't consigliere's code i swear
+
         if (seer.IsAlive() && RevealList.TryGetValue(seer.PlayerId, out var targets))
         {
             return targets.Contains(target.PlayerId);
@@ -214,17 +212,17 @@ internal class Baker : RoleBase
         if (BTOS2Baker.GetBool())
         {
             var sb = new StringBuilder();
-            switch (BreadID) // 0 = Reveal, 1 = Roleblock, 2 = Barrier
+            switch (BreadID)
             {
-                case 0: // Switch to Roleblock
+                case 0:
                     BreadID = 1;
                     sb.Append(GetString("BakerSwitchBread") + GetString("BakerRoleblockBread"));
                     break;
-                case 1: // Switch to Barrier
+                case 1:
                     BreadID = 2;
                     sb.Append(GetString("BakerSwitchBread") + GetString("BakerBarrierBread"));
                     break;
-                case 2: // Switch to Reveal
+                case 2:
                     BreadID = 0;
                     sb.Append(GetString("BakerSwitchBread") + GetString("BakerRevealBread"));
                     break;
@@ -241,13 +239,13 @@ internal class Baker : RoleBase
             var sb = new StringBuilder();
             switch (BreadID)
             {
-                case 0: // Reveal
+                case 0:
                     sb.Append(GetString("BakerCurrentBread") + GetString("BakerRevealBread"));
                     break;
-                case 1: // Roleblock
+                case 1:
                     sb.Append(GetString("BakerCurrentBread") + GetString("BakerRoleblockBread"));
                     break;
-                case 2: // Barrier
+                case 2:
                     sb.Append(GetString("BakerCurrentBread") + GetString("BakerBarrierBread"));
                     break;
             }
@@ -280,15 +278,15 @@ internal class Baker : RoleBase
             {
                 switch (BreadID)
                 {
-                    case 0: // Reveal
+                    case 0:
                         RevealList[killer.PlayerId].Add(target.PlayerId);
                         SendRPC(1, killer, target);
                         break;
-                    case 1: // Roleblock
+                    case 1:
                         RoleblockedPlayers[killer.PlayerId].Add(target.PlayerId);
                         SendRPC(3, killer, target);
                         break;
-                    case 2: // Barrier
+                    case 2:
                         BarrierList[killer.PlayerId].Add(target.PlayerId);
                         SendRPC(2, killer, target);
                         break;
@@ -354,13 +352,12 @@ internal class Baker : RoleBase
 }
 internal class Famine : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Famine;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Famine);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralApocalypse;
-    //==================================================================\\
 
     public static readonly Dictionary<byte, HashSet<byte>> FamineList = [];
 

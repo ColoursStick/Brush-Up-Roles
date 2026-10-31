@@ -12,12 +12,11 @@ namespace TONE.Roles.Crewmate;
 
 internal class Justice : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Justice;
     private const int Id = 10700;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
-    //==================================================================\\
 
     public static OptionItem TrialLimitPerMeeting;
     private static OptionItem TrialLimitPerGame;

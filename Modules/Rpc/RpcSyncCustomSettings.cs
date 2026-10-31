@@ -15,7 +15,7 @@ namespace TONE.Modules.Rpc
 
         public override void SerializeRpcValues(MessageWriter writer)
         {
-            // is single
+
             writer.Write(false);
             writer.WritePacked(startAmount);
             writer.WritePacked(lastAmount);

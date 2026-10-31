@@ -8,7 +8,7 @@ public class NotificationPopperAwakePatch
 {
     public static void Prefix(NotificationPopper __instance)
     {
-        // not use ??= because exceptions may occur
+
         NotificationPopperPatch.Instance = __instance;
     }
 }

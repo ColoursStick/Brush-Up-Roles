@@ -46,7 +46,7 @@ public static class RegionMenuPatch
 [HarmonyPatch]
 public static class ServerDropDownPatch
 {
-    // From BetterAmongUs, code by D1GQ
+
     [HarmonyPatch(typeof(ServerDropdown), nameof(ServerDropdown.FillServerOptions))]
     [HarmonyPrefix]
     internal static bool FillServerOptions_Prefix(ServerDropdown __instance)
@@ -61,10 +61,8 @@ public static class ServerDropDownPatch
         const float columnWidth = 4.15f;
         const float buttonSpacing = 0.5f;
 
-        // Get all available regions except current one
         var regions = DestroyableSingleton<ServerManager>.Instance.AvailableRegions.OrderBy(ServerManager.DefaultRegions.Contains).ToList();
 
-        // Calculate total columns needed
         int totalColumns = Mathf.Max(1, Mathf.CeilToInt(regions.Count / (float)maxPerColumn));
         int rowsInLastColumn = regions.Count % maxPerColumn;
         int maxRows = (regions.Count > maxPerColumn) ? maxPerColumn : regions.Count;
@@ -81,7 +79,6 @@ public static class ServerDropDownPatch
             IRegionInfo region = regionInfo;
             ServerListButton serverListButton = __instance.ButtonPool.Get<ServerListButton>();
 
-            // Calculate position based on column and row
             float xPos = (column - (totalColumns - 1) / 2f) * columnWidth;
             float yPos = __instance.y_posButton - buttonSpacing * (num % maxPerColumn);
 
@@ -96,7 +93,6 @@ public static class ServerDropDownPatch
             serverListButton.Button.OnClick.AddListener((Action)(() => __instance.ChooseOption(region)));
             __instance.controllerSelectable.Add(serverListButton.Button);
 
-            // Move to next column if current column is full
             num++;
             if (num % maxPerColumn == 0)
             {
@@ -104,7 +100,6 @@ public static class ServerDropDownPatch
             }
         }
 
-        // Calculate background dimensions
         float backgroundHeight = 1.2f + buttonSpacing * (maxRows - 1);
         float backgroundWidth = (totalColumns > 1) ?
             (columnWidth * (totalColumns - 1) + __instance.background.size.x) :
@@ -121,7 +116,7 @@ public static class ServerDropDownPatch
 
     [HarmonyPatch(typeof(ServerDropdown), nameof(ServerDropdown.FillServerOptions))]
     [HarmonyPostfix]
-    // Used for find a game manager  
+
     internal static void FillServerOptions_Postfix(ServerDropdown __instance)
     {
         if (SceneManager.GetActiveScene().name != "FindAGame" || OperatingSystem.IsAndroid()) return;
@@ -149,8 +144,7 @@ public static class ServerDropDownPatch
 [HarmonyPatch(typeof(FindAGameManager))]
 public static class FindAGameManagerPatch
 {
-    // 10+ Listing ported from BetterAmongUs, coded by D1GQ
-    // HostName and gamecode coded by Pietro
+
     public static Scroller Scroller;
 
     [HarmonyPatch(nameof(FindAGameManager.HandleList))]

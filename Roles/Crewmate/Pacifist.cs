@@ -10,14 +10,13 @@ namespace TONE.Roles.Crewmate;
 
 internal class Pacifist : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Pacifist;
     private const int Id = 9200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Pacifist);
     public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
-    //==================================================================\\
 
     public static OptionItem PacifistCooldown;
     private static OptionItem PacifistMaxOfUseage;

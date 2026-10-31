@@ -7,30 +7,25 @@ using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
 
-// https://github.com/tukasa0001/TownOfHost/blob/main/Roles/Impostor/Penguin.cs
 namespace TONE.Roles.Impostor;
 
 internal class Penguin : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Penguin;
     private const int Id = 27500;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Penguin);
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
-    //==================================================================\\
 
     private static OptionItem OptionAbductTimerLimit;
     private static OptionItem OptionMeetingKill;
-
 
     public PlayerControl AbductVictim;
     private float AbductTimer;
     private float AbductTimerLimit;
     private bool stopCount;
     private bool MeetingKill;
-
-    // Measures to prevent the opponent who is about to be killed during abduction from using their abilities
 
     public override void SetupCustomOption()
     {
@@ -95,7 +90,7 @@ internal class Penguin : RoleBase
             Main.PlayerStates[AbductVictim.PlayerId].CanUseMovingPlatform = true;
             AbductVictim = null;
         }
-        //MyState.CanUseMovingPlatform = true;
+
         AbductTimer = 255f;
 
         var penguin = _Player;
@@ -113,7 +108,7 @@ internal class Penguin : RoleBase
         {
             if (target != AbductVictim && !target.IsTransformedNeutralApocalypse())
             {
-                // During an abduction, only the abductee can be killed.
+
                 killer?.RpcMurderPlayer(AbductVictim);
                 killer?.ResetKillCooldown();
                 doKill = false;
@@ -130,7 +125,7 @@ internal class Penguin : RoleBase
 
     public override bool OnCheckShapeshift(PlayerControl shapeshifter, PlayerControl target, ref bool resetCooldown, ref bool shouldAnimate)
     {
-        // not should shapeshifted
+
         resetCooldown = false;
         return false;
     }
@@ -146,7 +141,7 @@ internal class Penguin : RoleBase
     {
         stopCount = true;
         if (AbductVictim == null) return;
-        // If you meet a meeting with time running out, kill it even if you're on a ladder.
+
         if (AbductVictim.IsTransformedNeutralApocalypse())
         {
             RemoveVictim();
@@ -168,7 +163,6 @@ internal class Penguin : RoleBase
     {
         if (GameStates.AirshipIsActive) return;
 
-        //Maps other than Airship
         RestartAbduct();
     }
     public void OnSpawnAirship()
@@ -225,17 +219,17 @@ internal class Penguin : RoleBase
             }
             if (AbductTimer <= 0f && !penguin.MyPhysics.Animations.IsPlayingAnyLadderAnimation() && !AbductVictim.IsTransformedNeutralApocalypse())
             {
-                // Set IsDead to true first (prevents ladder chase)
+
                 AbductVictim.Data.IsDead = true;
                 AbductVictim.Data.MarkDirty();
-                // If the penguin himself is on a ladder, kill him after getting off the ladder.
+
                 if (!AbductVictim.MyPhysics.Animations.IsPlayingAnyLadderAnimation())
                 {
                     var abductVictim = AbductVictim;
                     _ = new LateTask(() =>
                     {
                         var sId = abductVictim.NetTransform.lastSequenceId + 5;
-                        //Host side
+
                         abductVictim.NetTransform.SnapTo(penguin.transform.position, (ushort)sId);
                         penguin.MurderPlayer(abductVictim, ExtendedPlayerControl.ResultFlags);
 
@@ -262,14 +256,14 @@ internal class Penguin : RoleBase
             }
             else if (AbductTimer <= 0f && !penguin.MyPhysics.Animations.IsPlayingAnyLadderAnimation() && AbductVictim.IsTransformedNeutralApocalypse())
             {
-                // If the penguin himself is on a ladder, kill him after getting off the ladder.
+
                 if (!AbductVictim.MyPhysics.Animations.IsPlayingAnyLadderAnimation())
                 {
                     var abductVictim = AbductVictim;
                     _ = new LateTask(() =>
                     {
                         var sId = abductVictim.NetTransform.lastSequenceId + 5;
-                        //Host side
+
                         abductVictim.NetTransform.SnapTo(penguin.transform.position, (ushort)sId);
                         penguin.MurderPlayer(abductVictim, ExtendedPlayerControl.ResultFlags);
 
@@ -288,7 +282,7 @@ internal class Penguin : RoleBase
                     RemoveVictim();
                 }
             }
-            // SnapToRPC does not work for players on top of the ladder, and only the host behaves differently, so teleporting is not done uniformly.
+
             else if (!AbductVictim.MyPhysics.Animations.IsPlayingAnyLadderAnimation())
             {
                 var position = penguin.transform.position;

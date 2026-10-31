@@ -48,7 +48,7 @@ public class Bewilder : IAddon
     }
     public static void ApplyGameOptions(IGameOptions opt, PlayerControl player)
     {
-        // If the Bewilder was killed, his killer will receive his vision
+
         if (Main.EnumeratePlayerControls().Any(x => x.Is(CustomRoles.Bewilder) && !x.IsAlive() && x.GetRealKiller()?.PlayerId == player.PlayerId && KillerGetBewilderVision.GetBool() && !x.Is(CustomRoles.Hangman)))
         {
             opt.SetVision(false);

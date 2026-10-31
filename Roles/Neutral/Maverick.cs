@@ -8,13 +8,12 @@ namespace TONE.Roles.Neutral;
 
 internal class Maverick : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Maverick;
     private const int Id = 13200;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem CanVent;

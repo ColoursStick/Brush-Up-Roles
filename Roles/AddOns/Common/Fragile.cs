@@ -55,4 +55,3 @@ public class Fragile : IAddon
         return false;
     }
 }
-

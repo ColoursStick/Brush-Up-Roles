@@ -8,7 +8,6 @@ using UnityEngine;
 
 namespace TONE;
 
-// Code based off of https://github.com/TownOfNext/TownOfNext/blob/main/src/Patches/ChatControlPatch.cs
 [HarmonyPatch(typeof(ChatController))]
 public static class SendTargetPatch
 {
@@ -156,12 +155,6 @@ class ChatControllerUpdatePatch
     private static SpriteRenderer OpenBanMenuIcon;
     private static SpriteRenderer OpenKeyboardIcon;
 
-    // Innersloth anti-cheat updates
-    /*public static void Prefix()
-    {
-        if (AmongUsClient.Instance.AmHost && DataManager.Settings.Multiplayer.ChatMode == InnerNet.QuickChatModes.QuickChatOnly)
-            DataManager.Settings.Multiplayer.ChatMode = InnerNet.QuickChatModes.FreeChatOrQuickChat;
-    }*/
     public static void Postfix(ChatController __instance)
     {
         if (Main.DarkTheme.Value)
@@ -174,10 +167,8 @@ class ChatControllerUpdatePatch
                 __instance.freeChatField.textArea.outputText.color = Color.white;
             }
 
-            // free chat
             __instance.freeChatField.background.color = backgroundColor;
 
-            // quick chat
             __instance.quickChatField.background.color = backgroundColor;
             __instance.quickChatField.text.color = Color.white;
 

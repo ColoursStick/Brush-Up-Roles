@@ -5,13 +5,12 @@ namespace TONE.Roles.Impostor;
 
 internal class Godfather : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Godfather;
     private const int Id = 3400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Godfather);
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
-    //==================================================================\\
 
     private static OptionItem GodfatherAbilityUses;
 

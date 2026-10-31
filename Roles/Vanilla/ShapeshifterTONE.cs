@@ -4,12 +4,11 @@ namespace TONE.Roles.Vanilla;
 
 internal class ShapeshifterTONE : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.ShapeshifterTONE;
     private const int Id = 400;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorVanilla;
-    //==================================================================\\
 
     private static OptionItem ShapeshiftCooldown;
     private static OptionItem ShapeshiftDuration;

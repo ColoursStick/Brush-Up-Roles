@@ -18,7 +18,6 @@ using static TONE.Translator;
 
 namespace TONE;
 
-// Patch for non-host modded clients to ensure that the intro cutscene is shown correctly
 [HarmonyPatch]
 static class ShowRoleMoveNextPatch
 {
@@ -67,7 +66,6 @@ class CoShowIntroPatch
 
                 ShipStatusBeginPatch.hasBegun = true;
 
-                // Assign tasks after assign all roles, as it should be
                 ShipStatus.Instance.Begin();
 
                 GameOptionsSender.AllSenders.Clear();
@@ -115,9 +113,9 @@ public class SetUpRoleTextPatch
         if (!GameStates.IsModHost) return;
         if (AmongUsClient.Instance.AmHost)
         {
-            // After showing team for non-modded clients update player names.
+
             IsInIntro = false;
-            //Utils.NotifyRoles(ForceLoop: false, NoCache: true);
+
         }
 
         if (GameStates.IsNormalGame)
@@ -193,14 +191,13 @@ public class SetUpRoleTextPatch
             }
         }, 0.0001f, "Override Role Text");
 
-        // Set normal name for modded
         _ = new LateTask(() =>
         {
-            // Return if game is ended or player in lobby or player is null
+
             if (AmongUsClient.Instance.IsGameOver || GameStates.IsLobby || PlayerControl.LocalPlayer == null) return;
 
             var realName = Main.AllPlayerNames[PlayerControl.LocalPlayer.PlayerId];
-            // Don't use RpcSetName because the modded client needs to set the name locally
+
             PlayerControl.LocalPlayer.SetName(realName);
         }, 1f, "Reset Name For Modded Players");
 
@@ -210,7 +207,6 @@ public class SetUpRoleTextPatch
     {
         using SymmetricAlgorithm desAlg = DES.Create();
 
-        // Incoming key must be 8 bit or will cause error
         desAlg.Key = Encoding.UTF8.GetBytes(key);
         desAlg.IV = Encoding.UTF8.GetBytes(key);
 
@@ -285,8 +281,6 @@ public class SetUpRoleTextPatch
                 Logger.Error($"Encryption error: {ex.Message}", "Intro.Roles");
             }
         }
-        //https://www.toolhelper.cn/SymmetricEncryption/DES
-        //mode CBC, PKCS7, 64bit, Key = IV= "TONE" + playerid + 000/00 "to 8 bits
 
         yield return null;
 
@@ -358,12 +352,6 @@ class BeginCrewmatePatch
             teamToDisplay = new Il2CppSystem.Collections.Generic.List<PlayerControl>();
             teamToDisplay.Add(PlayerControl.LocalPlayer);
             teamToDisplay.Add(Lovers.LoversPlayers[PlayerControl.LocalPlayer]);
-
-            // foreach (var pc in Main.EnumerateAlivePlayerControls())
-            // {
-            //     if (pc.Is(CustomRoles.Lovers) && pc != PlayerControl.LocalPlayer)
-            //         teamToDisplay.Add(pc);
-            // }
 
             __instance.BackgroundBar.material.color = new Color32(255, 154, 206, byte.MaxValue);
             return true;
@@ -448,7 +436,7 @@ class BeginCrewmatePatch
             {
                 if (pc.GetCustomRole().IsImpostor() || pc.GetCustomRole().IsMadmate() && !pc.Is(CustomRoles.Madmate))
                 {
-                    // Crewpostor here
+
                     traitorTeam.Add(pc);
                 }
                 else if (pc.Is(CustomRoles.Madmate) && Traitor.KnowMadmate.GetBool())
@@ -749,7 +737,6 @@ class BeginCrewmatePatch
                 break;
         }
 
-        // I hope no one notices this in code
         if (Input.GetKey(KeyCode.RightShift))
         {
             __instance.TeamTitle.text = "Damn!!";
@@ -795,10 +782,6 @@ class BeginImpostorPatch
 {
     public static bool Prefix(IntroCutscene __instance, ref Il2CppSystem.Collections.Generic.List<PlayerControl> yourTeam)
     {
-        // Be careful while you are doing this part
-        // This part occurs when local player got impostor base but may need to change to BeginCrewmate
-        // or BeginCrewmate return false and call BeginImpostor
-        // Do not make them call each other!
 
         var role = PlayerControl.LocalPlayer.GetCustomRole();
 
@@ -810,16 +793,15 @@ class BeginImpostorPatch
             __instance.BeginCrewmate(yourTeam);
             return false;
         }
-        // Madmate called from BeginCrewmate, need to skip previous Lovers and Egoist check here
 
         if ((role.IsMadmate() || PlayerControl.LocalPlayer.Is(CustomRoles.Madmate)) && !PlayerControl.LocalPlayer.Is(CustomRoles.Narc))
         {
             yourTeam = new();
             yourTeam.Add(PlayerControl.LocalPlayer);
 
-            if (role != CustomRoles.Parasite) // Parasite and Impostor doesnt know each other
+            if (role != CustomRoles.Parasite)
             {
-                // Crew postor is counted as madmate but should be a impostor
+
                 if (Madmate.MadmateKnowWhosImp.GetBool() || role != CustomRoles.Madmate)
                 {
                     foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => x.GetCustomRole().IsImpostor() && x.PlayerId != PlayerControl.LocalPlayer.PlayerId))
@@ -827,7 +809,7 @@ class BeginImpostorPatch
                         yourTeam.Add(pc);
                     }
                 }
-                // Crewpostor is counted as Madmate but should be a Impostor
+
                 if (Madmate.MadmateKnowWhosMadmate.GetBool() || role != CustomRoles.Madmate && Madmate.ImpKnowWhosMadmate.GetBool())
                 {
                     foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Madmate) && x.PlayerId != PlayerControl.LocalPlayer.PlayerId))
@@ -861,13 +843,11 @@ class BeginImpostorPatch
             return false;
         }
 
-        // We only check Impostor main role here!
         if (role.IsImpostor())
         {
             yourTeam = new();
             yourTeam.Add(PlayerControl.LocalPlayer);
 
-            // Parasite and Impostor doesnt know each other
             foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => !x.AmOwner && !x.Is(CustomRoles.Parasite) && (x.GetCustomRole().IsImpostor() || !x.Is(CustomRoles.Madmate) && x.GetCustomRole().IsMadmate())))
             {
                 yourTeam.Add(pc);
@@ -881,7 +861,7 @@ class BeginImpostorPatch
                 }
             }
             __instance.BackgroundBar.material.color = Palette.ImpostorRed;
-            return true; // manually return true here,otherwise the intro screen wont load at all
+            return true;
         }
 
         if (role.IsCoven())
@@ -915,17 +895,15 @@ internal static class IntroCutsceneDestroyPatch
         {
             if (OperatingSystem.IsAndroid()) Logger.Info("IntroCutscene destroyed for Starlight", "IntroCutscene");
 
-            // Host is desync role
             if (PlayerControl.LocalPlayer.HasDesyncRole())
             {
                 PlayerControl.LocalPlayer.Data.Role.AffectedByLightAffectors = false;
 
                 foreach (var target in PlayerControl.AllPlayerControls.GetFastEnumerator())
                 {
-                    // Set all players as killable players
+
                     target.Data.Role.CanBeKilled = true;
 
-                    // When target is impostor, set name color as white
                     target.cosmetics.SetNameColor(Color.white);
                     target.Data.Role.NameColor = Color.white;
                 }
@@ -936,10 +914,9 @@ internal static class IntroCutsceneDestroyPatch
 
                 foreach (var target in PlayerControl.AllPlayerControls.GetFastEnumerator().Where(x => !x.IsPlayerCoven()))
                 {
-                    // Set all players as killable players
+
                     target.Data.Role.CanBeKilled = true;
 
-                    // When target is Impostor, set name color as white
                     target.cosmetics.SetNameColor(Color.white);
                     target.Data.Role.NameColor = Color.white;
                 }
@@ -956,8 +933,7 @@ internal static class IntroCutsceneDestroyPatch
 
         foreach (var pc in Main.EnumeratePlayerControls())
         {
-            // Set roleAssigned as false for override role for modded players
-            // For override role for vanilla clients we use "Data.Disconnected" while assign
+
             pc.roleAssigned = false;
         }
 
@@ -1015,9 +991,9 @@ internal static class IntroCutsceneDestroyPatch
                 }
             }
 
-            if (GhostRoleAssign.forceRole.Any()) // Incase user has /up access
+            if (GhostRoleAssign.forceRole.Any())
             {
-                // Needs to be delayed for the game to load it properly
+
                 _ = new LateTask(() =>
                 {
                     GhostRoleAssign.forceRole.Do(x =>

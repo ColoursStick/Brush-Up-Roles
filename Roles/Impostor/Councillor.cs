@@ -13,13 +13,12 @@ namespace TONE.Roles.Impostor;
 
 internal class Councillor : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Councillor;
     private const int Id = 1000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Councillor);
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem MurderLimitPerMeeting;
     private static OptionItem MurderLimitPerGame;
@@ -31,7 +30,6 @@ internal class Councillor : RoleBase
     private static OptionItem KillCooldown;
 
     private int MurderLimitMeeting;
-
 
     public override void SetupCustomOption()
     {
@@ -68,7 +66,7 @@ internal class Councillor : RoleBase
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || _Player == null || GameStates.IsExilling) return false;
 
-        int operate = 0; // 1:ID 2:猜测
+        int operate = 0;
         msg = msg.ToLower().TrimStart().TrimEnd();
         if (CheckCommond(ref msg, "id|guesslist|gl编号|玩家编号|玩家id|id列表|玩家列表|列表|所有id|全部id")) operate = 1;
         else if (CheckCommond(ref msg, "sp|jj|tl|Murder|审判|判|审", false)) operate = 2;
@@ -171,7 +169,7 @@ internal class Councillor : RoleBase
                     return true;
                 }
                 else if (target.Is(CustomRoles.Pestilence)) CouncillorSuicide = true;
-                // else if (target.Is(CustomRoles.Trickster)) CouncillorSuicide = true;
+
                 else if (target.IsTransformedNeutralApocalypse() && !target.Is(CustomRoles.Pestilence))
                 {
                     pc.ShowInfoMessage(isUI, GetString("ApocalypseImmune"));

@@ -7,12 +7,11 @@ namespace TONE.Roles.Crewmate;
 
 internal class Enigma : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Enigma;
     private const int Id = 8100;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
-    //==================================================================\\
 
     private static OptionItem EnigmaClueStage1Tasks;
     private static OptionItem EnigmaClueStage2Tasks;
@@ -353,8 +352,8 @@ internal class Enigma : RoleBase
 
         private string GetStage1Clue(int length)
         {
-            int start = length - rd.Next(2, 4); // 2 or 3
-            int end = length + rd.Next(2, 4); // 2 or 3
+            int start = length - rd.Next(2, 4);
+            int end = length + rd.Next(2, 4);
 
             start = start < 0 ? 0 : start;
             start = start >= 10 ? 8 : start;
@@ -365,8 +364,8 @@ internal class Enigma : RoleBase
 
         private string GetStage2Clue(int length)
         {
-            int start = length - rd.Next(1, 3); // 1 or 2
-            int end = length + rd.Next(1, 3); // 1 or 2
+            int start = length - rd.Next(1, 3);
+            int end = length + rd.Next(1, 3);
 
             start = start < 0 ? 0 : start;
             start = start >= 10 ? 9 : start;
@@ -536,8 +535,6 @@ internal class Enigma : RoleBase
         KillerRoleClue,
         KillerLevelClue,
         FriendCodeClue
-        //SecurityClue,
-        //SabotageClue,
-        //RandomClue
+
     }
 }

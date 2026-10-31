@@ -6,12 +6,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Inhibitor : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Inhibitor;
     private const int Id = 34200;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
-    //==================================================================\\
 
     private static OptionItem InhibitMax;
     private static OptionItem InhibitCDIncrease;
@@ -103,5 +102,5 @@ internal class Inhibitor : RoleBase
     {
         hud.KillButton.OverrideText(GetString("InhibitorInhibitText"));
     }
-    // public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Inhibit");
+
 }

@@ -10,12 +10,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Wraith : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Wraith;
     private const int Id = 18500;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem SuicideCooldown;
     public static OptionItem KillCooldown;
@@ -109,11 +108,10 @@ internal class Wraith : RoleBase
 
 internal class Wraithh : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Wraithh;
     public override CustomRoles ThisRoleBase => CustomRoles.GuardianAngel;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorGhosts;
-    //==================================================================\\
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
@@ -145,7 +143,7 @@ internal class Wraithh : RoleBase
         killer.RpcResetAbilityCooldown();
         return false;
     }
-    // EAC bans players when GA uses sabotage
+
     public override bool CanUseSabotage(PlayerControl pc) => false;
 
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Wraith");

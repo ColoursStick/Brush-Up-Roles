@@ -10,13 +10,12 @@ namespace TONE.Roles.Impostor;
 
 internal class RiftMaker : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.RiftMaker;
     private const int Id = 27200;
 
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
-    //==================================================================\\
 
     private static OptionItem SSCooldown;
     private static OptionItem KillCooldown;
@@ -56,9 +55,8 @@ internal class RiftMaker : RoleBase
     }
 
     public override void SetAbilityButtonText(HudManager hud, byte id) => hud.AbilityButton.OverrideText(GetString("RiftMakerButtonText"));
-    // public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Create Rift");
 
-    private void SendRPC(byte riftID, int operate) // Something here is throwing a null ref
+    private void SendRPC(byte riftID, int operate)
     {
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(operate);
@@ -69,15 +67,15 @@ internal class RiftMaker : RoleBase
         }
         writer.Write(riftID);
 
-        if (operate == 0) //sync markedloaction and last tp
+        if (operate == 0)
         {
             int length = MarkedLocation.Count;
-            writer.Write(MarkedLocation.ElementAt(length - 1).Key.x); //x coordinate
-            writer.Write(MarkedLocation.ElementAt(length - 1).Key.y); //y coordinate
+            writer.Write(MarkedLocation.ElementAt(length - 1).Key.x);
+            writer.Write(MarkedLocation.ElementAt(length - 1).Key.y);
 
             writer.Write(LastTP[riftID].ToString());
         }
-        else if (operate == 2) //sync last tp
+        else if (operate == 2)
         {
             writer.Write(LastTP[riftID].ToString());
         }
@@ -96,7 +94,7 @@ internal class RiftMaker : RoleBase
             return;
         }
         byte riftID = reader.ReadByte();
-        if (operate == 0) //sync  marked location and last tp
+        if (operate == 0)
         {
             float xLoc = reader.ReadSingle();
             float yLoc = reader.ReadSingle();
@@ -106,11 +104,11 @@ internal class RiftMaker : RoleBase
             string stimeStamp = reader.ReadString();
             if (long.TryParse(stimeStamp, out long timeStamp)) LastTP[riftID] = timeStamp;
         }
-        else if (operate == 1) //clear marked location
+        else if (operate == 1)
         {
             MarkedLocation.Clear();
         }
-        else if (operate == 2) //sync last tp
+        else if (operate == 2)
         {
             string stimeStamp = reader.ReadString();
             if (long.TryParse(stimeStamp, out long timeStamp)) LastTP[riftID] = timeStamp;
@@ -152,7 +150,7 @@ internal class RiftMaker : RoleBase
         shapeshifter.Notify(GetString("RiftCreated"));
 
         SendRPC(shapeshifterId, 0);
-        //sendrpc for marked location and lasttp
+
     }
 
     public override void OnCoEnterVent(PlayerPhysics physics, int ventId)
@@ -165,7 +163,7 @@ internal class RiftMaker : RoleBase
             physics?.RpcBootFromVent(ventId);
 
             MarkedLocation.Clear();
-            //send rpc for clearing markedlocation
+
             SendRPC(player.PlayerId, 1);
             player.Notify(GetString("RiftsDestroyed"));
 
@@ -198,7 +196,7 @@ internal class RiftMaker : RoleBase
         else return;
 
         LastTP[playerId] = now;
-        //SENDRPC
+
         SendRPC(playerId, 2);
         player.RpcTeleport(TPto);
         return;

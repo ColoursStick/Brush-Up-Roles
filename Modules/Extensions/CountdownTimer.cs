@@ -5,8 +5,6 @@ using UnityEngine;
 
 namespace TONE.Modules.Extensions;
 
-// Credit: Endless Host Roles by Gurge44
-// Reference: https://github.com/Gurge44/EndlessHostRoles/blob/main/Modules/Extensions/CountdownTimer.cs
 public sealed class CountdownTimer : IDisposable
 {
     private readonly float _durationSeconds;
@@ -48,9 +46,6 @@ public sealed class CountdownTimer : IDisposable
             Start();
     }
 
-    /// <summary>
-    /// Remaining time (clamped to 0)
-    /// </summary>
     public TimeSpan Remaining
     {
         get

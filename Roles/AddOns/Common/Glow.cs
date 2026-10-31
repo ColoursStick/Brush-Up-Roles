@@ -70,7 +70,7 @@ public class Glow : IAddon
         float setImpVision = opt.GetFloat(FloatOptionNames.ImpostorLightMod);
         setCrewVision += player.Is(CustomRoles.Glow) ? GlowVisionSelf.GetFloat() : GlowVisionOthers.GetFloat();
         setImpVision += player.Is(CustomRoles.Glow) ? GlowVisionSelf.GetFloat() : GlowVisionOthers.GetFloat();
-        //opt.SetFloat(FloatOptionNames.CrewLightMod, setCrewVision);
+
         opt.SetFloat(FloatOptionNames.ImpostorLightMod, setImpVision);
         opt.SetFloat(FloatOptionNames.CrewLightMod, setCrewVision);
     }
@@ -99,4 +99,3 @@ public class Glow : IAddon
         }
     }
 }
-

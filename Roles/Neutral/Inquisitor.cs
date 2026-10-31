@@ -11,13 +11,12 @@ namespace TONE.Roles.Neutral;
 
 internal class Inquisitor : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Inquisitor;
     private const int Id = 33000;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralChaos;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem OptionHereticCount;
@@ -136,7 +135,6 @@ internal class Inquisitor : RoleBase
             {
                 Logger.Info($"Wow, no targets for inquisitor to select! Changing inquisitor role to other", "Inquisitor");
 
-                // Unable to find a target? Try to turn to opportunist
                 var changedRole = CustomRoles.Opportunist;
 
                 inquisitor.GetRoleClass()?.OnRemove(playerId);

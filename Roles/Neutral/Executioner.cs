@@ -8,13 +8,12 @@ namespace TONE.Roles.Neutral;
 
 internal class Executioner : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Executioner;
     private const int Id = 14200;
     public static readonly HashSet<byte> playerIdList = [];
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralEvil;
-    //==================================================================\\
 
     private static OptionItem CanTargetImpostor;
     private static OptionItem CanTargetNeutralKiller;
@@ -204,15 +203,6 @@ internal class Executioner : RoleBase
         Utils.NotifyRoles(SpecifySeer: executioner);
     }
 
-    /*public override void OnMurderPlayerAsTarget(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
-    {
-        if (_Player != null && _Player.PlayerId == target.PlayerId)
-        {
-            SendRPC(SetTarget: false);
-            TargetList.Remove(TargetId);
-            TargetId = byte.MaxValue;
-        }
-    }*/
     private void OnOthersDead(PlayerControl killer, PlayerControl target, bool inMeeting)
     {
         if (IsTarget(target.PlayerId))

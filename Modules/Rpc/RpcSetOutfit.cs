@@ -23,7 +23,6 @@ namespace TONE.Modules.Rpc
             messages.Add(new RpcSetHatStrMessage(netId, outfit.HatId, GetNextSequenceId(netId, RpcCalls.SetHatStr)));
             messages.Add(new RpcSetPetStrMessage(netId, outfit.PetId, GetNextSequenceId(netId, RpcCalls.SetPetStr)));
             messages.Add(new RpcSetSkinStrMessage(netId, outfit.SkinId, GetNextSequenceId(netId, RpcCalls.SetSkinStr)));
-            // messages.Add(new RpcSetVisorStrMessage(netId, outfit.VisorId, GetNextSequenceId(netId, RpcCalls.SetVisorStr)));
 
             if (setNamePlate)
             {
@@ -33,8 +32,7 @@ namespace TONE.Modules.Rpc
 
         public override void SerializeCustomValues(MessageWriter writer)
         {
-            // First StartMessage and last EndMessage is done by vanilla code so you need to implement yourself
-            // writer.StartMessage(GameDataTypes.RpcFlag); 
+
             writer.WritePacked(netId);
             writer.Write((byte)RpcCalls.SetColor);
             writer.Write(playerInfoNetId);
@@ -52,7 +50,6 @@ namespace TONE.Modules.Rpc
             writer.Write(outfit.VisorId);
             writer.Write(GetNextSequenceId(netId, RpcCalls.SetVisorStr));
 
-            //writer.EndMessage();
         }
 
         private static byte GetNextSequenceId(uint netId, RpcCalls call)
@@ -61,7 +58,7 @@ namespace TONE.Modules.Rpc
             {
                 if (obj is PlayerControl player)
                 {
-                    // Add 10 to prevent cancelled shange outfit due to delay
+
                     return (byte)(player.GetNextRpcSequenceId(call) + 10);
                 }
             }

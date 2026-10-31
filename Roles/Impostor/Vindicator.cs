@@ -2,12 +2,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Vindicator : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Vindicator;
     private const int Id = 3800;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
-    //==================================================================\\
 
     private static OptionItem VindicatorAdditionalVote;
     private static OptionItem VindicatorHideVote;

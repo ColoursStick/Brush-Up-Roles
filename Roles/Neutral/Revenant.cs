@@ -5,13 +5,12 @@ namespace TONE.Roles.Neutral;
 
 internal class Revenant : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Revenant;
     private const int Id = 30200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Revenant);
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
-    //==================================================================\\
 
     public override void SetupCustomOption()
     {

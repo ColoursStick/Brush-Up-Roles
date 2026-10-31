@@ -5,12 +5,11 @@ namespace TONE.Roles.Impostor;
 
 internal class KillingMachine : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.KillingMachine;
     private const int Id = 23800;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem MNKillCooldown;
 

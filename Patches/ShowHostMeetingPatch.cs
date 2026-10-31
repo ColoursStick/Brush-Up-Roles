@@ -3,8 +3,6 @@ using UnityEngine;
 
 namespace TONE.Patches;
 
-// Thanks TOU-R: https://github.com/eDonnes124/Town-Of-Us-R/blob/master/source/Patches/ShowHostMeetingPatch.cs
-
 [HarmonyPatch]
 public class ShowHostMeetingPatch
 {
@@ -32,7 +30,7 @@ public class ShowHostMeetingPatch
     [HarmonyPostfix]
     public static void Update_Postfix(MeetingHud __instance)
     {
-        // Not display in local game, because it will be impossible to complete the meeting
+
         if (!GameStates.IsOnlineGame) return;
 
         PlayerMaterial.SetColors(HostColor, __instance.HostIcon);

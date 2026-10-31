@@ -8,7 +8,6 @@ public class Tricky : IAddon
     private const int Id = 19900;
     public AddonTypes Type => AddonTypes.Impostor;
     private static OptionItem EnabledDeathReasons;
-    //private static Dictionary<byte, PlayerState.DeathReason> randomReason = [];
 
     public void SetupCustomOption()
     {
@@ -17,7 +16,7 @@ public class Tricky : IAddon
     }
     public void Init()
     {
-        //randomReason = [];
+
     }
     public void Add(byte playerId, bool gameIsLoading = true)
     { }

@@ -10,13 +10,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Lighter : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Lighter;
     private const int Id = 8400;
     public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
-    //==================================================================\\
 
     private static OptionItem LighterVisionNormal;
     private static OptionItem LighterVisionOnLightsOut;

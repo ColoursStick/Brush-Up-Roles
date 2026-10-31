@@ -9,7 +9,7 @@ public class Tired : IAddon
     public CustomRoles Role => CustomRoles.Tired;
     private const int Id = 27300;
     public AddonTypes Type => AddonTypes.Harmful;
-    private static readonly Dictionary<byte, bool> playerIdList = []; // Target Action player for Vision
+    private static readonly Dictionary<byte, bool> playerIdList = [];
 
     private static OptionItem SetVision;
     private static OptionItem SetSpeed;
@@ -64,12 +64,11 @@ public class Tired : IAddon
 
     public static void AfterActionTasks(PlayerControl player)
     {
-        // Speed
+
         player.Notify(GetString("TiredNotify"));
         var tmpSpeed = Main.AllPlayerSpeed[player.PlayerId];
         Main.AllPlayerSpeed[player.PlayerId] = SetSpeed.GetFloat();
 
-        // Vision
         playerIdList[player.PlayerId] = true;
         player.MarkDirtySettings();
 

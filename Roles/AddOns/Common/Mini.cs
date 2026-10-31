@@ -11,11 +11,10 @@ namespace TONE.Roles.AddOns.Common;
 
 public class Mini : IAddon
 {
-    //===========================SETUP================================\\
+
     public CustomRoles Role => CustomRoles.Mini;
     private const int Id = 7000;
     public AddonTypes Type => AddonTypes.Helpful;
-    //==================================================================\\
 
     private static OptionItem GrowUpDuration;
     public static OptionItem EveryoneCanKnowMini;
@@ -26,7 +25,7 @@ public class Mini : IAddon
 
     public static int Age = new();
     private static int GrowUpTime = new();
-    //private static int GrowUp = new();
+
     private static long LastFixedUpdate = new();
     private static bool misguessed = false;
 
@@ -85,7 +84,6 @@ public class Mini : IAddon
     {
         if (Age >= 18) return;
 
-        //Check if nice mini is dead
         if (player.Is(CustomRoles.Mini) && !player.IsAlive() && player.IsPlayerCrewmateTeam() && CanWin.GetBool())
         {
             if (CustomWinnerHolder.WinnerTeam == CustomWinner.Default && !CustomWinnerHolder.CheckForConvertedWinner(player.PlayerId))
@@ -93,8 +91,8 @@ public class Mini : IAddon
                 CustomWinnerHolder.ResetAndSetWinner(CustomWinner.NiceMini);
                 CustomWinnerHolder.WinnerIds.Add(player.PlayerId);
             }
-            // â†‘ This code will show the mini winning player on the checkout screen, Tommy you shouldn't comment it out!
-        } //Is there any need to check this 30 times a second?
+
+        }
 
         if (GameStates.IsMeeting && !CountMeetingTime.GetBool()) return;
 
@@ -107,11 +105,6 @@ public class Mini : IAddon
             Age += 1;
             GrowUpTime = 0;
             Logger.Info("Mini grow up by 1", "Mini");
-
-            /*Dont show guard animation for evil mini,
-            this would simply stop them from murdering.
-            Imagine reseting kill cool down every 20 seconds
-            and evil mini can never kill before age 18*/
 
             if (UpDateAge.GetBool())
             {

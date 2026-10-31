@@ -44,5 +44,5 @@ public class Hurried : IAddon
         }
         return false;
     }
-    //Hard to check specific player, loop check all player
+
 }

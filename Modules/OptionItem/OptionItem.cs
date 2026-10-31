@@ -18,14 +18,12 @@ public abstract class OptionItem
     public static int CurrentPreset { get; set; }
     #endregion
 
-    // Constructor variables
     public int Id { get; }
     public string Name { get; }
     public int DefaultValue { get; }
     public TabGroup Tab { get; }
     public bool IsSingleValue { get; }
 
-    // Nullable/Empty Variables
     public Color NameColor { get; protected set; }
     public OptionFormat ValueFormat { get; protected set; }
     public CustomGameMode GameMode { get; protected set; }
@@ -59,7 +57,6 @@ public abstract class OptionItem
     }
     public int SingleValue { get; private set; }
 
-    // Parent and Child Info
     public OptionItem Parent { get; private set; }
     public List<OptionItem> Children;
 
@@ -67,10 +64,9 @@ public abstract class OptionItem
 
     public event EventHandler<UpdateValueEventArgs> UpdateValueEvent;
 
-    // Constructor
     public OptionItem(int id, string name, int defaultValue, TabGroup tab, bool isSingleValue, bool vanillaStr)
     {
-        // Info Setting
+
         Id = id;
         Name = name;
         DefaultValue = defaultValue;
@@ -78,7 +74,6 @@ public abstract class OptionItem
         IsSingleValue = isSingleValue;
         IsVanillaText = vanillaStr;
 
-        // Nullable Info Setting
         NameColor = Color.white;
         ValueFormat = OptionFormat.None;
         GameMode = CustomGameMode.All;
@@ -92,10 +87,8 @@ public abstract class OptionItem
         IsHidden = false;
         IsText = false;
 
-        // Initialize Objects
         Children = [];
 
-        // Set default value
         if (Id == PresetId)
         {
             SingleValue = DefaultValue;
@@ -127,7 +120,6 @@ public abstract class OptionItem
         }
     }
 
-    // Setter
     public OptionItem Do(Action<OptionItem> action)
     {
         action(this);
@@ -167,7 +159,6 @@ public abstract class OptionItem
     public OptionItem RegisterUpdateValueEvent(EventHandler<UpdateValueEventArgs> handler)
         => Do(i => UpdateValueEvent += handler);
 
-    // þ¢«ÒüìµÅøÒüêÞ¥×µø©
     public OptionItem AddReplacement((string key, string value) kvp)
         => Do(i =>
         {
@@ -177,7 +168,6 @@ public abstract class OptionItem
     public OptionItem RemoveReplacement(string key)
         => Do(i => ReplacementDictionary?.Remove(key));
 
-    // Getter
     public virtual string GetName(bool disableColor = false, bool console = false)
     {
         return disableColor ?
@@ -197,7 +187,6 @@ public abstract class OptionItem
     }
     public virtual int GetValue() => IsSingleValue ? SingleValue : AllValues[CurrentPreset];
 
-    // Deprecated IsHidden function
     public virtual bool IsHiddenOn(CustomGameMode mode, bool forLobbyView = false, bool checkCollapsedSection = true)
     {
         if (forLobbyView) mode = LobbyViewSettingsPanePatch.LastGameModeSelected;
@@ -280,7 +269,7 @@ public abstract class OptionItem
     {
         AllValues = values;
     }
-    // This Code For Reset All TONE Setting To Default
+
     public virtual void SetValueNoRpc(int value)
     {
         int beforeValue = CurrentValue;
@@ -315,8 +304,6 @@ public abstract class OptionItem
         RPC.SyncCustomSettingsRPC(targetId);
     }
 
-
-    // EventArgs
     private void CallUpdateValueEvent(int beforeValue, int currentValue)
     {
         if (UpdateValueEvent == null) return;

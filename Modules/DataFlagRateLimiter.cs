@@ -4,7 +4,6 @@ using System.Diagnostics;
 
 namespace TONE.Modules;
 
-// Credit: EHR
 public static class DataFlagRateLimiter
 {
     public class QueuedAction
@@ -24,29 +23,17 @@ public static class DataFlagRateLimiter
 
     private static int LastPingMs;
 
-    // =========================
-    // RELIABLE
-    // =========================
-
     private static readonly Queue<QueuedAction> ReliableQueue = new();
     private static readonly Stopwatch ReliableTimer = Stopwatch.StartNew();
     private static int ReliableSent;
 
     private static int ReliableRateLimitPerSecond = Options.MaxSpiltReliableDataFlagPerSecond.GetInt();
 
-    // =========================
-    // UNRELIABLE (SendOption.None)
-    // =========================
-
     private static readonly Queue<QueuedAction> UnreliableQueue = new();
     private static readonly Stopwatch UnreliableTimer = Stopwatch.StartNew();
     private static int UnreliableSent;
 
     private static int UnreliableRateLimitPerSecond = Options.MaxSpiltNoneDataFlagPerSecond.GetInt();
-
-    // =========================
-    // PUBLIC API
-    // =========================
 
     public static QueuedAction Enqueue(Action action, SendOption channel = SendOption.Reliable, int calls = 1, Action cleanup = null)
     {
@@ -58,7 +45,6 @@ public static class DataFlagRateLimiter
             Done = false
         };
 
-        // Not needed on modded regions
         if (!Main.CurrentServerIsVanilla || !Options.BypassRateLimitAC.GetBool())
         {
             Execute(qa);
@@ -77,7 +63,7 @@ public static class DataFlagRateLimiter
                 EnqueueInternal(ReliableQueue, ref ReliableSent, ReliableRateLimitPerSecond, qa);
                 break;
 
-            case SendOption.None: // Unreliable
+            case SendOption.None:
                 EnqueueInternal(UnreliableQueue, ref UnreliableSent, UnreliableRateLimitPerSecond, qa);
                 break;
         }
@@ -85,16 +71,11 @@ public static class DataFlagRateLimiter
         return qa;
     }
 
-    // Called once per frame
     public static void OnFixedUpdate()
     {
         ProcessQueue(ReliableQueue, ref ReliableSent, ReliableTimer, ReliableRateLimitPerSecond);
         ProcessQueue(UnreliableQueue, ref UnreliableSent, UnreliableTimer, UnreliableRateLimitPerSecond);
     }
-
-    // =========================
-    // INTERNAL LOGIC
-    // =========================
 
     private static void EnqueueInternal(
         Queue<QueuedAction> queue,
@@ -102,7 +83,7 @@ public static class DataFlagRateLimiter
         int limit,
         QueuedAction qa)
     {
-        // Try immediate execution if no backlog
+
         if (queue.Count == 0 && sent + qa.Cost <= limit)
         {
             Execute(qa);
@@ -119,7 +100,7 @@ public static class DataFlagRateLimiter
         Stopwatch timer,
         int limit)
     {
-        // Reset window every second
+
         if (timer.ElapsedMilliseconds >= 1000 + Math.Max(0, LastPingMs - AmongUsClient.Instance.Ping))
         {
             LastPingMs = AmongUsClient.Instance.Ping;

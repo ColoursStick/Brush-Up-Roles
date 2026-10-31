@@ -11,21 +11,19 @@ namespace TONE.Roles.Coven;
 
 internal class PotionMaster : CovenManager
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.PotionMaster;
     private const int Id = 17700;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenUtility;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem RevealMaxCount;
     private static OptionItem BarrierMaxCount;
     private static OptionItem CovenCanSeeReveals;
     private static OptionItem RevealsPersist;
-    //private static OptionItem CanVent;
-    //private static OptionItem HasImpostorVision;
+
     enum OptionName
     {
         PotionMasterMaxReveals,
@@ -39,8 +37,6 @@ internal class PotionMaster : CovenManager
     private static readonly Dictionary<byte, int> BarrierLimit = [];
     private static byte PotionMode = 0;
 
-
-
     public override void SetupCustomOption()
     {
         SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
@@ -53,8 +49,7 @@ internal class PotionMaster : CovenManager
         CovenCanSeeReveals = BooleanOptionItem.Create(Role, Id + 12, OptionName.PotionMasterCovenCanSeeReveals, true, false);
         RevealsPersist = BooleanOptionItem.Create(Role, Id + 13, OptionName.PotionMasterRevealsPersist, true, false)
             .SetParent(CovenCanSeeReveals);
-        //CanVent = BooleanOptionItem.Create(Id + 12, GeneralOption.CanVent, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.PotionMaster]);
-        //HasImpostorVision = BooleanOptionItem.Create(Id + 13, GeneralOption.ImpostorVision, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.PotionMaster]);
+
     }
     public override void Init()
     {
@@ -203,10 +198,10 @@ internal class PotionMaster : CovenManager
             var sb = new StringBuilder();
             switch (PotionMode)
             {
-                case 0: // Reveal
+                case 0:
                     sb.Append(GetString("PotionMasterPotionCurrent") + GetString("PotionMasterReveal"));
                     break;
-                case 1: // Barrier
+                case 1:
                     sb.Append(GetString("PotionMasterPotionCurrent") + GetString("PotionMasterBarrier"));
                     break;
             }

@@ -11,13 +11,12 @@ namespace TONE.Roles._Ghosts_.Crewmate;
 
 internal class Hawk : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Hawk;
     private const int Id = 28000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Hawk);
     public override CustomRoles ThisRoleBase => CustomRoles.GuardianAngel;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateGhosts;
-    //==================================================================\\
 
     public static OptionItem KillCooldown;
     public static OptionItem HawkCanKillNum;

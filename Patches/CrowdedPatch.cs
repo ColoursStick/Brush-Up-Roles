@@ -5,10 +5,6 @@ using System;
 using TMPro;
 using UnityEngine;
 
-// https://github.com/CrowdedMods/CrowdedMod/blob/master/src/CrowdedMod
-// Niko adjusted mono behavior patches to fit into non-reactor mods
-// 参考：https://github.com/Gurge44/EndlessHostRoles/blob/main/Patches/Crowded.cs
-
 namespace TONE.Patches.Crowded;
 
 internal static class Crowded
@@ -154,15 +150,13 @@ internal static class Crowded
             __instance.GameModeText.text = DestroyableSingleton<TranslationController>.Instance.GetString(GameModesHelpers.ModeToName[GameOptionsManager.Instance.CurrentGameOptions.GameMode]);
             return false;
 
-            // Skip maxplayers => max impostors array check here
-            // Overwrite to 3 bug
         }
     }
 
     [HarmonyPatch(typeof(ServerManager), nameof(ServerManager.SetRegion))]
     public static class ServerManager_SetRegion
     {
-        // I dont find a effect way to patch CreateOptionsPicker LOL
+
         public static void Postfix(ServerManager __instance)
         {
             if (GameStates.IsVanillaServer)
@@ -398,7 +392,6 @@ public class AbstractPagingBehaviour : MonoBehaviour
     private int _page;
 
     public virtual int MaxPerPage => 15;
-    // public virtual IEnumerable<T> Targets { get; }
 
     public virtual int PageIndex
     {
@@ -411,7 +404,6 @@ public class AbstractPagingBehaviour : MonoBehaviour
     }
 
     public virtual int MaxPageIndex => throw new NotImplementedException();
-    // public virtual int MaxPages => Targets.Count() / MaxPerPage;
 
     public virtual void OnPageChanged() => throw new NotImplementedException();
 
@@ -451,10 +443,6 @@ public class AbstractPagingBehaviour : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Loops around if you go over the limits.<br/>
-    /// Attempting to go up a page while on the first page will take you to the last page and vice versa.
-    /// </summary>
     public virtual void Cycle(bool increment)
     {
         var change = increment ? 1 : -1;
@@ -498,7 +486,7 @@ public class MeetingHudPagingBehaviour : AbstractPagingBehaviour
         base.Update();
 
         if (meetingHud.state is MeetingHud.MeetingStates.Animating or MeetingHud.MeetingStates.Proceeding || meetingHud.TimerText.text.Contains($" ({PageIndex + 1}/{MaxPageIndex + 1})"))
-            return; // TimerText does not update there                                                 ^ Sometimes the timer text is spammed with the page counter for some weird reason so this is just a band-aid fix for it
+            return;
 
         meetingHud.TimerText.text += $" ({PageIndex + 1}/{MaxPageIndex + 1})";
     }

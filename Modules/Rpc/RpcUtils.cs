@@ -8,7 +8,7 @@ namespace TONE.Modules.Rpc;
 [HarmonyPatch]
 public class RpcUtils
 {
-    // You need to register and cast shit into IGameDataMessage so the game will recoginze it and put it in quque
+
     public static void LateBroadcastReliableMessage(BaseGameDataMessage message)
     {
         try
@@ -60,7 +60,7 @@ public class RpcUtils
     [HarmonyPostfix]
     public static void PackAndSendQueuedMessagesPostfix(InnerNetClient __instance, [HarmonyArgument(0)] Queue<IGameDataMessage> queue, [HarmonyArgument(1)] SendOption sendOption)
     {
-        if (queue.Count > 0) return; // wait for vanilla to be done sending data
+        if (queue.Count > 0) return;
 
         PackAndSendSpecificMessage(sendOption);
     }

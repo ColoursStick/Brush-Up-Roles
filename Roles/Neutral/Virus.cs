@@ -13,14 +13,13 @@ namespace TONE.Roles.Neutral;
 
 internal class Virus : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Virus;
     private const int Id = 18300;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Virus);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem InfectMax;
@@ -107,7 +106,7 @@ internal class Virus : RoleBase
             if (addon is CustomRoles.Admired)
             {
                 Admirer.AdmiredList[_Player.PlayerId].Add(reporter.PlayerId);
-                Admirer.SendRPC(_Player.PlayerId, reporter.PlayerId); //Sync playerId list
+                Admirer.SendRPC(_Player.PlayerId, reporter.PlayerId);
             }
         }
 

@@ -11,14 +11,13 @@ namespace TONE.Roles.Crewmate;
 
 internal class Medic : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Medic;
     private const int Id = 8600;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Medic);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
-    //==================================================================\\
 
     private static OptionItem WhoCanSeeProtectOpt;
     private static OptionItem KnowShieldBrokenOpt;
@@ -26,9 +25,6 @@ internal class Medic : RoleBase
     private static OptionItem ShieldDeactivationIsVisibleOpt;
     private static OptionItem ResetCooldown;
     public static OptionItem GuesserIgnoreShield;
-    /*private static OptionItem MedicPortableVitals;
-    private static OptionItem VitalsCooldown;
-    private static OptionItem VitalsDuration;*/
 
     private static readonly HashSet<byte> GlobalProtectedList = [];
     private static readonly Dictionary<byte, HashSet<byte>> ProtectedPlayers = [];
@@ -68,14 +64,7 @@ internal class Medic : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         GuesserIgnoreShield = BooleanOptionItem.Create(Id + 32, "MedicShieldedCanBeGuessed", false, TabGroup.CrewmateRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Medic]);
-        /*MedicPortableVitals = BooleanOptionItem.Create(Id + 35, "MedicPortableVitals", false, TabGroup.CrewmateRoles, false)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Medic]);
-        VitalsCooldown = IntegerOptionItem.Create(Id + 36, GeneralOption.ScientistBase_BatteryCooldown, new(1, 250, 1), 15, TabGroup.CrewmateRoles, false)
-            .SetParent(MedicPortableVitals)
-            .SetValueFormat(OptionFormat.Seconds);
-        VitalsDuration = IntegerOptionItem.Create(Id + 37, GeneralOption.ScientistBase_BatteryDuration, new(1, 250, 1), 5, TabGroup.CrewmateRoles, false)
-            .SetParent(MedicPortableVitals)
-            .SetValueFormat(OptionFormat.Seconds);*/
+
     }
     public override void Init()
     {
@@ -278,14 +267,14 @@ internal class Medic : RoleBase
     {
         if (!seer.Is(CustomRoles.Medic))
         {
-            // The seer sees protect on himself
+
             if (seer.PlayerId == target.PlayerId && (IsProtect(seer.PlayerId) || TempMarkProtected.Contains(seer.PlayerId)) && (WhoCanSeeProtectOpt.GetInt() is 0 or 2))
             {
                 return ColorString(GetRoleColor(CustomRoles.Medic), "✚");
             }
             else if (seer.PlayerId != target.PlayerId && !seer.IsAlive() && (IsProtect(target.PlayerId) || TempMarkProtected.Contains(target.PlayerId)))
             {
-                // Dead players see protect
+
                 return ColorString(GetRoleColor(CustomRoles.Medic), "✚");
             }
         }

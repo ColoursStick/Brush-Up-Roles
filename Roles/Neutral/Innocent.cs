@@ -6,13 +6,12 @@ namespace TONE.Roles.Neutral;
 
 internal class Innocent : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Innocent;
     private const int Id = 14300;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralEvil;
-    //==================================================================\\
 
     private static OptionItem InnocentCanWinByImp;
     private bool TargetIsKilled = false;

@@ -5,18 +5,16 @@ using TONE.Roles.Core;
 using TONE.Roles.Neutral;
 using static TONE.Options;
 
-
 namespace TONE.Roles.Impostor;
 
 internal class Lightning : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Lightning;
     private const int Id = 24100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Lightning);
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem ConvertTime;

@@ -22,23 +22,12 @@ public class AirshipElectricalDoors
         }
         return DoorsArray?.ToArray();
     }
-    // 0: BottomRightHort
-    // 1: BottomHort
-    // 2: TopRightHort
-    // 3: TopCenterHort
-    // 4: TopLeftHort
-    // 5: LeftVert
-    // 6: RightVert
-    // 7: TopRightVert
-    // 8: TopLeftVert
-    // 9: BottomRightVert
-    // 10: LeftDoorTop
-    // 11: LeftDoorBottom
+
 }
 [HarmonyPatch(typeof(ElectricalDoors), nameof(ElectricalDoors.Initialize))]
 class ElectricalDoorsInitializePatch
 {
-    public static void Postfix(/*ElectricalDoors __instance*/)
+    public static void Postfix()
     {
         if (!GameStates.IsInGame) return;
         var closedoors = "";

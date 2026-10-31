@@ -11,7 +11,6 @@ public class PresetOptionItem(int defaultValue, TabGroup tab, bool vanilla) : Op
         return new PresetOptionItem(defaultValue, tab, vanillaText);
     }
 
-    // Getter
     public override int GetInt() => Rule.GetValueByIndex(CurrentValue);
     public override float GetFloat() => Rule.GetValueByIndex(CurrentValue);
     public override string GetString()
@@ -34,7 +33,6 @@ public class PresetOptionItem(int defaultValue, TabGroup tab, bool vanilla) : Op
     public override int GetValue()
         => Rule.RepeatIndex(base.GetValue());
 
-    // Setter
     public override void SetValue(int value, bool doSync = true)
     {
         base.SetValue(Rule.RepeatIndex(value), doSync);

@@ -8,7 +8,6 @@ public class WriterProxy(MessageWriter writer) : ICustomWriter
 {
     public MessageWriter Writer { get; private set; } = writer;
 
-
     public void Write(float val) => Writer.Write(val);
     public void Write(string val) => Writer.Write(val);
     public void Write(ulong val) => Writer.Write(val);

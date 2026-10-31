@@ -12,12 +12,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Puppeteer : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Puppeteer;
     private const int Id = 4300;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
-    //==================================================================\\
 
     private static OptionItem PuppeteerDoubleKills;
 
@@ -35,7 +34,7 @@ internal class Puppeteer : RoleBase
     }
     public override void Add(byte playerId)
     {
-        // Double Trigger
+
         var pc = Utils.GetPlayerById(playerId);
         pc.AddDoubleTrigger();
 
@@ -137,7 +136,7 @@ internal class Puppeteer : RoleBase
                         Utils.MarkEveryoneDirtySettings();
                         PuppeteerList.Remove(puppet.PlayerId);
                         SendRPC(byte.MaxValue, puppet.PlayerId, 2);
-                        //Utils.NotifyRoles(SpecifySeer: puppet);
+
                         Utils.NotifyRoles(SpecifySeer: Utils.GetPlayerById(puppeteerId), SpecifyTarget: puppet, ForceLoop: true);
 
                         if (!puppet.IsTransformedNeutralApocalypse() && PuppeteerDoubleKills.GetBool())

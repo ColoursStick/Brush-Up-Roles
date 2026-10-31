@@ -4,12 +4,11 @@ namespace TONE.Roles.Impostor;
 
 internal class IdentityThief : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.IdentityThief;
     private const int Id = 34100;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
 

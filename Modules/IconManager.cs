@@ -13,7 +13,6 @@ public static class IconManager
     private static readonly Regex ColorTagRegex = new("<color=(?<color>#[0-9a-fA-F]{6,8})>", RegexOptions.Compiled);
     private static readonly Regex LegendLineRegex = new(@"^(?<glyph>\S{1,3})\s*[-–—:]\s*(?<desc>.+)$", RegexOptions.Compiled);
 
-    // 忽略玩家ID，生命值等
     private const string IgnoredSymbols = "()[]{}<>【】〈〉（）「」『』、，。！？；：,.!?;:'\"`-_=+*/\\|&%$#@^~";
 
     public sealed class IconEntry
@@ -23,7 +22,6 @@ public static class IconManager
         public string Line;
     }
 
-    // 当前语言的图标图例
     public static List<IconEntry> GetIconEntries() => ParseLegend(GetString("Command.icons"));
 
     public static string GetVisibleMarks(PlayerControl seer, PlayerControl target)
@@ -75,7 +73,6 @@ public static class IconManager
         {
             if (!marks.Contains(entry.Glyph, StringComparison.Ordinal)) continue;
 
-            // 某些图标被多个职业使用（例如 ⦿），筛选出颜色匹配的那个
             if (entries.Count(x => x.Glyph == entry.Glyph) > 1 && entry.Color != null && !ContainsColor(marks, entry.Color)) continue;
 
             sb.Append('\n').Append(entry.Line);
@@ -118,7 +115,6 @@ public static class IconManager
         return entries;
     }
 
-    // 语言缺失的图标
     private static string GetUnknownGlyphs(string marks, List<IconEntry> entries)
     {
         var sb = new StringBuilder();

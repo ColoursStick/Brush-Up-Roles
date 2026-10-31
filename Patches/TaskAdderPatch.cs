@@ -36,13 +36,6 @@ class ShowFolderPatch
             var crewBehaviour = DestroyableSingleton<RoleManager>.Instance.AllRoles.ToArray().FirstOrDefault(role => role.Role == RoleTypes.Crewmate);
             foreach (var cRole in CustomRolesHelper.AllRoles)
             {
-                /*if(cRole == CustomRoles.Crewmate ||
-                cRole == CustomRoles.Impostor ||
-                cRole == CustomRoles.Scientist ||
-                cRole == CustomRoles.Engineer ||
-                cRole == CustomRoles.GuardianAngel ||
-                cRole == CustomRoles.Shapeshifter
-                ) continue;*/
 
                 TaskAddButton button = Object.Instantiate(__instance.RoleButton);
                 button.Text.text = Utils.GetRoleName(cRole);

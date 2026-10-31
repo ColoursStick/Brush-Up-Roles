@@ -13,12 +13,10 @@ internal class Vampire : RoleBase
         public float KillTimer = killTimer;
     }
 
-    //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Vampire;
     private const int Id = 5000;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
-    //==================================================================\\
 
     private static OptionItem OptionKillDelay;
     private static OptionItem CanVent;

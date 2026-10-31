@@ -43,13 +43,12 @@ public class Eavesdropper : IAddon
         {
             if (IRandom.Instance.Next(0, 100) < EavesdropPercentChance.GetFloat())
             {
-                // Get all specific msg
+
                 var eavesdropperMsg = MeetingHudStartPatch.msgToSend.Where(x => x.Item2 != 255).Select(x => x.Item1).ToList();
 
-                // Check any data
                 if (eavesdropperMsg.Any())
                 {
-                    // Get random message and send Eavesdropper
+
                     var randomMsg = eavesdropperMsg.RandomElement();
                     MeetingHudStartPatch.AddMsg(randomMsg, eavesdropperId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Eavesdropper), Translator.GetString("EavesdropperMsgTitle")));
                 }

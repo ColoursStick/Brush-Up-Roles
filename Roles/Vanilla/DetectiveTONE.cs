@@ -4,12 +4,11 @@ namespace TONE.Roles.Vanilla;
 
 internal class DetectiveTONE : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.DetectiveTONE;
     private const int Id = 33200;
     public override CustomRoles ThisRoleBase => CustomRoles.Detective;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateVanilla;
-    //==================================================================\\
 
     private static OptionItem DetectiveSuspectLimit;
 

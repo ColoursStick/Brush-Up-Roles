@@ -114,7 +114,7 @@ public static class GuessManager
             && !pc.Is(CustomRoles.Guesser)
             && !Options.GuesserMode.GetBool()) return false;
 
-        int operate = 0; // 1:ID 2:猜测
+        int operate = 0;
         msg = msg.ToLower().TrimStart().TrimEnd();
         if (CheckCommond(ref msg, "id|guesslist|gl编号|玩家编号|玩家id|id列表|玩家列表|列表|所有id|全部id||編號|玩家編號")) operate = 1;
         else if (CheckCommond(ref msg, "shoot|guess|bet|st|gs|bt|猜|赌|賭", false)) operate = 2;
@@ -225,8 +225,6 @@ public static class GuessManager
                 if (pc.Is(CustomRoles.Mini) && Mini.GuessCheck(isUI, pc, target, role, ref guesserSuicide)) return true;
 
                 if (target.Is(CustomRoles.Mini) && Mini.OnRoleGuess(isUI, target, pc, role, ref guesserSuicide)) return true;
-                // Used to be a exploit. Guess may be canceled even misguessed
-                // You need to manually check whether guessed correct and then perform role abilities
 
                 if (CopyCat.playerIdList.Contains(pc.PlayerId))
                 {
@@ -318,40 +316,35 @@ public static class GuessManager
                     return true;
                 }
 
-                // Guesser (add-on) Cant Guess Addons
                 if (role.IsAdditionRole() && pc.Is(CustomRoles.Guesser) && !Guesser.GCanGuessAdt.GetBool())
                 {
                     pc.ShowInfoMessage(isUI, GetString("GuessAdtRole"));
                     return true;
                 }
 
-                // Guesser Mode Can/Cant Guess Addons
                 if (Options.GuesserMode.GetBool())
                 {
                     if (role.IsAdditionRole() && !Options.CanGuessAddons.GetBool())
                     {
-                        // Impostors Cant Guess Addons
+
                         if (Options.ImpostorsCanGuess.GetBool() && (pc.Is(Custom_Team.Impostor) || pc.GetCustomRole().IsMadmate()) && !(pc.Is(CustomRoles.EvilGuesser) || pc.Is(CustomRoles.Guesser)))
                         {
                             pc.ShowInfoMessage(isUI, GetString("GuessAdtRole"));
                             return true;
                         }
 
-                        // Crewmates Cant Guess Addons
                         if (Options.CrewmatesCanGuess.GetBool() && pc.Is(Custom_Team.Crewmate) && !(pc.Is(CustomRoles.NiceGuesser) || pc.Is(CustomRoles.Guesser)))
                         {
                             pc.ShowInfoMessage(isUI, GetString("GuessAdtRole"));
                             return true;
                         }
 
-                        // Coven Cant Guess Addons
                         if (Options.CovenCanGuess.GetBool() && pc.Is(Custom_Team.Coven) && !pc.Is(CustomRoles.Guesser))
                         {
                             pc.ShowInfoMessage(isUI, GetString("GuessAdtRole"));
                             return true;
                         }
 
-                        // Neutrals Cant Guess Addons
                         if ((Options.NeutralKillersCanGuess.GetBool() || Options.PassiveNeutralsCanGuess.GetBool()) && pc.Is(Custom_Team.Neutral) && !(pc.Is(CustomRoles.Doomsayer) || pc.Is(CustomRoles.Guesser)))
                         {
                             pc.ShowInfoMessage(isUI, GetString("GuessAdtRole"));
@@ -486,7 +479,7 @@ public static class GuessManager
     {
         try
         {
-            // DEATH STUFF //
+
             GameEndCheckerForNormal.ShouldNotCheck = true;
             var amOwner = pc.AmOwner;
             pc.RpcExileV3();
@@ -524,7 +517,6 @@ public static class GuessManager
             Swapper.CheckSwapperTarget(pc.PlayerId);
             Balancer.CheckBalancerTarget(pc.PlayerId);
 
-            // Prevent double check end voting
             if (meetingHud.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted)
             {
                 meetingHud.CheckForEndVoting();
@@ -537,7 +529,7 @@ public static class GuessManager
         }
         catch (Exception error)
         {
-            // try{} catch{} added in case an exception occurs, and "ShouldNotCheck" will remain true forever
+
             Logger.Error($"Error after guesser murder: {error}", "RpcGuesserMurderPlayer");
             GameEndCheckerForNormal.ShouldNotCheck = false;
         }
@@ -561,7 +553,7 @@ public static class GuessManager
         PlayerVoteArea voteArea = MeetingHud.Instance.playerStates.First(
             x => x.PlayerId == pc.PlayerId
         );
-        //pc.Die(DeathReason.Kill);
+
         if (voteArea == null) return;
         if (voteArea.DidVote) voteArea.UnsetVote();
         voteArea.AmDead = true;
@@ -589,7 +581,7 @@ public static class GuessManager
         string result = string.Empty;
         for (int i = 0; i < mc.Count; i++)
         {
-            result += mc[i];//匹配结果是完整的数字，此处可以不做拼接的
+            result += mc[i];
         }
 
         if (int.TryParse(result, out int num))
@@ -598,16 +590,13 @@ public static class GuessManager
         }
         else
         {
-            //并不是玩家编号，判断是否颜色
-            //byte color = GetColorFromMsg(msg);
-            //好吧我不知道怎么取某位玩家的颜色，等会了的时候再来把这里补上
+
             id = byte.MaxValue;
             error = GetString("GuessHelp");
             role = new();
             return false;
         }
 
-        //判断选择的玩家是否合理
         PlayerControl target = Utils.GetPlayerById(id);
         if (target == null || target.Data.IsDead)
         {
@@ -662,9 +651,6 @@ public static class GuessManager
             {
                 if (PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.Is(CustomRoles.EvilGuesser))
                     CreateGuesserButton(__instance);
-
-                /*    if (PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.Is(CustomRoles.Ritualist))
-                        CreateGuesserButton(__instance); */
 
                 if (PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.Is(CustomRoles.NiceGuesser))
                     CreateGuesserButton(__instance);
@@ -779,15 +765,6 @@ public static class GuessManager
             List<Transform> buttons = [];
             Transform selectedButton = null;
 
-            /* 
-                TabId:
-                Crewmate   = 0
-                Impostor   = 1
-                Neutral    = 2
-                Coven      = 3
-                Add-ons    = 4
-            */
-
             int tabCount = 0;
             for (int TabId = 0; TabId < 5; TabId++)
             {
@@ -807,8 +784,7 @@ public static class GuessManager
                     }
                     else if (PlayerControl.LocalPlayer.Is(CustomRoles.Guesser))
                     {
-                        //if (!Options.GCanGuessCrew.GetBool() && TabId == 0) continue;
-                        //if (!Options.GCanGuessImp.GetBool() && TabId == 1) continue;
+
                         if (!Guesser.GCanGuessAdt.GetBool() && TabId == 4) continue;
                     }
                     else if (Options.GuesserMode.GetBool() &&
@@ -847,7 +823,7 @@ public static class GuessManager
                     Custom_Team.Addon => new Color32(255, 154, 206, byte.MaxValue),
                     _ => throw new NotImplementedException(),
                 };
-                //Logger.Info(Teamlabel.color.ToString(), ((Custom_Team)TabId).ToString());
+
                 Teamlabel.text = GetString("Type" + ((Custom_Team)TabId).ToString());
                 Teamlabel.alignment = TextAlignmentOptions.Center;
                 Teamlabel.transform.localPosition = new Vector3(0, 0, Teamlabel.transform.localPosition.z);
@@ -928,7 +904,6 @@ public static class GuessManager
             {
                 List<CustomRoles> listOfRoles = CustomRolesHelper.AllRoles.Where(role => !role.IsGhostRole() && (role.IsEnable() || role.RoleExist(countDead: true))).ToList();
 
-                // Always show
                 foreach (var role in CustomRolesHelper.AllRoles)
                 {
                     if (role.GetStaticRoleClass().ThisRoleType != Custom_RoleType.ImpostorVanilla && role.GetStaticRoleClass().ThisRoleType != Custom_RoleType.CrewmateVanilla) continue;
@@ -1020,7 +995,6 @@ public static class GuessManager
 
             var orderedRoleList = roleMap.OrderBy(kv => kv.Value).Select(kv => kv.Key).ToArray();
 
-
             foreach (var role in orderedRoleList)
             {
                 if (role.IsVanilla()) continue;
@@ -1076,7 +1050,6 @@ public static class GuessManager
                 label.transform.localPosition = new Vector3(0, 0, label.transform.localPosition.z);
                 label.transform.localScale *= 1.6f;
                 label.autoSizeTextContainer = true;
-                //int copiedIndex = info[(int)role.GetCustomRoleTeam()];
 
                 button.GetComponent<PassiveButton>().OnClick.RemoveAllListeners();
                 if (PlayerControl.LocalPlayer.IsAlive()) button.GetComponent<PassiveButton>().OnClick.AddListener((UnityEngine.Events.UnityAction)(() =>
@@ -1107,7 +1080,6 @@ public static class GuessManager
                             }
                         }
 
-                        // Reset the GUI
                         __instance.playerStates.ToList().ForEach(x =>
                         {
                             x.gameObject.SetActive(true);
@@ -1149,7 +1121,6 @@ public static class GuessManager
         }
     }
 
-    // Modded non-host client guess role/add-on
     private static void SendRPC(int playerId, CustomRoles role)
     {
         var msg = new RpcGuess(PlayerControl.LocalPlayer.NetId, playerId, (int)role);

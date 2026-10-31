@@ -72,8 +72,8 @@ public class Workhorse : IAddon
         if (AssignOnlyToCrewmate)
             return pc.Is(Custom_Team.Crewmate);
 
-        return Utils.HasTasks(pc.Data) //Player has task
-            && !OverrideTasksData.AllData.ContainsKey(pc.GetCustomRole()); //Has the ability to overwrite tasks
+        return Utils.HasTasks(pc.Data)
+            && !OverrideTasksData.AllData.ContainsKey(pc.GetCustomRole());
     }
     public static bool OnAddTask(PlayerControl pc)
     {
@@ -83,12 +83,11 @@ public class Workhorse : IAddon
         pc.RpcSetCustomRole(CustomRoles.Workhorse, false, false);
         var taskState = pc.GetPlayerTaskState();
         taskState.AllTasksCount += NumLongTasks + NumShortTasks;
-        //taskState.CompletedTasksCount++; //Addition for this completion
 
         if (AmongUsClient.Instance.AmHost)
         {
             AddMidGame(pc.PlayerId);
-            pc.Data.RpcSetTasks(new Il2CppStructArray<byte>(0)); // Redistribute tasks
+            pc.Data.RpcSetTasks(new Il2CppStructArray<byte>(0));
             pc.SyncSettings();
             Utils.NotifyRoles(SpecifySeer: pc);
         }

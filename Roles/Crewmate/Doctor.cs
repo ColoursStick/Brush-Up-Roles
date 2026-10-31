@@ -6,12 +6,11 @@ namespace TONE.Roles.Crewmate;
 
 internal class Doctor : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Doctor;
     private const int Id = 6700;
     public override CustomRoles ThisRoleBase => CustomRoles.Scientist;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
-    //==================================================================\\
 
     private static OptionItem TaskCompletedBatteryChargeOpt;
     public static OptionItem VisibleToEveryoneOpt;

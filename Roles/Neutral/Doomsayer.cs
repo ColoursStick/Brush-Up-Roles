@@ -14,7 +14,7 @@ namespace TONE.Roles.Neutral;
 
 internal class Doomsayer : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Doomsayer;
     private const int Id = 14100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Doomsayer);
@@ -22,7 +22,6 @@ internal class Doomsayer : RoleBase
     public override bool IsBalance => true;
     public override CustomRoles ThisRoleBase => EasyMode.GetBool() ? CustomRoles.Impostor : CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralEvil;
-    //==================================================================\\
 
     private static OptionItem DoomsayerAmountOfGuessesToWin;
     private static OptionItem DoomsayerMinimumAmountOfGuessesToWin;
@@ -68,7 +67,7 @@ internal class Doomsayer : RoleBase
             .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
         DCanGuessNeutrals = BooleanOptionItem.Create(Id + 14, "DCanGuessNeutrals", true, TabGroup.NeutralRoles, true)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
-        // BUR: 本模组已移除巫师阵营，该选项无意义
+
         DCanGuessCoven = BooleanOptionItem.Create(Id + 26, "DCanGuessCoven", true, TabGroup.NeutralRoles, true)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer])
             .SetHidden(true);
@@ -120,7 +119,6 @@ internal class Doomsayer : RoleBase
         var ProgressText = new StringBuilder();
         Color TextColor = GetRoleColor(CustomRoles.Doomsayer).ShadeColor(0.25f);
 
-        //ProgressText.Append(GetTaskCount(playerId, comms));
         ProgressText.Append(ColorString(TextColor, ColorString(Color.white, " - ") + $"({playerId.GetAbilityUseLimit()}/{AmountOfGuesses})"));
         return ProgressText.ToString();
     }

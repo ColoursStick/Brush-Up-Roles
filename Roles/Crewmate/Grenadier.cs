@@ -9,14 +9,13 @@ namespace TONE.Roles.Crewmate;
 
 internal class Grenadier : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Grenadier;
     private const int Id = 8200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Grenadier);
     public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
-    //==================================================================\\
 
     private static readonly Dictionary<byte, long> GrenadierBlinding = [];
     private static readonly Dictionary<byte, long> MadGrenadierBlinding = [];
@@ -62,7 +61,7 @@ internal class Grenadier : RoleBase
     }
     public static void ApplyGameOptionsForOthers(IGameOptions opt, PlayerControl player)
     {
-        // Grenadier or Mad Grenadier enter the vent
+
         if ((GrenadierBlinding.Any() &&
             (player.IsPlayerImpostorTeam() ||
             (player.IsPlayerNeutralTeam() && GrenadierCanAffectNeutral.GetBool()) ||
@@ -97,7 +96,7 @@ internal class Grenadier : RoleBase
                     .Where(x => !x.IsPlayerImpostorTeam())
                     .Do(x => x.RPCPlayCustomSound("FlashBang"));
             }
-            // Why in the world is there a separate list for Mad, whatever i guess -- Marg
+
             else if (pc.Is(CustomRoles.Enchanted))
             {
                 MadGrenadierBlinding.Remove(pc.PlayerId);

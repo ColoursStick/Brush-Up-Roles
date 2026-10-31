@@ -11,14 +11,13 @@ namespace TONE.Roles.Crewmate;
 
 internal class Veteran : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Veteran;
     private const int Id = 11350;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Veteran);
     public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
-    //==================================================================\\
 
     public static OptionItem VeteranSkillCooldown;
     public static OptionItem VeteranSkillDuration;
@@ -54,7 +53,7 @@ internal class Veteran : RoleBase
     public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)
     {
         var killerRole = killer.GetCustomRole();
-        // Not should kill
+
         if (killerRole is CustomRoles.Taskinator
             or CustomRoles.Crusader
             or CustomRoles.Bodyguard
@@ -108,14 +107,13 @@ internal class Veteran : RoleBase
     }
     public override void OnEnterVent(PlayerControl pc, Vent vent)
     {
-        // Ability use limit reached
+
         if (pc.GetAbilityUseLimit() <= 0)
         {
             pc.Notify(GetString("OutOfAbilityUsesDoMoreTasks"));
             return;
         }
 
-        // Use ability
         if (!VeteranInProtect.ContainsKey(pc.PlayerId))
         {
             VeteranInProtect.Remove(pc.PlayerId);

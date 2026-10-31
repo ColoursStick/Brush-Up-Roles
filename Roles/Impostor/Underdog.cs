@@ -4,12 +4,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Underdog : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Underdog;
     private const int Id = 2700;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem UnderdogKillCooldown;
     private static OptionItem ReduceKillCooldown;

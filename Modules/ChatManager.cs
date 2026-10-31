@@ -83,11 +83,9 @@ namespace TONE.Modules.ChatManager
         {
             using SHA256 sha256 = SHA256.Create();
 
-            // get sha-256 hash
             byte[] sha256Bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(text));
             string sha256Hash = BitConverter.ToString(sha256Bytes).Replace("-", "").ToLower();
 
-            // pick front 5 and last 4
             return string.Concat(sha256Hash.AsSpan(0, 5), sha256Hash.AsSpan(sha256Hash.Length - 4));
         }
 
@@ -100,7 +98,7 @@ namespace TONE.Modules.ChatManager
         }
         public static void SendMessage(PlayerControl player, string message)
         {
-            int operate = 0; // 1:ID 2:猜测
+            int operate = 0;
             string msg = message;
             string playername = player.GetNameWithRole();
             message = message.ToLower().TrimStart().TrimEnd();
@@ -147,7 +145,7 @@ namespace TONE.Modules.ChatManager
                 }
                 if (!player.IsAlive() || !GameStates.IsMeeting) return;
                 message = msg;
-                //Logger.Warn($"Logging msg : {message}","Checking Exile");
+
                 Dictionary<byte, string> newChatEntry = new()
                     {
                         { player.PlayerId, message }
@@ -170,7 +168,7 @@ namespace TONE.Modules.ChatManager
         public static void SendPreviousMessagesToAll()
         {
             if (!AmongUsClient.Instance.AmHost || !GameStates.IsModHost) return;
-            //This should never function for non host
+
             if (GameStates.IsExilling && chatHistory.Count < 20)
             {
                 if (quickChatSpamMode != QuickChatSpamMode.QuickChatSpam_Disabled)

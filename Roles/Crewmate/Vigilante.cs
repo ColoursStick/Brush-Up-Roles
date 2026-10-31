@@ -7,13 +7,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Vigilante : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Vigilante;
     private const int Id = 11400;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
-    //==================================================================\\
 
     private static OptionItem VigilanteKillCooldown;
     private static OptionItem ConvertedVigilanteCanVent;

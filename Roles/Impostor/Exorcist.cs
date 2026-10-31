@@ -10,14 +10,13 @@ namespace TONE.Roles.Impostor;
 
 internal class Exorcist : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Exorcist;
     private const int Id = 31200;
     public static readonly HashSet<byte> PlayerIds = [];
     public static bool HasEnabled => PlayerIds.Any();
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem ExorcismActiveFor;
     private static OptionItem ExorcismPerGame;
@@ -81,7 +80,6 @@ internal class Exorcist : RoleBase
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || player == null || GameStates.IsExilling) return false;
         if (!player.Is(CustomRoles.Exorcist) || !player.IsAlive()) return false;
-
 
         msg = msg.ToLower().Trim();
 
@@ -223,7 +221,6 @@ internal class Exorcist : RoleBase
         GameObject ControllerHighlight = exorcistButton.transform.Find("ControllerHighlight").gameObject;
         ControllerHighlight.transform.localScale = new Vector3(0.5f, 2f, 0.5f);
     }
-
 
     private static void ExorcistOnClick(GameObject exorcistButton)
     {

@@ -9,19 +9,18 @@ namespace TONE.Roles.Impostor;
 
 internal class Blackmailer : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Blackmailer;
     private const int Id = 24600;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Blackmailer);
 
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
-    //==================================================================\\
 
     private static OptionItem SkillCooldown;
     private static OptionItem ShowShapeshiftAnimationsOpt;
 
-    private static readonly Dictionary<byte, byte> ForBlackmailer = []; // <Target, BlackMailer>
+    private static readonly Dictionary<byte, byte> ForBlackmailer = [];
 
     public override void SetupCustomOption()
     {

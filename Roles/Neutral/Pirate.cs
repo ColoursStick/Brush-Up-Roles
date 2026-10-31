@@ -10,19 +10,17 @@ using static TONE.Options;
 using static TONE.Translator;
 using static TONE.Utils;
 
-
 namespace TONE.Roles.Neutral;
 
 internal class Pirate : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Pirate;
     private const int Id = 15000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Pirate);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralChaos;
-    //==================================================================\\
 
     private static OptionItem SuccessfulDuelsToWin;
     private static OptionItem DuelCooldown;
@@ -180,7 +178,6 @@ internal class Pirate : RoleBase
         if (!GameStates.IsMeeting || pc == null || GameStates.IsExilling) return false;
         if (!pc.Is(CustomRoles.Pirate) && PirateTarget != pc.PlayerId) return false;
 
-
         msg = msg.ToLower().TrimStart().TrimEnd();
         bool operate = false;
         if (CheckCommond(ref msg, "duel")) operate = true;
@@ -236,7 +233,6 @@ internal class Pirate : RoleBase
         return true;
     }
 
-
     private static bool MsgToPlayerAndRole(string msg, out int rpsOpt, out string error)
     {
         if (msg.StartsWith("/")) msg = msg.Replace("/", string.Empty);
@@ -246,7 +242,7 @@ internal class Pirate : RoleBase
         string result = string.Empty;
         for (int i = 0; i < mc.Count; i++)
         {
-            result += mc[i];//匹配结果是完整的数字，此处可以不做拼接的
+            result += mc[i];
         }
 
         if (int.TryParse(result, out int num))
@@ -279,18 +275,13 @@ internal class Pirate : RoleBase
         var comList = command.Split('|');
         for (int i = 0; i < comList.Length; i++)
         {
-            //if (exact)
-            //{
-            //    if (msg == "/" + comList[i]) return true;
-            //}
-            //else
-            //{
+
             if (msg.StartsWith("/" + comList[i]))
             {
                 msg = msg.Replace("/" + comList[i], string.Empty);
                 return true;
             }
-            //}
+
         }
         return false;
     }

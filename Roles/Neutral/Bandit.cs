@@ -9,14 +9,13 @@ namespace TONE.Roles.Neutral;
 
 internal class Bandit : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Bandit;
     private const int Id = 16000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Bandit);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;
-    //==================================================================\\
 
     private static OptionItem KillCooldownOpt;
     private static OptionItem StealCooldown;
@@ -77,7 +76,7 @@ internal class Bandit : RoleBase
 
         foreach (var subRole in AllSubRoles.ToList())
         {
-            if (subRole is CustomRoles.Cleansed or // making Bandit unable to steal Cleansed for obvious reasons. Although it can still be cleansed by cleanser.
+            if (subRole is CustomRoles.Cleansed or
                 CustomRoles.LastImpostor or
                 CustomRoles.Narc
                 || (subRole is CustomRoles.Nimble && CanVent.GetBool())
@@ -157,7 +156,7 @@ internal class Bandit : RoleBase
         if (!target.HasSubRole() || target.Is(CustomRoles.Stubborn)) flag = true;
 
         var SelectedAddOn = SelectRandomAddon(killer, target);
-        if (SelectedAddOn == null || flag) // no stealable addons found on the target.
+        if (SelectedAddOn == null || flag)
         {
             killer.Notify(Translator.GetString("Bandit_NoStealableAddons"));
             killCooldown = KillCooldownOpt.GetFloat();
@@ -176,7 +175,7 @@ internal class Bandit : RoleBase
 
         if (killer.CheckDoubleTrigger(target, () => { StealAddon(killer, target, SelectedAddOn); }))
         {
-            // Double click
+
             killCooldown = KillCooldownOpt.GetFloat();
             killer.ResetKillCooldown();
             killer.SetKillCooldown();
@@ -184,7 +183,7 @@ internal class Bandit : RoleBase
         }
         else
         {
-            // Single click
+
             killCooldown = StealCooldown.GetFloat();
             return false;
         }

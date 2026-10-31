@@ -1,15 +1,5 @@
 namespace TONE.Patches;
 
-// Thanks Galster (https://github.com/Galster-dev)
-
-/*
- * Info for those who port this code to their mod or view the code
- * We patch CoStartGameHost so it's not work now in normal game
- * But work for AU code
- * So not used, execpt vanilla Hide&Seek
-*/
-
-// Thanks: https://github.com/AU-Avengers/TOU-Mira/blob/main/TownOfUs/Patches/AprilFools/DleksMapOptionPickerPatches.cs
 [HarmonyPatch(typeof(GameStartManager))]
 class AllMapIconsPatch
 {
@@ -27,7 +17,7 @@ class AllMapIconsPatch
             });
         }
     }
-    // Vanilla players getting error when trying get dleks map icon
+
     [HarmonyPatch(nameof(GameStartManager.Start)), HarmonyPostfix]
     [Obfuscation(Exclude = true)]
     public static void Postfix_AllMapIcons(GameStartManager __instance)
@@ -71,7 +61,7 @@ class AutoSelectDleksPatch
     {
         if (__instance.Title == StringNames.GameMapName)
         {
-            // vanilla clamps this to not auto select dleks
+
             __instance.Value = GameOptionsManager.Instance.CurrentGameOptions.MapId;
         }
     }

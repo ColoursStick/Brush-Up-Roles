@@ -14,14 +14,13 @@ namespace TONE.Roles.Crewmate;
 
 internal class Inspector : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Inspector;
     private const int Id = 8300;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Inspector);
 
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
-    //==================================================================\\
 
     private static OptionItem InspectCheckLimitMax;
     private static OptionItem InspectCheckLimitPerMeeting;
@@ -151,7 +150,7 @@ internal class Inspector : RoleBase
                 return true;
             }
             var target1 = GetPlayerById(targetId1);
-            // Voodoo Master Check 1
+
             bool target1IsVM = false;
             if (target1.Is(CustomRoles.VoodooMaster) && VoodooMaster.Dolls[target1.PlayerId].Count > 0)
             {
@@ -163,7 +162,7 @@ internal class Inspector : RoleBase
             if (target1IsVM) target1Name = Utils.GetPlayerListByRole(CustomRoles.VoodooMaster).First().GetRealName();
 
             var target2 = GetPlayerById(targetId2);
-            // Voodoo Master Check 1
+
             bool target2IsVM = false;
             if (target2.Is(CustomRoles.VoodooMaster) && VoodooMaster.Dolls[target1.PlayerId].Count > 0)
             {

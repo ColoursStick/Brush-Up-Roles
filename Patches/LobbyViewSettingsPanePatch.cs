@@ -10,7 +10,6 @@ using static TONE.Translator;
 
 namespace TONE.Patches;
 
-// Credit: https://github.com/Gurge44/EndlessHostRoles/blob/main/Patches/LobbyViewSettingsPanePatch.cs
 [HarmonyPatch(typeof(LobbyViewSettingsPane))]
 public static class LobbyViewSettingsPanePatch
 {
@@ -30,11 +29,6 @@ public static class LobbyViewSettingsPanePatch
     private static readonly Dictionary<TabGroup, PassiveButton> AllTabButtons = [];
     private static readonly HashSet<CustomRoles> RoleEnabledList = [];
 
-    // Storing Unity objects in static variables prevents GC from collecting them
-    // (and everything inside them, like event listeners)
-    // even if the object was destroyed
-    // This method doesn't check object lifetime because it's called when a game starts,
-    // and these are guaranteed to be destroyed by then
     public static void ClearReferences()
     {
         RoleListCoroutine = null;
@@ -65,8 +59,6 @@ public static class LobbyViewSettingsPanePatch
             var maskBg = __instance.backgroundMask.transform;
 
             yield return null;
-
-            // #### Resize the lobby view window ####
 
             background.localPosition = new(-0.619f, -0.5462f, 12f);
             background.localScale = new(1.0141f, 1.6141f, 1.041f);
@@ -100,23 +92,18 @@ public static class LobbyViewSettingsPanePatch
 
             yield return null;
 
-            // #### Patch info panel origin ####
             var viewSettingsInfoPanel = __instance.infoPanelOrigin;
 
-            // Change Title Text
             var titleText = viewSettingsInfoPanel.titleText;
             titleText.alignment = TextAlignmentOptions.Left;
             titleText.fontSizeMin = 1f;
             titleText.margin = new Vector4(-1f, 0.0008f, 0f, 0f);
             titleText.transform.localPosition = new Vector3(0.02f, 0f, -2f);
 
-            // Change label background
             var labelBackground = viewSettingsInfoPanel.labelBackground.transform;
             labelBackground.localPosition = new(-0.5325f, 0f, 0);
             labelBackground.localScale = new(1.22f, 1f, 1f);
-            //labelBackground.color = new(0.6f, 0.6f, 0.6f); // Also changed vanilla label background
 
-            // Change value size
             var spritePanel = viewSettingsInfoPanel.transform.FindChild("Value")?.transform.FindChild("Sprite");
             spritePanel.localPosition = new(2f, 0f, 0);
             spritePanel.localScale = new(0.35f, 0.6f, 1f);
@@ -141,7 +128,6 @@ public static class LobbyViewSettingsPanePatch
 
             __instance.transform.FindChild("ClickToClose").transform.FindChild("IgnoreClose").localScale = new(1f, 2f, 1f);
 
-            // #### Set colors for vanilla setting tab ####
             __instance.taskTabButton.activeTextColor = __instance.taskTabButton.inactiveTextColor = Color.white;
             __instance.taskTabButton.selectedTextColor = Color.gray;
             __instance.taskTabButton.inactiveSprites.GetComponent<SpriteRenderer>().color = Color.black;
@@ -153,25 +139,19 @@ public static class LobbyViewSettingsPanePatch
             __instance.taskTabButton.selectedSprites.transform.FindChild("Shine").gameObject.SetActive(false);
             yield return null;
 
-            // #### Set colors for role tab ####
             __instance.rolesTabButton.activeTextColor = __instance.rolesTabButton.inactiveTextColor = Color.white;
             __instance.rolesTabButton.selectedTextColor = Color.gray;
-            //__instance.rolesTabButton.inactiveSprites.GetComponent<SpriteRenderer>().color = Color.black;
-            //__instance.rolesTabButton.activeSprites.GetComponent<SpriteRenderer>().color = Color.gray;
-            //__instance.rolesTabButton.selectedSprites.GetComponent<SpriteRenderer>().color = Color.black;
+
             __instance.rolesTabButton.inactiveSprites.GetComponent<SpriteRenderer>().sprite = Utils.LoadSprite("TONE.Resources.Images.DefaultPlate.png", 135f);
-            //__instance.rolesTabButton.activeSprites.GetComponent<SpriteRenderer>().sprite = CustomButton.Get("GuessPlate");
-            //__instance.rolesTabButton.selectedSprites.GetComponent<SpriteRenderer>().sprite = CustomButton.Get("GuessPlate");
+
             __instance.rolesTabButton.inactiveSprites.transform.FindChild("Shine").gameObject.SetActive(false);
             __instance.rolesTabButton.activeSprites.transform.FindChild("Shine").gameObject.SetActive(false);
             __instance.rolesTabButton.selectedSprites.transform.FindChild("Shine").gameObject.SetActive(false);
             yield return null;
 
-            // #### Patch info panel role origin ####
             var panelRole = __instance.infoPanelRoleOrigin;
             var panelRoleTransform = panelRole.transform;
 
-            // Role name
             panelRole.titleText.transform.localScale = new(1.7f, 1.7f, 1f);
             panelRole.titleText.transform.localPosition = new(-2.7f, 0f, -2f);
             panelRole.titleText.alignment = TextAlignmentOptions.Left;
@@ -182,7 +162,6 @@ public static class LobbyViewSettingsPanePatch
             panelRole.titleText.outlineWidth = LangHasSensitiveOutlineText() ? 0.09f : 0.23f;
             panelRole.titleText.color = Color.white;
 
-            // "% Chance" title text
             panelRole.chanceTitle.alignment = TextAlignmentOptions.Left;
             panelRole.chanceTitle.enableWordWrapping = false;
             panelRole.chanceTitle.overflowMode = TextOverflowModes.Overflow;
@@ -193,7 +172,6 @@ public static class LobbyViewSettingsPanePatch
             panelRole.chanceTitle.transform.localPosition = new(5.15f, -0.02f, -2f);
             panelRole.chanceTitle.transform.localScale = new(1.1f, 1.1f, 1f);
 
-            // Chance value
             panelRole.chanceText.fontWeight = FontWeight.Black;
             panelRole.chanceText.outlineColor = Color.black;
             panelRole.chanceText.outlineWidth = 0.26f;
@@ -204,14 +182,12 @@ public static class LobbyViewSettingsPanePatch
                 chanceTransform.localPosition = new(2.5f, -0.02f, -1f);
             }
 
-            // Max count sprite
             var valueTransform = panelRole.transform.FindChild("Value");
             if (valueTransform != null)
             {
                 valueTransform.localPosition = new(0.35f, -0.02f, -1f);
             }
 
-            // Max count value
             panelRole.settingText.fontWeight = FontWeight.Black;
             panelRole.settingText.outlineColor = Color.black;
             panelRole.settingText.outlineWidth = 0.2f;
@@ -219,7 +195,6 @@ public static class LobbyViewSettingsPanePatch
 
             yield return null;
 
-            // #### Patch category header role origin ####
             var categoryHeaderRoleTitle = __instance.categoryHeaderRoleOrigin.Title;
 
             categoryHeaderRoleTitle.fontWeight = FontWeight.Black;
@@ -228,7 +203,6 @@ public static class LobbyViewSettingsPanePatch
 
             yield return null;
 
-            // #### Patch advanced role panel origin ####
             var advancedRolePanelTitle = __instance.advancedRolePanelOrigin.header.Title;
             var advancedRolePanelTitleTransform = advancedRolePanelTitle.transform;
 
@@ -250,14 +224,12 @@ public static class LobbyViewSettingsPanePatch
             TabButtons[VanillaRolesTabName] = __instance.taskTabButton;
             yield return null;
 
-            // Change game mode text & position
             __instance.gameModeText.DestroyTranslator();
             __instance.gameModeText.text = GetString(Options.CurrentGameMode.ToString());
             __instance.gameModeText.color = Main.GameModeColors[Options.CurrentGameMode];
             LastGameModeSelected = Options.CurrentGameMode;
             yield return null;
 
-            // Create button "Show Only Enabled Roles"
             ShowOnlyEnabledRolesButton = Object.Instantiate(__instance.rolesTabButton, __instance.rolesTabButton.transform.parent);
             ShowOnlyEnabledRolesButton.buttonText.DestroyTranslator();
             ShowOnlyEnabledRolesButton.name = "ShowOnlyEnabledRolesButton";
@@ -292,7 +264,6 @@ public static class LobbyViewSettingsPanePatch
             ShowOnlyEnabledRolesButton.gameObject.SetActive(false);
             yield return null;
 
-            // Create right arrow button
             var rightButton = Object.Instantiate(__instance.BackButton, __instance.BackButton.transform.parent).gameObject;
             var rightButtonBoxCollider2D = rightButton.GetComponent<BoxCollider2D>();
             rightButtonBoxCollider2D.size = new Vector2(0.3f, 0.3f);
@@ -325,11 +296,10 @@ public static class LobbyViewSettingsPanePatch
             }
             yield return null;
 
-            // Create left arrow button
             var leftButton = Object.Instantiate(rightButton, __instance.BackButton.transform.parent).gameObject;
             leftButton.transform.localPosition = new Vector3(-6.4f, 3.85f, -2f);
             leftButton.name = "LeftButtonArrow";
-            // flip button
+
             leftButton.transform.FindChild("Normal").gameObject.GetComponentInChildren<SpriteRenderer>().flipX = true;
             leftButton.transform.FindChild("Hover").gameObject.GetComponentInChildren<SpriteRenderer>().flipX = true;
 
@@ -348,21 +318,11 @@ public static class LobbyViewSettingsPanePatch
             }
             yield return null;
 
-
-            // #### Add Tab Group ####
-
-            // Started vanilla tab button positions:
-            // taskTabButton  - x: -5.65 - y: 3.1 - z: 0
-            // rolesTabButton - x: -3.2  - y: 3.1 - z: 0
-
-            // x: +2.45
-            // y: -0.6
-
             int indexSettings = 1;
             int indexRoles = 0;
             foreach (var tabGroup in Enum.GetValues<TabGroup>())
             {
-                // Brush Up Roles：本模组不提供巫师阵营，「查看」面板里也不生成该页签
+
                 if (tabGroup == TabGroup.CovenRoles) continue;
 
                 Vector3 newXPos;
@@ -415,9 +375,6 @@ public static class LobbyViewSettingsPanePatch
                             newXPos = cloneRoleTabButton.transform.localPosition;
                             newXPos.x += 2.45f * indexRoles;
 
-                            /*if (tabGroup is TabGroup.Addons)
-                                newXPos.y += 0.6f;
-                            else*/
                             indexRoles++;
 
                             cloneRoleTabButton.transform.localPosition = newXPos;
@@ -443,7 +400,7 @@ public static class LobbyViewSettingsPanePatch
                 }
                 yield return null;
             }
-            __instance.rolesTabButton.gameObject.SetActive(false); // Hide vanilla role tab
+            __instance.rolesTabButton.gameObject.SetActive(false);
 
             __instance.scrollBar.ContentXBounds.max = 1f;
             __instance.scrollBar.SetYBoundsMax(-2f);
@@ -634,7 +591,7 @@ public static class LobbyViewSettingsPanePatch
                 BaseGameSetting data = GameOptionsMenuPatch.GetSetting(option);
 
                 bool enabledOrNotCollapsed = !option.IsHiddenOn(Options.CurrentGameMode, true) && option.Parent?.GetBool() is null or true;
-                // Title
+
                 if (data == null && option is TextOptionItem toi)
                 {
                     if (!firstTitle && enabledOrNotCollapsed)
@@ -658,9 +615,9 @@ public static class LobbyViewSettingsPanePatch
                     chmButton.OnMouseOver = new();
                     chmButton.OnMouseOut = new();
                     chmButton.OnClick = new();
-                    // ⚠️ Brush Up Roles：已移除「点击分类标题收起/展开」的功能（同 GameOptionsMenuPatch）
+
                     chmButton.SetButtonEnableState(true);
-                    // ⚠️ Brush Up Roles：空分类连标题一起隐藏
+
                     categoryHeaderMasked.gameObject.SetActive(enabledOrNotCollapsed && CategoryHasVisibleOptions(toi, tabName));
 
                     viewSettings.settingsInfo.Add(categoryHeaderMasked.gameObject);
@@ -805,7 +762,6 @@ public static class LobbyViewSettingsPanePatch
                 string titleName = option.GetName(disableColor: true).Trim('★', ' ').RemoveHtmlTags();
                 string realName = option.Name;
 
-                // Title
                 if (data == null && option is TextOptionItem toi)
                 {
                     CategoryHeaderRoleVariant categoryHeaderRoleVariant = Object.Instantiate(viewSettings.categoryHeaderRoleOrigin, viewSettings.settingsContainer);
@@ -819,7 +775,7 @@ public static class LobbyViewSettingsPanePatch
                     if (enabled)
                     {
                         if (index == 0) yPos -= 0.4f;
-                        else yPos -= 0.9f; // Y position after all settings drawed
+                        else yPos -= 0.9f;
                     }
                     categoryHeaderRoleVariant.transform.localScale = Vector3.one;
                     categoryHeaderRoleVariant.transform.localPosition = new Vector3(0.09f, yPos, -2f);
@@ -832,9 +788,9 @@ public static class LobbyViewSettingsPanePatch
                     chmButton.OnMouseOver = new();
                     chmButton.OnMouseOut = new();
                     chmButton.OnClick = new();
-                    // ⚠️ Brush Up Roles：已移除「点击分类标题收起/展开」的功能（同 GameOptionsMenuPatch）
+
                     chmButton.SetButtonEnableState(true);
-                    // ⚠️ Brush Up Roles：空分类连标题一起隐藏
+
                     categoryHeaderRoleVariant.gameObject.SetActive(enabled && CategoryHasVisibleOptions(toi, tabName));
 
                     viewSettings.settingsInfo.Add(categoryHeaderRoleVariant.gameObject);
@@ -846,14 +802,14 @@ public static class LobbyViewSettingsPanePatch
                     header = toi;
                     yield return null;
                 }
-                // Roles
+
                 if (allCustomRoles.FindFirst(x => x.ToString() == realName, out CustomRoles role))
                 {
                     if (role == default) continue;
 
                     try
                     {
-                        index = 0; // Set 0 when all settings is drawed
+                        index = 0;
                         option.Header = header;
 
                         int chancePerGame = Options.CustomRoleSpawnChances.TryGetValue(role, out var valueRoleOpt) ? valueRoleOpt.GetChance() : 0;
@@ -866,7 +822,6 @@ public static class LobbyViewSettingsPanePatch
                             ViewSettingsInfoPanelRoleVariant viewSettingsInfoPanelRoleVariant = Object.Instantiate(viewSettings.infoPanelRoleOrigin, viewSettings.settingsContainer);
                             viewSettingsInfoPanelRoleVariant.name = realName;
 
-                            // Max count title
                             var settingTitle = Object.Instantiate(viewSettingsInfoPanelRoleVariant.chanceTitle, viewSettingsInfoPanelRoleVariant.transform);
                             settingTitle.name = "MaxCountTitle";
                             settingTitle.DestroyTranslator();
@@ -876,7 +831,6 @@ public static class LobbyViewSettingsPanePatch
                             settingTitle.enableWordWrapping = false;
                             settingTitle.overflowMode = TextOverflowModes.Overflow;
 
-                            // if start y pos not changed
                             if (yPos == 1.3f) yPos -= 0.8f;
                             viewSettingsInfoPanelRoleVariant.transform.localScale = Vector3.one;
                             viewSettingsInfoPanelRoleVariant.transform.localPosition = new Vector3(xPos, yPos, -2f);
@@ -889,13 +843,13 @@ public static class LobbyViewSettingsPanePatch
                             int numPerGame = Options.CustomRoleCounts.TryGetValue(role, out var valueInt) ? valueInt.GetInt() : 0;
                             var roleIcon = GetRoleIcon(role);
 
-                            viewSettingsInfoPanelRoleVariant.SetInfo(titleName, numPerGame, chancePerGame, 61, option.NameColor, roleIcon /*<- Role Icons sets here*/, tabName is not TabGroup.ImpostorRoles, roleDisabled);
+                            viewSettingsInfoPanelRoleVariant.SetInfo(titleName, numPerGame, chancePerGame, 61, option.NameColor, roleIcon , tabName is not TabGroup.ImpostorRoles, roleDisabled);
 
                             if (roleDisabled)
                             {
                                 if (role.IsAdditionRole())
                                 {
-                                    //viewSettingsInfoPanelRoleVariant.chanceText.text = $"{GetString("RoleOff")}/{chanceAddOnPerGame}";
+
                                     viewSettingsInfoPanelRoleVariant.chanceText.text = GetString("RoleOff");
                                     viewSettingsInfoPanelRoleVariant.chanceText.outlineWidth = LangHasSensitiveOutlineText() ? 0.09f : 0.26f;
                                 }
@@ -927,7 +881,7 @@ public static class LobbyViewSettingsPanePatch
                 }
                 else if (data && enabledOrNotCollapsed && role == default(CustomRoles))
                 {
-                    // Skip all role settings
+
                     if (option.Parent != null && allCustomRoles.Any(x => x.ToString() == option.Parent?.Name)) continue;
                     if (option.Parent?.Parent != null && allCustomRoles.Any(x => x.ToString() == option.Parent?.Parent?.Name)) continue;
                     if (option.Parent?.Parent?.Parent != null && allCustomRoles.Any(x => x.ToString() == option.Parent?.Parent?.Parent.Name)) continue;
@@ -1018,7 +972,7 @@ public static class LobbyViewSettingsPanePatch
                     {
                         continue;
                     }
-                    // 1 child setting is "Max" or "Spawn chance" setting
+
                     else if (optionRole.Children.Count <= 1) continue;
 
                     bool useLeftColumn = leftY >= rightY;
@@ -1049,11 +1003,11 @@ public static class LobbyViewSettingsPanePatch
         advancedRoleViewPanel.name = role + "AdvancedPanel";
         advancedRoleViewPanel.transform.localScale = Vector3.one;
         advancedRoleViewPanel.transform.localPosition = new Vector3(xPosRoleHeader, yPos, -2f);
-        advancedRoleViewPanel.header.SetHeader((StringNames)(6000 + role), maskLayer, tabName is not TabGroup.ImpostorRoles, roleIcon /*<- Role Icons sets here*/);
+        advancedRoleViewPanel.header.SetHeader((StringNames)(6000 + role), maskLayer, tabName is not TabGroup.ImpostorRoles, roleIcon );
         advancedRoleViewPanel.divider.material.SetInt(PlayerMaterial.MaskLayer, maskLayer);
         advancedRoleViewPanel.header.Title.text = GetString(role.ToString());
         advancedRoleViewPanel.header.Title.color = Color.white;
-        // default color
+
         if (optionRole.NameColor != Color.white)
         {
             advancedRoleViewPanel.header.Background.color = optionRole.NameColor;
@@ -1154,16 +1108,10 @@ public static class LobbyViewSettingsPanePatch
             o = o.Parent;
         }
     }
-    /// <summary>
-    /// 该分类下是否还有「可见的选项」。
-    ///
-    /// ⚠️ Brush Up Roles 新增：用于隐藏空分类。
-    ///    例：本模组移除了巫师阵营，原 TONE 的「内鬼帮助类身份」等分类会变成空分类，
-    ///    此前会留下一个只有标题、下面什么都没有的分类条，这里让它整条不显示。
-    /// </summary>
+
     private static bool CategoryHasVisibleOptions(TextOptionItem header, TabGroup tab)
     {
-        if (header == null) return true;   // 拿不到标题就不做隐藏，避免误伤
+        if (header == null) return true;
 
         foreach (var option in OptionItem.AllOptions)
         {
@@ -1171,7 +1119,6 @@ public static class LobbyViewSettingsPanePatch
             if (ReferenceEquals(option, header)) continue;
             if (!ReferenceEquals(option.Header, header)) continue;
 
-            // 该选项可见 → 分类非空
             if (!option.IsHiddenOn(Options.CurrentGameMode, true, checkCollapsedSection: false)
                 && option.Parent?.GetBool() is null or true)
                 return true;

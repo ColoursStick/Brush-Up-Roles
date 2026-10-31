@@ -5,7 +5,7 @@ class ChanceChangePatch
 {
     public static void Postfix(RoleOptionSetting __instance)
     {
-        // Remove vanilla role spawn
+
         string disableText = $" ({Translator.GetString("Disabled")})";
         foreach (var button in __instance.GetComponentsInChildren<PassiveButton>())
         {
@@ -22,18 +22,5 @@ class ChanceChangePatch
             __instance.OnValueChanged.Invoke(__instance);
         }
     }
-    /*[HarmonyPatch(typeof(GameOptionsManager), nameof(GameOptionsManager.SwitchGameMode))]
-    class SwitchGameModePatch
-    {
-        public static void Postfix(GameModes gameMode)
-        {
-            if (gameMode == GameModes.HideNSeek)
-            {
-                ErrorText.Instance.HnSFlag = true;
-                ErrorText.Instance.AddError(ErrorCode.HnsUnload);
-                Harmony.UnpatchAll();
-                Main.Instance.Unload();
-            }
-        }
-    }*/
+
 }

@@ -12,12 +12,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Chronomancer : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Chronomancer;
     private const int Id = 900;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private int ChargedTime = 0;
     long now = Utils.GetTimeStamp();
@@ -31,8 +30,8 @@ internal class Chronomancer : RoleBase
 
     private string LastCD;
 
-    private static Color32 OrangeColor = new(255, 190, 92, 255); // The lest color
-    private static Color32 GreenColor = new(0, 128, 0, 255); // The final color
+    private static Color32 OrangeColor = new(255, 190, 92, 255);
+    private static Color32 GreenColor = new(0, 128, 0, 255);
 
     private static int Charges;
 
@@ -181,8 +180,7 @@ internal class Chronomancer : RoleBase
 
     public void SendChargedTimeRPC()
     {
-        // Cant directly write Ability Limit, create another method to send it
-        // Only send to the target to prevent logging in other's
+
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(ChargedTime);
         RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));

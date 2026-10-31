@@ -8,12 +8,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Iceologer : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Iceologer;
     private const int Id = 33500;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
-    //==================================================================\\
 
     private static OptionItem FreezeCooldown;
     private static OptionItem FreezeDuration;

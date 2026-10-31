@@ -38,7 +38,6 @@ public static class OutfitManager
             var setOutfit = new RpcSetOutfit(player.NetId, player.Data.NetId, Outfit, true, setNamePlate);
             RpcUtils.LateBroadcastReliableMessage(setOutfit);
 
-            //cannot use currentoutfit type because of mushroom mixup . .
             var OutfitTypeSet = player.CurrentOutfitType != PlayerOutfitType.Shapeshifted ? PlayerOutfitType.Default : PlayerOutfitType.Shapeshifted;
 
             player.Data.SetOutfit(OutfitTypeSet, Outfit);

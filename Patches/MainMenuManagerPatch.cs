@@ -36,7 +36,6 @@ public class MainMenuManagerStartPatch
 class MainMenuManagerLateUpdatePatch
 {
     private static int lateUpdate = 590;
-    //private static GameObject LoadingHint;
 
     private static void Postfix(MainMenuManager __instance)
     {
@@ -51,8 +50,7 @@ class MainMenuManagerLateUpdatePatch
 
         var PlayOnlineButton = __instance.PlayOnlineButton;
 #if PC
-        // ⚠️ RunLoginPatch（绕过 EOS 登录）只在 PC 端编译（见 ClientPatch.cs 的 #if Windows）。
-        //    安卓端该类型不存在，所以这段必须一并排除，否则安卓平台编译失败。
+
         if (PlayOnlineButton != null)
         {
             if (RunLoginPatch.isAllowedOnline && !Main.hasAccess)
@@ -78,13 +76,9 @@ public static class MainMenuManagerPatch
     private static PassiveButton backgroundButton;
     private static PassiveButton qqButton;
 
-    // ── 主菜单进场动画用 ──
-    /// <summary>进场动画要搬的面板（主菜单 UI，含按钮与 Logo）</summary>
     public static GameObject MenuPanel;
-    /// <summary>面板的最终位置</summary>
-    public static Vector3 MenuPanelHome;
 
-    //private static PassiveButton patreonButton;
+    public static Vector3 MenuPanelHome;
 
     [HarmonyPatch(nameof(MainMenuManager.Start)), HarmonyPostfix, HarmonyPriority(Priority.Normal)]
     public static void Start_Postfix(MainMenuManager __instance)
@@ -96,21 +90,21 @@ public static class MainMenuManagerPatch
 
         if (OperatingSystem.IsAndroid())
         {
-            // In Starlight there is a official patch for this.
+
             Main.UnlockFPS.Value = false;
         }
         else
         {
-            // FPS
+
             Application.targetFrameRate = Main.UnlockFPS.Value ? 165 : 60;
         }
 
         __instance.screenTint.gameObject.transform.localPosition += new Vector3(1000f, 0f);
         __instance.screenTint.enabled = false;
         __instance.rightPanelMask.SetActive(true);
-        // The background texture (large sprite asset)
+
         __instance.mainMenuUI.FindChild<SpriteRenderer>("BackgroundTexture").transform.gameObject.SetActive(false);
-        // The glint on the Among Us Menu
+
         __instance.mainMenuUI.FindChild<SpriteRenderer>("WindowShine").transform.gameObject.SetActive(false);
         __instance.mainMenuUI.FindChild<Transform>("ScreenCover").gameObject.SetActive(false);
 
@@ -119,7 +113,7 @@ public static class MainMenuManagerPatch
         rightPanel.gameObject.GetComponent<SpriteRenderer>().enabled = false;
         GameObject maskedBlackScreen = rightPanel.FindChild<Transform>("MaskedBlackScreen").gameObject;
         maskedBlackScreen.GetComponent<SpriteRenderer>().enabled = false;
-        //maskedBlackScreen.transform.localPosition = new Vector3(-3.345f, -2.05f); //= new Vector3(0f, 0f);
+
         maskedBlackScreen.transform.localScale = new Vector3(7.35f, 4.5f, 4f);
 
         __instance.mainMenuUI.gameObject.transform.position += new Vector3(-0.2f, 0f);
@@ -129,25 +123,17 @@ public static class MainMenuManagerPatch
         leftPanel.GetComponentsInChildren<SpriteRenderer>(true).Where(r => r.name == "Shine").ToList().ForEach(r => r.enabled = false);
 
         GameObject splashArt = new("SplashArt");
-        splashArt.transform.position = new Vector3(0, 0f, 600f); //= new Vector3(0, 0.4f, 600f);
+        splashArt.transform.position = new Vector3(0, 0f, 600f);
         var spriteRenderer = splashArt.AddComponent<SpriteRenderer>();
 
-        // ⚠️ Brush Up Roles：背景改为「玩家目录优先」。
-        //    玩家可把任意图片放进 BrushUpRoles-DATA/Backgrounds/，随机挑一张作为背景；
-        //    目录为空或全部读取失败时，自动退回内嵌的默认背景。
         var bgSprite = BackgroundManager.LoadRandomSprite();
         if (bgSprite != null) spriteRenderer.sprite = bgSprite;
 
-        // 交给 MainMenuIntroAnimationPatch 做「面板从下往上滑入」的进场动画。
-        // 动的是主菜单 UI（含按钮与 Logo），SplashArt 背景保持不动。
         MenuPanel = __instance.mainMenuUI;
         MenuPanelHome = MenuPanel != null ? MenuPanel.transform.position : Vector3.zero;
 
-
         if (template == null) return;
 
-
-        // donation Button
         if (donationButton == null)
         {
             donationButton = CreateButton(
@@ -156,11 +142,10 @@ public static class MainMenuManagerPatch
                 new(0, 255, 255, byte.MaxValue),
                 new(75, 255, 255, byte.MaxValue),
                 (UnityEngine.Events.UnityAction)(() => Constants.OpenURL(Main.DonationInviteUrl)),
-                GetString("SupportUs")); //"Donation"
+                GetString("SupportUs"));
         }
         donationButton.gameObject.SetActive(Main.ShowDonationButton);
 
-        // GitHub Button
         if (gitHubButton == null)
         {
             gitHubButton = CreateButton(
@@ -169,11 +154,10 @@ public static class MainMenuManagerPatch
                 new(153, 153, 153, byte.MaxValue),
                 new(209, 209, 209, byte.MaxValue),
                 (UnityEngine.Events.UnityAction)(() => Constants.OpenURL(Main.GitHubInviteUrl)),
-                GetString("GitHub")); //"GitHub"
+                GetString("GitHub"));
         }
         gitHubButton.gameObject.SetActive(Main.ShowGitHubButton);
 
-        // Discord Button
         if (discordButton == null)
         {
             discordButton = CreateButton(
@@ -182,12 +166,10 @@ public static class MainMenuManagerPatch
                 new(88, 101, 242, byte.MaxValue),
                 new(148, 161, byte.MaxValue, byte.MaxValue),
                 (UnityEngine.Events.UnityAction)(() => Constants.OpenURL(Main.DiscordInviteUrl)),
-                GetString("Discord")); //"Discord"
+                GetString("Discord"));
         }
         discordButton.gameObject.SetActive(Main.ShowDiscordButton);
 
-        // QQ Group Button
-        // 放在官网按钮上方（原本 donation / github / discord 的位置，那三个默认关闭）
         if (qqButton == null)
         {
             qqButton = CreateButton(
@@ -200,7 +182,6 @@ public static class MainMenuManagerPatch
         }
         qqButton.gameObject.SetActive(Main.ShowQQButton);
 
-        // Website Button
         if (websiteButton == null)
         {
             websiteButton = CreateButton(
@@ -213,8 +194,6 @@ public static class MainMenuManagerPatch
         }
         websiteButton.gameObject.SetActive(Main.ShowWebsiteButton);
 
-        // Background Folder Button
-        // 点开 BrushUpRoles-DATA/Backgrounds/，往里面放图片即可替换主菜单背景
         if (backgroundButton == null)
         {
             backgroundButton = CreateButton(
@@ -291,7 +270,7 @@ public static class MainMenuManagerPatch
     }
     public static void ForEach<TSource>(this IEnumerable<TSource> source, Action<TSource> action)
     {
-        //if (source == null) throw new ArgumentNullException("source");
+
         if (source == null) throw new ArgumentNullException(nameof(source));
 
         IEnumerator<TSource> enumerator = source.GetEnumerator();

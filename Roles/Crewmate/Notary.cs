@@ -12,13 +12,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Notary : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Notary;
     private const int Id = 34700;
     public override bool IsExperimental => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
-    //==================================================================\\
 
     private static OptionItem NotarizeLimitPerGame;
     private static OptionItem NotarizeLimitPerMeeting;
@@ -67,7 +66,7 @@ internal class Notary : RoleBase
         if (!GameStates.IsMeeting || !pc || GameStates.IsExilling) return false;
         if (!pc.Is(CustomRoles.Notary)) return false;
 
-        int operate = 0; // 1:ID 2:猜测
+        int operate = 0;
         msg = msg.ToLower().TrimStart().TrimEnd();
         if (GuessManager.CheckCommond(ref msg, "id|guesslist|gl编号|玩家编号|玩家id|id列表|玩家列表|列表|所有id|全部id||編號|玩家編號")) operate = 1;
         else if (GuessManager.CheckCommond(ref msg, "nr|notarize|公证", false)) operate = 2;
@@ -164,7 +163,7 @@ internal class Notary : RoleBase
         string result = string.Empty;
         for (int i = 0; i < mc.Count; i++)
         {
-            result += mc[i];//匹配结果是完整的数字，此处可以不做拼接的
+            result += mc[i];
         }
 
         if (int.TryParse(result, out int num))

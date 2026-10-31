@@ -69,7 +69,7 @@ public class MeetingTimeManager
         if (!TimeManager.HasEnabled && !TimeThief.HasEnabled) BonusMeetingTime = Math.Clamp(TotalMeetingTime + BonusMeetingTime, MeetingTimeMinTimeThief, MeetingTimeMax) - TotalMeetingTime;
 
         if (BonusMeetingTime >= 0)
-            VotingTime += BonusMeetingTime; // Extended voting hours
+            VotingTime += BonusMeetingTime;
         if (Balancer.Choose)
         {
             DiscussionTime = 0;
@@ -77,10 +77,10 @@ public class MeetingTimeManager
         }
         else
         {
-            DiscussionTime += BonusMeetingTime; // Prioritize meeting time reduction
-            if (DiscussionTime < 0) // If meeting time alone is not sufficient to cover
+            DiscussionTime += BonusMeetingTime;
+            if (DiscussionTime < 0)
             {
-                VotingTime += DiscussionTime; // Shorten voting time for missing
+                VotingTime += DiscussionTime;
                 DiscussionTime = 0;
             }
         }

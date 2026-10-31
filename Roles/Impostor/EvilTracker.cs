@@ -10,7 +10,7 @@ namespace TONE.Roles.Impostor;
 
 internal class EvilTracker : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.EvilTracker;
     private const int Id = 1400;
     private static readonly HashSet<byte> playerIdList = [];
@@ -18,7 +18,7 @@ internal class EvilTracker : RoleBase
 
     public override CustomRoles ThisRoleBase => (TargetMode)OptionTargetMode.GetValue() == TargetMode.Never ? CustomRoles.Impostor : CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
+
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Track");
 
     private static OptionItem OptionCanSeeKillFlash;
@@ -148,16 +148,16 @@ internal class EvilTracker : RoleBase
     }
     private static void SetTarget(byte trackerId = byte.MaxValue, byte targetId = byte.MaxValue)
     {
-        if (trackerId == byte.MaxValue) // Targets can be re-set
+        if (trackerId == byte.MaxValue)
             foreach (var playerId in playerIdList)
                 CanSetTarget[playerId] = true;
-        else if (targetId == byte.MaxValue) // Target deletion
+        else if (targetId == byte.MaxValue)
             Target[trackerId] = byte.MaxValue;
         else
         {
-            Target[trackerId] = targetId; // Set Target
+            Target[trackerId] = targetId;
             if (CurrentTargetMode != TargetMode.Always)
-                CanSetTarget[trackerId] = false; // Target cannot be re-set
+                CanSetTarget[trackerId] = false;
 
             if (AmongUsClient.Instance.AmHost)
                 TargetArrow.Add(trackerId, targetId);

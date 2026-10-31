@@ -30,7 +30,7 @@ internal class SpeedRun : GameModeBase
     public static OptionItem SpeedRun_AllowCloseDoor;
 
     public static OptionItem SpeedRun_ArrowPlayers;
-    public static OptionItem SpeedRun_ArrowPlayersPlayerLiving; // Only * players left show arrows
+    public static OptionItem SpeedRun_ArrowPlayersPlayerLiving;
 
     public static OptionItem SpeedRun_SpeedBoostAfterTask;
     public static OptionItem SpeedRun_SpeedBoostSpeed;
@@ -65,7 +65,6 @@ internal class SpeedRun : GameModeBase
         SpeedRun_NumLongTasks = IntegerOptionItem.Create(Id + 3, "SpeedRun_NumLongTasks", new(0, 15, 1), 1, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.SpeedRun)
             .SetColor(new Color32(255, 251, 0, byte.MaxValue));
-
 
         SpeedRun_ShowChatInGame = BooleanOptionItem.Create(Id + 20, "SpeedRun_ShowChatInGame", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.SpeedRun)
@@ -187,7 +186,7 @@ internal class SpeedRun : GameModeBase
 
     public override void SetPredicate() => GameEndCheckerForNormal.predicate = new SpeedRunGameEndPredicate();
 
-    public static void RpcSyncSpeedRunStates(byte specificPlayerId = 255) // Not 255, Sync single single player
+    public static void RpcSyncSpeedRunStates(byte specificPlayerId = 255)
     {
         if (specificPlayerId != 255)
         {
@@ -285,7 +284,7 @@ internal class SpeedRun : GameModeBase
 
     public static void OnMurderPlayer(PlayerControl killer, PlayerControl target)
     {
-        if (killer.PlayerId != target.PlayerId) // Check Disconnect
+        if (killer.PlayerId != target.PlayerId)
         {
             PlayerNumKills[killer.PlayerId]++;
             RpcSyncSpeedRunStates(killer.PlayerId);
@@ -357,7 +356,6 @@ internal class SpeedRun : GameModeBase
             playerInfoList.Add((playerId, playerName, isAlive, finishedTasks, kills, finishTime, completedTasks, totalTasks));
         }
 
-        // Alive > Finish all tasks > Kill number > Time cost to finish all tasks > Not yet finish tasks then task number
         playerInfoList = playerInfoList.OrderByDescending(p => p.isAlive)
                                      .ThenByDescending(p => p.finishedTasks)
                                      .ThenByDescending(p => p.kills)
@@ -387,7 +385,6 @@ internal class SpeedRun : GameModeBase
                 builder.Append(ColorString(taskColor, $" ({info.completedTasks}/{info.totalTasks})"));
             }
 
-            // 如果不是最后一个玩家，添加换行符
             if (i < playerInfoList.Count - 1)
             {
                 builder.AppendLine();
@@ -612,7 +609,7 @@ public class Runner : RoleBase
         SpeedBoostState = (false, 0f);
         ProtectState = (false, 0f);
         target.MarkDirtySettings();
-        SpeedRun.OnMurderPlayer(killer, target); // Disconnect also handled here.
+        SpeedRun.OnMurderPlayer(killer, target);
         SendRPC();
 
         target.RpcSetRoleType(RoleTypes.CrewmateGhost, true);

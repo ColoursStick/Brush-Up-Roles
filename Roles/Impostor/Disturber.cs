@@ -10,13 +10,12 @@ namespace TONE.Roles.Impostor;
 
 internal class Disturber : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Disturber;
     private const int Id = 34400;
     public override bool IsExperimental => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
-    //==================================================================\\
 
     private static OptionItem FogRadius;
     private static OptionItem DisturberAbilityUses;

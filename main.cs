@@ -39,7 +39,7 @@ namespace TONE;
 [BepInProcess("Among Us.exe")]
 public class Main : BasePlugin
 {
-    // == Program Config ==
+
     public const string OriginalForkId = "OriginalTOH";
 
     public static readonly string ModName = "Brush Up Roles";
@@ -58,27 +58,20 @@ public class Main : BasePlugin
     public const string PluginGuid = "com.brushuproles.amongus";
     public const string PluginVersion = "1.2.0";
     public const string PluginDisplayVersion = "1.2.0";
-    public const int ExtraPluginVersion = 0; // Add Beta version number × 100
+    public const int ExtraPluginVersion = 0;
     public static readonly List<(int year, int month, int day)> SupportedVersionAU =
         [
-        /// 受支持的 Among Us 版本（语义版本，按年月日比较）。
-        ///
-        /// VersionChecker 会优先拿 Application.version（如 "2026.9.29"）与这里逐项比对，
-        /// 而不是拿 Constants 的分量 —— 后者与语义版本对不上，且各 build 之间还会变，
-        /// 会导致玩家被误判为「不支持的版本」而无法联机。
-        ///
-        /// 新增支持的版本时，在这里加一行即可。
-        (2026, 9, 29) // 2026.9.29（Among Us v19）
+
+        (2026, 9, 29)
     ];
 
-    // Change this to change alpha/beta/full release
     public static readonly Release RELEASE = Release.RELEASE;
 
-#pragma warning disable IDE1006 // Naming Styles
-    public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V2.0.0 Alpha 6 Hotfix 1
-    public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V2.0.0 Beta 3
-    public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V2.1.0
-#pragma warning restore IDE1006 // Naming Styles
+#pragma warning disable IDE1006
+    public static bool devRelease => RELEASE == Release.ALPHA;
+    public static bool canaryRelease => RELEASE == Release.BETA;
+    public static bool fullRelease => RELEASE == Release.RELEASE;
+#pragma warning restore IDE1006
 
     public enum Release
     {
@@ -100,7 +93,6 @@ public class Main : BasePlugin
     public static readonly bool ShowWebsiteButton = true;
     public static readonly string WebsiteInviteUrl = "https://au.yunsack.top/";
 
-    /// <summary>主菜单上的「背景图片」按钮：点开玩家背景目录。</summary>
     public static readonly bool ShowBackgroundButton = true;
 
     public static readonly bool ShowQQButton = true;
@@ -122,7 +114,7 @@ public class Main : BasePlugin
     public Dispatcher dispatcher;
     public static NormalGameOptionsV12 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
     public static HideNSeekGameOptionsV12 HideNSeekOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
-    //Client Options
+
     public static ConfigEntry<string> HideName { get; private set; }
     public static ConfigEntry<string> HideColor { get; private set; }
     public static ConfigEntry<int> MessageWait { get; private set; }
@@ -141,13 +133,12 @@ public class Main : BasePlugin
     public static ConfigEntry<bool> ForceOwnLanguageRoleName { get; private set; }
     public static ConfigEntry<bool> EnableCustomButton { get; private set; }
     public static ConfigEntry<bool> EnableCustomSoundEffect { get; private set; }
-    //public static ConfigEntry<bool> EnableCustomDecorations { get; private set; }
+
     public static ConfigEntry<bool> EnableMapVentIcon { get; private set; }
     public static ConfigEntry<bool> EnableCommandHelper { get; private set; }
     public static ConfigEntry<bool> EnableClientControlGUI { get; private set; }
     public static ConfigEntry<bool> SwitchVanilla { get; private set; }
 
-    // Debug
     public static ConfigEntry<bool> VersionCheat { get; private set; }
     public static bool IsHostVersionCheating = false;
     public static ConfigEntry<bool> GodMode { get; private set; }
@@ -155,7 +146,7 @@ public class Main : BasePlugin
 
     public static Dictionary<int, PlayerVersion> playerVersion = [];
     public static BAUPlayersData BAUPlayers = new();
-    //Preset Name Options
+
     public static ConfigEntry<string> Preset1 { get; private set; }
     public static ConfigEntry<string> Preset2 { get; private set; }
     public static ConfigEntry<string> Preset3 { get; private set; }
@@ -166,7 +157,7 @@ public class Main : BasePlugin
     public static ConfigEntry<string> Preset8 { get; private set; }
     public static ConfigEntry<string> Preset9 { get; private set; }
     public static ConfigEntry<string> Preset10 { get; private set; }
-    //Other Configs
+
     public static ConfigEntry<string> WebhookURL { get; private set; }
     public static ConfigEntry<string> BetaBuildURL { get; private set; }
     public static ConfigEntry<float> LastKillCooldown { get; private set; }
@@ -197,29 +188,13 @@ public class Main : BasePlugin
         [CustomGameMode.BonfireNight] = new Color32(255, 140, 0, byte.MaxValue),
     };
 
-    /// <summary>
-    /// Android（星光 Starlight）下的数据根目录。
-    ///
-    /// ⚠️ 官方指南要求：Android 上不要用硬编码路径 / 相对路径，
-    ///    应使用环境变量 STAR_DATA_PATH（或 Unity 的 Application.persistentDataPath）。
-    ///
-    /// 实测：在 BepInEx 加载插件的那一刻，STAR_DATA_PATH 可能**尚未设置**，
-    /// 此时原写法会让 Path 变成 null，拼出 "/BrushUpRoles-DATA" —— 那是
-    /// 文件系统根目录，Android 上只读，于是插件加载直接失败：
-    ///
-    ///     System.IO.IOException: Read-only file system : '/BrushUpRoles-DATA'
-    ///
-    /// 因此这里做三级兜底，并**实测可写性**，绝不返回 null 或不可写路径。
-    /// </summary>
     private static string ResolveAndroidDataPath()
     {
         var candidates = new List<string>();
 
-        // 1) 星光提供的专用数据目录（首选，官方推荐）
         var star = Environment.GetEnvironmentVariable("STAR_DATA_PATH");
         if (!string.IsNullOrWhiteSpace(star)) candidates.Add(star);
 
-        // 2) Unity 的持久化数据目录（官方指南给出的备选方案）
         try
         {
             var persistent = UnityEngine.Application.persistentDataPath;
@@ -227,7 +202,6 @@ public class Main : BasePlugin
         }
         catch { }
 
-        // 3) BepInEx 根目录下的子目录
         try
         {
             var be = Paths.BepInExRootPath;
@@ -235,30 +209,26 @@ public class Main : BasePlugin
         }
         catch { }
 
-        // 逐个验证「非空 + 不是根目录 + 可创建/可写」
         foreach (var c in candidates)
         {
             try
             {
                 var full = System.IO.Path.GetFullPath(c);
 
-                // 根目录一定不可写（这就是崩溃的那条路径）
                 if (full == "/" || full == System.IO.Path.GetPathRoot(full)) continue;
 
                 var probe = System.IO.Path.Combine(full, LANGUAGE_FOLDER_NAME);
                 Directory.CreateDirectory(probe);
 
-                // 真正写一次，确认可写
                 var testFile = System.IO.Path.Combine(probe, ".write-test");
                 File.WriteAllText(testFile, "ok");
                 File.Delete(testFile);
 
                 return full;
             }
-            catch { /* 换下一个候选 */ }
+            catch {  }
         }
 
-        // 4) 全部失败：用系统临时目录下的一级目录（仍保证可写）
         try
         {
             var tmp = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "BUR-data");
@@ -352,7 +322,7 @@ public class Main : BasePlugin
         }
     }
     public static bool ResetOptions = true;
-    public static string FirstDied = ""; //Store with hash puid so things can pass through different round
+    public static string FirstDied = "";
     public static string FirstDiedPrevious = "";
     public static int MadmateNum = 0;
     public static int BardCreations = 0;
@@ -365,8 +335,7 @@ public class Main : BasePlugin
 
     public static IEnumerable<PlayerControl> EnumeratePlayerControls()
     {
-        // foreach can throw System.InvalidOperationException: Collection was modified; enumeration operation may not execute.
-        // if the code waits frames between iterations, so the safest way is to use a for loop backwards
+
         for (int index = PlayerControl.AllPlayerControls.Count - 1; index >= 0; index--)
         {
             var pc = PlayerControl.AllPlayerControls[index];
@@ -512,7 +481,7 @@ public class Main : BasePlugin
                         }
                         else
                         {
-                            // Handle invalid or unrecognized enum keys
+
                             TONE.Logger.Error($"Invalid enum key: {kvp.Key}", "Reading Role Colors");
                         }
                     }
@@ -582,8 +551,7 @@ public class Main : BasePlugin
 
             CustomRolesHelper.DuplicatedRoles = new Dictionary<CustomRoles, Type>
             {
-                //{ CustomRoles.NiceMini, typeof(Mini) },
-                //{ CustomRoles.EvilMini, typeof(Mini) }
+
             };
 
             foreach (var role in CustomRolesHelper.AllRoles.Where(x => x < CustomRoles.NotAssigned))
@@ -677,13 +645,12 @@ public class Main : BasePlugin
                     string line;
                     while ((line = reader.ReadLine()) != null)
                     {
-                        // Split the line by ':' to get the first part
+
                         string[] parts = line.Split(':');
 
-                        // Check if there is at least one part before ':'
                         if (parts.Length >= 1)
                         {
-                            // Trim any leading or trailing spaces and add it to the list
+
                             string role = parts[0].Trim();
                             roleList.Add(role);
                         }
@@ -733,7 +700,6 @@ public class Main : BasePlugin
     {
         Instance = this;
 
-        //Client Options
         HideName = Config.Bind("Client Options", "Hide Game Code Name", "BUR");
         HideColor = Config.Bind("Client Options", "Hide Game Code Color", $"{ModColor}");
         DebugKeyInput = Config.Bind("Authentication", "Debug Key", "");
@@ -744,7 +710,7 @@ public class Main : BasePlugin
         DarkTheme = Config.Bind("Client Options", "DarkTheme", false);
         DisableLobbyMusic = Config.Bind("Client Options", "DisableLobbyMusic", false);
         ShowTextOverlay = Config.Bind("Client Options", "ShowTextOverlay", false);
-        // Brush Up Roles：默认关闭（该标签依赖 playerVersion 表，会一闪一闪）
+
         ShowModdedClientText = Config.Bind("Client Options", "ShowModdedClientText", false);
         HorseMode = Config.Bind("Client Options", "HorseMode", false);
         LongMode = Config.Bind("Client Options", "LongMode", false);
@@ -753,13 +719,12 @@ public class Main : BasePlugin
         ForceOwnLanguageRoleName = Config.Bind("Client Options", "ForceOwnLanguageRoleName", false);
         EnableCustomButton = Config.Bind("Client Options", "EnableCustomButton", true);
         EnableCustomSoundEffect = Config.Bind("Client Options", "EnableCustomSoundEffect", true);
-        //EnableCustomDecorations = Config.Bind("Client Options", "EnableCustomDecorations", true);
+
         EnableMapVentIcon = Config.Bind("Client Options", "EnableMapVentIcon", true);
         EnableCommandHelper = Config.Bind("Client Options", "EnableCommandHelper", true);
         EnableClientControlGUI = Config.Bind("Client Options", "EnableClientControlGUI", false);
         SwitchVanilla = Config.Bind("Client Options", "SwitchVanilla", false);
 
-        // Debug
         VersionCheat = Config.Bind("Client Options", "VersionCheat", false);
         GodMode = Config.Bind("Client Options", "GodMode", false);
         AutoRehost = Config.Bind("Client Options", "AutoRehost", false);
@@ -767,46 +732,38 @@ public class Main : BasePlugin
         if (!DebugModeManager.AmDebugger)
         {
             HorseMode.Value = false;
-            // Disable Horse Mode since it cause client crash
+
         }
 
-        // 日志标签用模组名（原先是硬编码的 "TONE"）
         Logger = BepInEx.Logging.Logger.CreateLogSource(ModName);
         coroutines = AddComponent<Coroutines>();
         dispatcher = AddComponent<Dispatcher>();
         TONE.Logger.Enable();
-        //TONE.Logger.Disable("NotifyRoles");
+
         TONE.Logger.Disable("SwitchSystem");
         TONE.Logger.Disable("ModNews");
-        // TONE.Logger.Disable("RpcSetNamePrivate");
+
         TONE.Logger.Disable("KnowRoleTarget");
         if (!DebugModeManager.AmDebugger)
         {
             TONE.Logger.Disable("2018k");
             TONE.Logger.Disable("Github");
-            //TONE.Logger.Disable("ReceiveRPC");
+
             TONE.Logger.Disable("SendRPC");
             TONE.Logger.Disable("SetRole");
             TONE.Logger.Disable("Info.Role");
             TONE.Logger.Disable("TaskState.Init");
-            //TONE.Logger.Disable("Vote");
-            //TONE.Logger.Disable("SendChat");
+
             TONE.Logger.Disable("SetName");
-            //TONE.Logger.Disable("AssignRoles");
-            //TONE.Logger.Disable("RepairSystem");
-            //TONE.Logger.Disable("MurderPlayer");
-            //TONE.Logger.Disable("CheckMurder");
+
             TONE.Logger.Disable("PlayerControl.RpcSetRole");
             TONE.Logger.Disable("SyncCustomSettings");
-            //TONE.Logger.Disable("DoNotifyRoles");
+
             TONE.Logger.Disable("CustomRpcSender");
         }
-        //TONE.Logger.isDetail = true;
 
-        // 認証関連-初期化
         DebugKeyAuth = new HashAuth(DebugKeyHash, DebugKeySalt);
 
-        // 認証関連-認証
         DebugModeManager.Auth(DebugKeyAuth, DebugKeyInput.Value);
 
         Preset1 = Config.Bind("Preset Name Options", "Preset1", "Preset_1");
@@ -832,7 +789,7 @@ public class Main : BasePlugin
 
         LoadRoleClasses();
         LoadAddonClasses();
-        LoadRoleColors(); //loads all the role colors from default and then tries to load custom colors if any.
+        LoadRoleColors();
         LoadGameModeClasses();
 
         CustomWinnerHolder.Reset();
@@ -840,10 +797,9 @@ public class Main : BasePlugin
         BanManager.Init();
         TemplateManager.Init();
         TagManager.Init();
-        //SpamManager.Init();
+
         Cloud.Init();
 
-        // 主菜单自定义背景目录（内部已 try/catch，失败不影响加载）
         BackgroundManager.Init();
 
         if (EnableClientControlGUI.Value) AddComponent<ClientControlGUI>();
@@ -860,9 +816,6 @@ public class Main : BasePlugin
         handler.Info($"{nameof(ThisAssembly.Git.Sha)}: {ThisAssembly.Git.Sha}");
         handler.Info($"{nameof(ThisAssembly.Git.Tag)}: {ThisAssembly.Git.Tag}");
 
-        // Injecting BaseModdedRpc has a very high chance for the game to crash on load!!!
-        // And you need to inject it for all the modded rpc to work!!!
-        // Works after injected. No idea how to resolve this problem.
         ClassInjector.RegisterTypeInIl2Cpp<BaseModdedRpc>();
         ClassInjector.RegisterTypeInIl2Cpp<CustomModdedData>();
 
@@ -880,17 +833,15 @@ public class Main : BasePlugin
 
         if (!OperatingSystem.IsAndroid())
         {
-            // there are some issues with TextBoxPatch and DiscordRPC on Android
+
             Harmony.PatchAll(typeof(TextBoxPatch));
             Harmony.PatchAll(typeof(DiscordRPC));
         }
 
         TextBoxPatch.AddChars();
 
-        // ConsoleManager.DetachConsole();
         if (DebugModeManager.AmDebugger && !OperatingSystem.IsAndroid()) ConsoleManager.CreateConsole();
 
-        // InitializeFileHash();
         FileHash = "Support_2026_08_18";
         TONE.Logger.Msg("========= Brush Up Roles loaded! =========", "Plugin Load");
     }
@@ -898,7 +849,7 @@ public class Main : BasePlugin
 [Obfuscation(Exclude = true)]
 public enum CustomRoles
 {
-    // Crewmate(Vanilla)
+
     Crewmate = 0,
     Engineer,
     GuardianAngel,
@@ -909,13 +860,11 @@ public enum CustomRoles
     Judge,
     Influencer,
 
-    // Impostor(Vanilla)
     Impostor,
     Phantom,
     Shapeshifter,
     Viper,
 
-    // Crewmate Vanilla Remakes
     CrewmateTONE,
     EngineerTONE,
     GuardianAngelTONE,
@@ -926,19 +875,16 @@ public enum CustomRoles
     JudgeTONE,
     InfluencerTONE,
 
-    // Impostor Vanilla Remakes
     ImpostorTONE,
     PhantomTONE,
     ShapeshifterTONE,
     ViperTONE,
 
-    // Impostor Ghost
     Bloodmoon,
     Minion,
     Possessor,
     Wraithh,
 
-    //Impostor
     Abyssbringer,
     Anonymous,
     AntiAdminer,
@@ -1022,12 +968,10 @@ public enum CustomRoles
     Wraith,
     Zombie,
 
-    //Crewmate Ghost
     Ghastly,
     Hawk,
     Warden,
 
-    //Crewmate
     Addict,
     Admirer,
     Alchemist,
@@ -1107,7 +1051,6 @@ public enum CustomRoles
     Vigilante,
     Witness,
 
-    //Neutral
     Agitater,
     Amnesiac,
     Apocalypse,
@@ -1187,7 +1130,6 @@ public enum CustomRoles
     Werewolf,
     Workaholic,
 
-    //Coven
     Coven,
     Conjurer,
     CovenLeader,
@@ -1208,36 +1150,27 @@ public enum CustomRoles
     VoodooMaster,
     WitchDoctor,
 
-    //FFA
     Killer,
 
-    //GM
     GM,
 
-    // Speed run
     Runner,
 
-    // Tag Mode
     TZombie,
     TCrewmate,
 
-    // Round Up
     RDeputy,
 
-    // Bonfire Night
     RWoodCollector,
     BWoodCollector,
     FireThief,
 
-    // C&R
     Cop,
     Robber,
     Disguiser,
 
-    // Sub-role after 500
     NotAssigned = 500,
 
-    // Add-ons
     Admired,
     Antidote,
     Autopsy,
@@ -1313,19 +1246,19 @@ public enum CustomRoles
     Susceptible,
     Swift,
     Tiebreaker,
-    Stealer, //stealer
+    Stealer,
     Torch,
     Trapper,
     Tricky,
     Tired,
     Unlucky,
-    Unreportable, //disregarded
+    Unreportable,
     VoidBallot,
     Watcher,
     Workhorse,
     Youtuber
 }
-//WinData
+
 [Obfuscation(Exclude = true)]
 public enum CustomWinner
 {
@@ -1434,8 +1367,7 @@ public enum AdditionalWinners
     Pixie = CustomRoles.Pixie,
     Quizmaster = CustomRoles.Quizmaster,
     Troller = CustomRoles.Troller,
-    //   NiceMini = CustomRoles.NiceMini,
-    //   Baker = CustomRoles.Baker,
+
 }
 [Obfuscation(Exclude = true)]
 public enum SuffixModes

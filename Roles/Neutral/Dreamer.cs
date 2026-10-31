@@ -7,14 +7,13 @@ namespace TONE.Roles.Neutral;
 
 internal class Dreamer : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Dreamer;
     private const int Id = 33600;
     public override bool IsExperimental => true;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     public static OptionItem FantasyCooldown;

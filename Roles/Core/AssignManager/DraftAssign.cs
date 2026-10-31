@@ -269,10 +269,9 @@ public static class DraftAssign
             Conf.Clear().Append($"<color=#ffffff>" + $"<size={ChatCommands.Csize}>" + Setting + cleared + "</size>" + "</color>");
 
         }
-        // Show role info
+
         Utils.SendMessage(Des, playerId, title, noReplay: true);
 
-        // Show role settings
         Utils.SendMessage("", playerId, Conf.ToString(), noReplay: true);
     }
 

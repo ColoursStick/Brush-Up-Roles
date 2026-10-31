@@ -7,13 +7,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Bastion : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Bastion;
     private const int Id = 10200;
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
-    //==================================================================\\
 
     private static OptionItem BombsClearAfterMeeting;
     private static OptionItem BastionBombCooldown;

@@ -10,13 +10,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Benefactor : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Benefactor;
     private const int Id = 26400;
 
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
-    //==================================================================\\
 
     private static OptionItem TaskMarkPerRoundOpt;
     private static OptionItem ShieldDuration;
@@ -105,16 +104,16 @@ internal class Benefactor : RoleBase
         {
             playerId.SetAbilityUseLimit(0);
             taskIndex[playerId].Clear();
-            SendRPC(type: 0, benefactorId: playerId); //clear taskindex
+            SendRPC(type: 0, benefactorId: playerId);
         }
         if (shieldedPlayers.Any())
         {
             shieldedPlayers.Clear();
-            SendRPC(type: 1); //clear all shielded players
+            SendRPC(type: 1);
         }
     }
 
-    public override void OnOthersTaskComplete(PlayerControl player, PlayerTask task, bool playerIsOverridden, PlayerControl realPlayer) // runs for every player which compeletes a task
+    public override void OnOthersTaskComplete(PlayerControl player, PlayerTask task, bool playerIsOverridden, PlayerControl realPlayer)
     {
         if (!AmongUsClient.Instance.AmHost) return;
 
@@ -136,7 +135,7 @@ internal class Benefactor : RoleBase
             player.RpcIncreaseAbilityUseLimitBy(1);
             taskIndex[playerId].Add(task.Index);
 
-            SendRPC(type: 2, benefactorId: playerId, taskIndex: task.Index); //add in task mark per round and taskindex
+            SendRPC(type: 2, benefactorId: playerId, taskIndex: task.Index);
             player.Notify(GetString("BenefactorTaskMarked"));
         }
         else
@@ -152,7 +151,7 @@ internal class Benefactor : RoleBase
                     long now = Utils.GetTimeStamp();
                     shieldedPlayers[playerId] = now;
                     taskIndex[benefactorId].Remove(task.Index);
-                    SendRPC(type: 3, benefactorId: benefactorId, targetId: playerId, taskIndex: task.Index); // remove taskindex and add shieldedPlayer time
+                    SendRPC(type: 3, benefactorId: benefactorId, targetId: playerId, taskIndex: task.Index);
                     Logger.Info($"{player.GetAllRoleName()} got a shield from {benefactorPC.GetNameWithRole()}", "Benefactor");
                 }
             }

@@ -11,7 +11,7 @@ namespace TONE.Roles.Neutral;
 
 internal class Cupid : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Cupid;
     private const int Id = 33400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Cupid);
@@ -19,12 +19,11 @@ internal class Cupid : RoleBase
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
-    //==================================================================\\
+
     private static readonly Dictionary<byte, (byte, byte)?> cupidArrows = [];
     private static readonly Dictionary<byte, byte?> firstArrow = [];
     private static readonly Dictionary<byte, bool> isProtecting = [];
 
-    // Your arrow couldn’t charm the target
     private static OptionItem CharmCooldown;
     public static OptionItem LoversKnowCupid;
     private static OptionItem ProtectCooldown;
@@ -51,7 +50,7 @@ internal class Cupid : RoleBase
 
     public override void Add(byte playerId)
     {
-        // playerId.SetAbilityUseLimit(2);
+
         cupidArrows[playerId] = null;
         firstArrow[playerId] = null;
         isProtecting[playerId] = false;
@@ -106,7 +105,6 @@ internal class Cupid : RoleBase
     {
         if (!HasEnabled) return false;
 
-        // returns 0xff is target is not one of cupid's lovers
         var cupid = GetCupidId(target.PlayerId);
 
         if (cupid == 0xff) return false;

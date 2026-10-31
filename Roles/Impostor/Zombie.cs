@@ -5,12 +5,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Zombie : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Zombie;
     private const int Id = 23900;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem ZombieKillCooldown;
     private static OptionItem ZombieSpeedReduce;

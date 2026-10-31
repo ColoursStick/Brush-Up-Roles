@@ -2,7 +2,7 @@ namespace TONE.Roles.Impostor;
 
 internal class TimeThief : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.TimeThief;
     private const int Id = 3700;
     private static readonly HashSet<byte> playerIdList = [];
@@ -10,14 +10,12 @@ internal class TimeThief : RoleBase
 
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem DecreaseMeetingTime;
     public static OptionItem LowerLimitVotingTime;
     private static OptionItem ReturnStolenTimeUponDeath;
     public static OptionItem MaxMeetingTimeOnAdmired;
-
 
     public override void SetupCustomOption()
     {

@@ -12,12 +12,11 @@ namespace TONE.Roles.Impostor;
 
 internal class BountyHunter : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.BountyHunter;
     private const int Id = 800;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem OptionTargetChangeTime;
     private static OptionItem OptionSuccessKillCooldown;
@@ -58,7 +57,7 @@ internal class BountyHunter : RoleBase
         if (AmongUsClient.Instance.AmHost)
         {
             ResetTarget(Utils.GetPlayerById(playerId));
-            //CustomRoleManager.OnFixedUpdateLowLoadOthers.Add(OnFixedUpdateLowLoadOthers);
+
         }
     }
     private static void SendRPC(byte bountyId, byte targetId)
@@ -82,7 +81,7 @@ internal class BountyHunter : RoleBase
 
     public override bool OnCheckShapeshift(PlayerControl shapeshifter, PlayerControl target, ref bool resetCooldown, ref bool shouldAnimate)
     {
-        // not should shapeshifted
+
         resetCooldown = false;
         return false;
     }

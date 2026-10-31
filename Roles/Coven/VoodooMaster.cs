@@ -9,13 +9,12 @@ namespace TONE.Roles.Coven;
 
 internal class VoodooMaster : CovenManager
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.VoodooMaster;
     private const int Id = 30700;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenUtility;
-    //==================================================================\\
 
     private static OptionItem VoodooCooldown;
     private static OptionItem VoodoosPerRound;

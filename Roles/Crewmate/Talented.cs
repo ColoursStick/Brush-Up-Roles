@@ -5,12 +5,11 @@ namespace TONE.Roles.Crewmate;
 
 internal class Talented : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Talented;
     private const int Id = 32500;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
-    //==================================================================\\
 
     private static List<CustomRoles> addons = [];
 

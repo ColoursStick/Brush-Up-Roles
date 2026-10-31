@@ -31,7 +31,6 @@ public class StringOptionItem(int id, string name, int defaultValue, TabGroup ta
         return opt;
     }
 
-    // Getter
     public override int GetInt() => Rule.GetValueByIndex(CurrentValue);
     public override float GetFloat() => Rule.GetValueByIndex(CurrentValue);
     public override string GetString()
@@ -41,13 +40,11 @@ public class StringOptionItem(int id, string name, int defaultValue, TabGroup ta
     }
     public int GetChance()
     {
-        //For 0% or 100%
+
         if (Selections.Length == 2) return CurrentValue * 100;
 
-        //TONEΓÇÖs career generation mode
         if (Selections.Length == 3) return CurrentValue;
 
-        //For 0% to 100% or 5% to 100%
         var offset = EnumHelper.GetAllNames<Options.SpawnChance>().Length - Selections.Length;
         var index = CurrentValue + offset;
         var rate = index * 5;
@@ -56,7 +53,6 @@ public class StringOptionItem(int id, string name, int defaultValue, TabGroup ta
     public override int GetValue()
         => Rule.RepeatIndex(base.GetValue());
 
-    // Setter
     public override void SetValue(int value, bool doSync = true)
     {
         base.SetValue(Rule.RepeatIndex(value), doSync);

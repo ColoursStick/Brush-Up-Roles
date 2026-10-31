@@ -1,7 +1,6 @@
 using AmongUs.GameOptions;
 using System;
 
-
 namespace TONE;
 
 public class OptionBackupData
@@ -35,10 +34,8 @@ public class OptionBackupData
                 AllValues.Add(new IntOptionBackupValue(name, value));
         }
 
-        // [Vanilla bug] Only the number of people in the room cannot be obtained with GetInt, so obtain it separately.
         AllValues.Add(new IntOptionBackupValue(Int32OptionNames.MaxPlayers, option.MaxPlayers));
 
-        // TryGetUInt is not implemented, so get it separately
         AllValues.Add(new UIntOptionBackupValue(UInt32OptionNames.Keywords, (uint)option.Keywords));
 
         foreach (RoleTypes role in new RoleTypes[] { RoleTypes.Scientist, RoleTypes.Engineer, RoleTypes.GuardianAngel, RoleTypes.Shapeshifter, RoleTypes.Noisemaker, RoleTypes.Phantom, RoleTypes.Tracker, RoleTypes.Viper, RoleTypes.Detective, RoleTypes.Judge, RoleTypes.SpiritGuide })

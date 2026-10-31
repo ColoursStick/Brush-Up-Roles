@@ -53,7 +53,7 @@ class PingTrackerUpdatePatch
 
             if (!GameStates.IsModHost)
             {
-                //CheckIsModHost = true;
+
                 sb.Append($"\r\n{Utils.ColorString(Color.red, GetString("Warning.NoModHost"))}");
             }
 
@@ -96,7 +96,7 @@ class PingTrackerUpdatePatch
         {
             if (DestroyableSingleton<HudManager>.Instance && !HudManager.Instance.Chat.isActiveAndEnabled)
             {
-                offset_x += 0.7f; // Additional offsets for chat button if present
+                offset_x += 0.7f;
             }
             else
             {
@@ -200,7 +200,7 @@ class VersionShowerStartPatch
         }
     }
 }
-// From TONX/Patches/AccountManagerPatch.cs, by KARPED1EM
+
 [HarmonyPatch(typeof(AccountTab), nameof(AccountTab.Awake))]
 public static class UpdateFriendCodeUIPatch
 {
@@ -208,7 +208,7 @@ public static class UpdateFriendCodeUIPatch
 
     public static void Prefix()
     {
-        // Brush Up Roles：不再显示上游作者署名；抬头也不带简称
+
         var credentialsText = $"<color={Main.ModColor}>{Main.ModName}</color> - {Main.PluginDisplayVersion}";
 
         GameObject friendCode = GameObject.Find("FriendCode");

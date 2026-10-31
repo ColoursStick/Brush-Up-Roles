@@ -4,16 +4,14 @@ using TONE.Roles.Core;
 
 namespace TONE.Roles.Neutral;
 
-// 来源：https://github.com/Yumenopai/TownOfHost_Y
 internal class Stalker : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Stalker;
     private const int Id = 18100;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => SnatchesWins ? Custom_RoleType.NeutralEvil : Custom_RoleType.NeutralKilling;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem HasImpostorVision;
@@ -57,7 +55,6 @@ internal class Stalker : RoleBase
 
         CustomSoundsManager.RPCPlayCustomSoundAll("FlashBang");
 
-        // Code from AU: SabotageSystemType.UpdateSystem switch SystemTypes.Electrical
         byte switchId = 4;
         for (int index = 0; index < 5; ++index)
         {

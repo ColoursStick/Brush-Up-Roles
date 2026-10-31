@@ -7,13 +7,12 @@ namespace TONE.Roles.Impostor;
 
 internal class Butcher : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Butcher;
     private const int Id = 24300;
 
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static Dictionary<byte, (int, int, Vector2)> MurderTargetLateTask = [];
     public override void SetupCustomOption()
@@ -49,7 +48,7 @@ internal class Butcher : RoleBase
         Main.PlayerStates[target.PlayerId].SetDead();
 
         Main.OverDeadPlayerList.Add(target.PlayerId);
-        //var ops = target.GetCustomPosition();
+
         var rd = IRandom.Instance;
 
         if (target.Is(CustomRoles.Avanger))
@@ -57,7 +56,7 @@ internal class Butcher : RoleBase
             CustomSoundsManager.RPCPlayCustomSoundAll("Congrats");
             CustomWinnerHolder.ResetAndSetWinner(CustomWinner.None);
 
-            var pcList = Main.EnumerateAlivePlayerControls().Where(x => x.PlayerId != target.PlayerId); // No need to do extra check cause nobody is winning
+            var pcList = Main.EnumerateAlivePlayerControls().Where(x => x.PlayerId != target.PlayerId);
             pcList.Do(x =>
             {
                 x.SetDeathReason(PlayerState.DeathReason.Revenge);
@@ -80,7 +79,7 @@ internal class Butcher : RoleBase
                 Main.EnumerateAlivePlayerControls().Where(x => x.PlayerId != target.PlayerId && !x.AmOwner)
                 .Do(x => target.RpcSpecificMurderPlayer(target, x));
             }
-        }, 0.2f, "Butcher Show Bodies"); //25 exactly takes over the whole screen
+        }, 0.2f, "Butcher Show Bodies");
 
         _ = new LateTask(() =>
         {
@@ -98,7 +97,7 @@ internal class Butcher : RoleBase
         if (!MurderTargetLateTask.TryGetValue(target.PlayerId, out var data)) return;
         var ops = data.Item3;
 
-        if (data.Item1 > 19) //on fix update updates 30 times pre second
+        if (data.Item1 > 19)
         {
             if (data.Item2 < 5)
             {

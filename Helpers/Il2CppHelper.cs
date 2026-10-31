@@ -6,7 +6,7 @@ namespace TONE;
 
 public static class Il2CppHelper
 {
-    // From https://github.com/TheOtherRolesAU/TheOtherRoles/blob/main/TheOtherRoles/Il2CppHelpers.cs
+
     private static class CastHelper<T> where T : Il2CppObjectBase
     {
         public static Func<IntPtr, T> Cast;

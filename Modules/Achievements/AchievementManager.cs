@@ -19,7 +19,6 @@ public static class AchievementManager
 
     private static string SavePath => $"{Main.Path}/BrushUpRoles-DATA/Achievements.json";
 
-    // 加载
     public static void Load()
     {
         AllAchievements.Clear();
@@ -46,7 +45,6 @@ public static class AchievementManager
             }
         }
 
-        // 读取本地存档
         try
         {
             if (File.Exists(SavePath))
@@ -65,9 +63,6 @@ public static class AchievementManager
         Logger.Info($"Loaded {AllAchievements.Count} achievements", "AchievementManager");
     }
 
-    /// <summary>
-    /// 游戏结束时保存成就
-    /// </summary>
     public static void Save()
     {
         try
@@ -82,9 +77,6 @@ public static class AchievementManager
         }
     }
 
-    /// <summary>
-    /// 游戏开始
-    /// </summary>
     public static void OnGameStart()
     {
         CompletedThisGame.Clear();
@@ -95,9 +87,6 @@ public static class AchievementManager
         }
     }
 
-    /// <summary>
-    /// 成功击杀
-    /// </summary>
     public static void OnPlayerKilled(PlayerControl killer, PlayerControl target)
     {
         if (!AmongUsClient.Instance.AmHost || !killer || !target) return;
@@ -118,9 +107,6 @@ public static class AchievementManager
         }
     }
 
-    /// <summary>
-    /// 职业技能事件
-    /// </summary>
     public static void OnRoleAbility(CustomRoles role, AchievementEventType type, PlayerControl player)
     {
         if (!AmongUsClient.Instance.AmHost || !player) return;
@@ -139,9 +125,6 @@ public static class AchievementManager
         }
     }
 
-    /// <summary>
-    /// 游戏结束
-    /// </summary>
     public static void OnGameEnd()
     {
         if (!AmongUsClient.Instance.AmHost) return;
@@ -159,9 +142,6 @@ public static class AchievementManager
         Save();
     }
 
-    /// <summary>
-    /// 成就完成
-    /// </summary>
     public static void OnAchievementCompleted(AchievementBase achievement)
     {
         if (achievement == null || achievement.CompletedThisGame) return;
@@ -169,9 +149,6 @@ public static class AchievementManager
         CompletedThisGame.Add(achievement.Id);
     }
 
-    /// <summary>
-    /// 展示成就列表
-    /// </summary>
     public static void ShowAchievements(byte playerId, string roleName = null)
     {
         List<AchievementBase> list = AllAchievements;
@@ -212,9 +189,6 @@ public static class AchievementManager
         Utils.SendMessage(sb.ToString(), playerId, GetString("Achievement.Completed") + $" <#ffc0cb>(<#00ffa5>{completed.Count}</color>/{list.Count})</color>");
     }
 
-    /// <summary>
-    /// 结算显示本局完成的成就
-    /// </summary>
     public static void ShowCompletedThisGame()
     {
         if (CompletedThisGame.Count == 0)
@@ -234,7 +208,6 @@ public static class AchievementManager
     private static string GetRoleLabel(AchievementBase a)
         => a.Role == CustomRoles.NotAssigned ? GetString("Achievement.All") : Utils.ColorString(Utils.GetRoleColor(a.Role), Utils.GetRoleName(a.Role));
 
-    // 反射
     private static List<Type> GetAchievementTypes()
     {
         var result = new List<Type>();
@@ -248,7 +221,7 @@ public static class AchievementManager
         }
         catch (ReflectionTypeLoadException ex)
         {
-            // 加载失败，跳过能加载的部分
+
             foreach (var type in ex.Types)
             {
                 if (type != null && !type.IsAbstract && typeof(AchievementBase).IsAssignableFrom(type))

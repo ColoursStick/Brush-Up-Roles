@@ -5,12 +5,12 @@ namespace TONE.Roles.Neutral;
 
 internal class Opportunist : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Opportunist;
     private const int Id = 13300;
     public override CustomRoles ThisRoleBase => OpportunistCanUseVent.GetBool() ? CustomRoles.Engineer : CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
-    //==================================================================\\
+
     public override bool HasTasks(NetworkedPlayerInfo player, CustomRoles role, bool ForRecompute) => OppoImmuneToAttacksWhenTasksDone.GetBool() && !ForRecompute;
 
     public static OptionItem OppoImmuneToAttacksWhenTasksDone;

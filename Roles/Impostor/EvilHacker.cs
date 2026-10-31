@@ -9,16 +9,14 @@ using static TONE.Options;
 
 namespace TONE.Roles.Impostor;
 
-// Ported from: https://github.com/tukasa0001/TownOfHost/blob/main/Roles/Impostor/EvilHacker.cs
 internal class EvilHacker : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.EvilHacker;
     private const int Id = 28400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.EvilHacker);
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem OptionCanSeeDeadMark;
     private static OptionItem OptionCanSeeImpostorMark;
@@ -218,7 +216,6 @@ internal class EvilHacker : RoleBase
 
     public static bool CheckKillFlash(PlayerControl killer, PlayerControl target)
         => canSeeKillFlash && killer.PlayerId != target.PlayerId;
-
 
     private static readonly TimeSpan NotifyDuration = TimeSpan.FromSeconds(10);
     private readonly struct MurderNotify

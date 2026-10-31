@@ -6,7 +6,7 @@ namespace TONE.Modules.Rpc
 {
     public class RpcSetRoleGrouped : CustomModdedData
     {
-        // Use RpcUtils.SendMessageSpecifically to send this message
+
         public override GameDataTypes FirstDataType => GameDataTypes.RpcFlag;
         public RpcSetRoleGrouped(List<(PlayerControl, RoleTypes)> playerRoles) : base()
         {
@@ -34,7 +34,7 @@ namespace TONE.Modules.Rpc
 
         public override void SerializeCustomValues(MessageWriter writer)
         {
-            // writer.StartMessage(GameDataTypes.RpcFlag);
+
             writer.WritePacked(firstCall.Item1);
             writer.Write((byte)RpcCalls.SetRole);
             writer.Write((ushort)firstCall.Item2);
@@ -42,7 +42,7 @@ namespace TONE.Modules.Rpc
 
             if (lastCall == null)
             {
-                // writer.EndMessage();
+
                 return;
             }
 
@@ -58,7 +58,7 @@ namespace TONE.Modules.Rpc
             writer.Write((byte)RpcCalls.SetRole);
             writer.Write((ushort)lastCall.Value.Item2);
             writer.Write(true);
-            // writer.EndMessage();
+
         }
 
         private readonly (uint, RoleTypes) firstCall;

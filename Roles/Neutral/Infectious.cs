@@ -10,7 +10,7 @@ namespace TONE.Roles.Neutral;
 
 internal class Infectious : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Infectious;
     private const int Id = 16600;
     private static readonly HashSet<byte> PlayerIds = [];
@@ -18,7 +18,6 @@ internal class Infectious : RoleBase
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;
-    //==================================================================\\
 
     private static OptionItem BiteCooldown;
     private static OptionItem BiteMax;
@@ -73,7 +72,7 @@ internal class Infectious : RoleBase
             if (addon is CustomRoles.Admired)
             {
                 Admirer.AdmiredList[killer.PlayerId].Add(target.PlayerId);
-                Admirer.SendRPC(killer.PlayerId, target.PlayerId); //Sync playerId list
+                Admirer.SendRPC(killer.PlayerId, target.PlayerId);
             }
 
             Utils.NotifyRoles(SpecifySeer: killer, SpecifyTarget: target, ForceLoop: true);
@@ -149,7 +148,7 @@ internal class Infectious : RoleBase
 
     public static bool TargetKnowOtherTargets => TargetKnowOtherTarget.GetBool();
 
-    public static bool KnowRole(PlayerControl player, PlayerControl target) // Addons know each-other
+    public static bool KnowRole(PlayerControl player, PlayerControl target)
     {
         if (player.Is(CustomRoles.Infected) && target.Is(CustomRoles.Infectious)) return true;
         if (KnowTargetRole.GetBool() && player.Is(CustomRoles.Infectious) && target.Is(CustomRoles.Infected)) return true;

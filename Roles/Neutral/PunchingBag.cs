@@ -9,12 +9,11 @@ namespace TONE.Roles.Neutral;
 
 internal class PunchingBag : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.PunchingBag;
     private const int Id = 14500;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralEvil;
-    //==================================================================\\
 
     private static OptionItem PunchingBagKillMax;
 

@@ -12,14 +12,13 @@ namespace TONE.Roles.Neutral;
 
 internal class Quizmaster : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Quizmaster;
     private const int Id = 27000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Quizmaster);
     public override bool IsExperimental => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => CanKillsAfterMark() ? Custom_RoleType.NeutralKilling : Custom_RoleType.NeutralChaos;
-    //==================================================================\\
 
     private static OptionItem MinQuestionDifficulty;
     private static OptionItem MaxQuestionDifficulty;
@@ -34,9 +33,9 @@ internal class Quizmaster : RoleBase
     private static PlayerControl Player;
     public static Sabotages lastSabotage = Sabotages.None;
     public static Sabotages firstSabotageOfRound = Sabotages.None;
-    //private static int killsForRound = 0;
+
     private static bool allowedKilling = false;
-    //private static bool allowedVenting = true;
+
     private static bool AlreadyMarked = false;
     private static byte MarkedPlayer = byte.MaxValue;
     public static string lastExiledColor = "None";
@@ -111,7 +110,7 @@ internal class Quizmaster : RoleBase
 
         if (targetId != byte.MaxValue)
         {
-            //allowedVenting = false;
+
             AlreadyMarked = true;
             MarkedPlayer = targetId;
 
@@ -135,7 +134,7 @@ internal class Quizmaster : RoleBase
         if (!killer.RpcCheckAndMurder(target, true)) return false;
         if (AlreadyMarked == false)
         {
-            //allowedVenting = false;
+
             AlreadyMarked = true;
             MarkedPlayer = target.PlayerId;
             SendRPC(target.PlayerId);
@@ -220,7 +219,7 @@ internal class Quizmaster : RoleBase
             CustomRoles randomRoleWithAddon = GetRandomRole([.. CustomRolesHelper.AllRoles], false);
             List<QuizQuestionBase> Questions =
             [
-                new SabotageQuestion { Stage = 1, Question = "LastSabotage",/* JSON ENTRIES */ QuizmasterQuestionType = QuizmasterQuestionType.LatestSabotageQuestion },
+                new SabotageQuestion { Stage = 1, Question = "LastSabotage", QuizmasterQuestionType = QuizmasterQuestionType.LatestSabotageQuestion },
                 new SabotageQuestion { Stage = 1, Question = "FirstRoundSabotage", QuizmasterQuestionType = QuizmasterQuestionType.FirstRoundSabotageQuestion },
                 new PlrColorQuestion { Stage = 1, Question = "LastEjectedPlayerColor", QuizmasterQuestionType = QuizmasterQuestionType.EjectionColorQuestion },
                 new PlrColorQuestion { Stage = 1, Question = "LastReportPlayerColor", QuizmasterQuestionType = QuizmasterQuestionType.ReportColorQuestion },
@@ -232,7 +231,7 @@ internal class Quizmaster : RoleBase
                 new SetAnswersQuestion { Stage = 2, Question = GetString("QuizmasterQuestions.BasisOfRole").Replace("{QMRole}", randomRole.ToColoredString()), HasQuestionTranslation = false, Answer = CustomRolesHelper.GetRoleTypes(randomRole).ToString(), PossibleAnswers = { "Crewmate", "Impostor", "Shapeshifter", "Scientist", "Engineer", "GuardianAngel", "Phantom" }, QuizmasterQuestionType = QuizmasterQuestionType.RoleBasisQuestion },
 
                 new SetAnswersQuestion { Stage = 3, Question = "FactionRemovedName", Answer = "None", PossibleAnswers = { "Sabotuer", "Sorcerers", "Coven", "Killer", "None" }, QuizmasterQuestionType = QuizmasterQuestionType.RemovedFactionQuestion },
-                // ^ I added Coven back so this question no longer applies :) - Marg
+
                 new SetAnswersQuestion { Stage = 3, Question = "WhatDoesEOgMeansInName", Answer = "Edited", PossibleAnswers = { "Edition", "Experimental", "Enhanced", "Edited" }, QuizmasterQuestionType = QuizmasterQuestionType.NameOriginQuestion },
                 new CountQuestion { Stage = 3, Question = "HowManyDiedFirstRound", QuizmasterQuestionType = QuizmasterQuestionType.DiedFirstRoundCountQuestion },
                 new CountQuestion { Stage = 3, Question = "ButtonPressedBefore", QuizmasterQuestionType = QuizmasterQuestionType.ButtonPressedBeforeThisQuestion },
@@ -242,12 +241,12 @@ internal class Quizmaster : RoleBase
                 new DeathReasonQuestion { Stage = 4, Question = "PlrDieMethod", QuizmasterQuestionType = QuizmasterQuestionType.PlrDeathMethodQuestion},
                 new SetAnswersQuestion { Stage = 4, Question = "LastAddedRoleForKarped", Answer = "Pacifist", PossibleAnswers = { "Pacifist", "Vampire", "Snitch", "Vigilante", "Jackal", "Mole", "Sniper" }, QuizmasterQuestionType = QuizmasterQuestionType.RoleAddedQuestion },
                 new DeathReasonQuestion { Stage = 4, Question = "PlrDieFaction", QuizmasterQuestionType = QuizmasterQuestionType.PlrDeathKillerFactionQuestion},
-                new SetAnswersQuestion { Stage = 4, Question = "QuizmasterCooldown", Answer = "15", PossibleAnswers = { "15", "30", "0", "999", AURoleOptions.KillCooldown.ToString() }, QuizmasterQuestionType = QuizmasterQuestionType.QuizmasterCooldownQuestion }, // this is a level 4 because the only way to know this would be to look at the code for Quizmaster
+                new SetAnswersQuestion { Stage = 4, Question = "QuizmasterCooldown", Answer = "15", PossibleAnswers = { "15", "30", "0", "999", AURoleOptions.KillCooldown.ToString() }, QuizmasterQuestionType = QuizmasterQuestionType.QuizmasterCooldownQuestion },
                 new SetAnswersQuestion { Stage = 4, Question = "WhoCoded", Answer = "Multiple People", PossibleAnswers = { "Furo", "Drakos", "qin-qwq", "Marg", "Multiple People", "TommyXL", "Niko", "Pyro", "KARPED1EM", "Ryuk" }, QuizmasterQuestionType = QuizmasterQuestionType.WhoCoded },
 
                 new SetAnswersQuestion { Stage = 5, Question = "TONEPartners", Answer = "6", PossibleAnswers = { "0", "1", "2", "3", "4", "5", "6", "7", "8" }, QuizmasterQuestionType = QuizmasterQuestionType.TONEPartners },
                 new SetAnswersQuestion { Stage = 5, Question = "TONEEventCoordinator", Answer = "造成不良影响者，会被“友好劝退”", PossibleAnswers = { "不得以任何形式的名义在群内拉帮结派", "造成不良影响者，会被“友好劝退”", "违规严重者将接受警长的“友好劝退”", "除官方红包，群内禁止群员发送任何形式的红包", "太空世界禁止黄、赌、毒、血腥暴力、带有政治色彩的话题", "任何船员们假借官方名义散播不实信息或未证实消息将会被限制进群！", "希望所有船员们可以遵守~", "违反行为包括但不仅限于以上条例，若有任何疑问可以私聊咨询群管理" }, QuizmasterQuestionType = QuizmasterQuestionType.TONEEventCoordinator },
-                new SetAnswersQuestion { Stage = 5, Question = "HowManyCats", Answer = "3", PossibleAnswers = { "0", "1", "2", "3", "4", "5", "6" }, QuizmasterQuestionType = QuizmasterQuestionType.HowManyCats }, // Copycat, Schrodinger's Cat, OIIAI (I want to count Jinx because of its origin in TOS2, but I won't)
+                new SetAnswersQuestion { Stage = 5, Question = "HowManyCats", Answer = "3", PossibleAnswers = { "0", "1", "2", "3", "4", "5", "6" }, QuizmasterQuestionType = QuizmasterQuestionType.HowManyCats },
                 new SetAnswersQuestion { Stage = 5, Question = "GuessingCommand", Answer = "Bet", PossibleAnswers = { "Nothing, it's just /bt", "Bet", "Bloodthirst", "Betray Them", "Bomb Tag", "Bad Thing" }, QuizmasterQuestionType = QuizmasterQuestionType.GuessingCommand },
                 new SetAnswersQuestion { Stage = 5, Question = "NotFromTOS2", Answer = "Moon Dancer", PossibleAnswers = { "Coven Leader", "Jinx", "Marshall", "Doomsayer", "Baker", "Moon Dancer", "Pirate", "Mayor", "Veteran", "Psychic" }, QuizmasterQuestionType = QuizmasterQuestionType.NotFromTOS2 },
             ];
@@ -292,8 +291,7 @@ internal class Quizmaster : RoleBase
         if (Player == null) return;
 
         firstSabotageOfRound = Sabotages.None;
-        //killsForRound = 0;
-        //allowedVenting = true;
+
         allowedKilling = false;
         diedThisRound = 0;
         if (MarkedPlayer != byte.MaxValue)
@@ -326,10 +324,8 @@ internal class Quizmaster : RoleBase
     public override string GetMark(PlayerControl seer, PlayerControl target = null, bool isForMeeting = false)
         => (!isForMeeting && seer.PlayerId != target.PlayerId && MarkedPlayer == target.PlayerId) ? Utils.ColorString(Utils.GetRoleColor(CustomRoles.Quizmaster), " ？！") : string.Empty;
 
-
     public override string GetMarkOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)
             => (isForMeeting && MarkedPlayer == target.PlayerId) ? Utils.ColorString(Utils.GetRoleColor(CustomRoles.Quizmaster), " ？！") : string.Empty;
-
 
     public static void OnSabotageCall(SystemTypes systemType)
     {
@@ -345,9 +341,9 @@ internal class Quizmaster : RoleBase
         {
             switch (systemType)
             {
-                case SystemTypes.HeliSabotage: //The Airhip
-                case SystemTypes.Laboratory: //Polus
-                case SystemTypes.Reactor: //Other maps
+                case SystemTypes.HeliSabotage:
+                case SystemTypes.Laboratory:
+                case SystemTypes.Reactor:
                     lastSabotage = Sabotages.Reactor;
                     break;
                 case SystemTypes.Electrical:
@@ -549,7 +545,6 @@ class DeathReasonQuestion : QuizQuestionBase
 
         chosenPlayer = Main.AllPlayerControls[rnd.Next(Main.AllPlayerControls.Count)];
 
-
         foreach (PlayerControl plr in Main.EnumeratePlayerControls())
         {
             if (QuizmasterQuestionType == QuizmasterQuestionType.PlrDeathReasonQuestion)
@@ -561,7 +556,7 @@ class DeathReasonQuestion : QuizQuestionBase
 
         int positionForRightAnswer = rnd.Next(0, 3);
 
-        HasQuestionTranslation = false; //doing this do i can just change the player name in question
+        HasQuestionTranslation = false;
         Question = GetString("QuizmasterQuestions." + Question).Replace("{PLR}", chosenPlayer.GetRealName());
 
         ShowInvalid = false;
@@ -707,7 +702,6 @@ class SabotageQuestion : QuizQuestionBase
             MapNames.Fungle => FungleSabotages.ConvertAll(f => f.ToString()),
             _ => throw new NotImplementedException(),
         };
-
 
         var rnd = IRandom.Instance;
         int positionForRightAnswer = rnd.Next(0, 3);

@@ -6,18 +6,16 @@ using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
 
-
 namespace TONE.Roles.Neutral;
 
 internal class Follower : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Follower;
     private const int Id = 12800;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
-    //==================================================================\\
 
     private static OptionItem MaxBetTimes;
     private static OptionItem BetCooldown;
@@ -52,7 +50,7 @@ internal class Follower : RoleBase
     }
     private void SendRPC(byte playerId)
     {
-        var writer = MessageWriter.Get(SendOption.Reliable); //SyncFollowerTargetAndTimes
+        var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(playerId);
         writer.Write(BetPlayer.TryGetValue(playerId, out var player) ? player : byte.MaxValue);
         RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));

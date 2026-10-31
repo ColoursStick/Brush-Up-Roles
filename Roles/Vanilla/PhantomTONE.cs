@@ -4,12 +4,11 @@ namespace TONE.Roles.Vanilla;
 
 internal class PhantomTONE : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.PhantomTONE;
     private const int Id = 450;
     public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorVanilla;
-    //==================================================================\\
 
     private static OptionItem InvisCooldown;
     private static OptionItem InvisDuration;

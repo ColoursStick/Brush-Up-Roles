@@ -8,13 +8,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Mechanic : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Mechanic;
     private const int Id = 8500;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Mechanic);
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
-    //==================================================================\\
 
     private static OptionItem SkillLimit;
     private static OptionItem FixesDoors;
@@ -111,7 +110,7 @@ internal class Mechanic : RoleBase
                 DoorsProgressing = true;
                 if (mapId == 2)
                 {
-                    //Polus
+
                     UpdateSystemPatch.CheckAndOpenDoorsRange(__instance, amount, 71, 72);
                     UpdateSystemPatch.CheckAndOpenDoorsRange(__instance, amount, 67, 68);
                     UpdateSystemPatch.CheckAndOpenDoorsRange(__instance, amount, 64, 66);
@@ -119,7 +118,7 @@ internal class Mechanic : RoleBase
                 }
                 else if (mapId == 4)
                 {
-                    //Airship
+
                     UpdateSystemPatch.CheckAndOpenDoorsRange(__instance, amount, 64, 67);
                     UpdateSystemPatch.CheckAndOpenDoorsRange(__instance, amount, 71, 73);
                     UpdateSystemPatch.CheckAndOpenDoorsRange(__instance, amount, 74, 75);
@@ -129,7 +128,7 @@ internal class Mechanic : RoleBase
                 }
                 else if (mapId == 5)
                 {
-                    // Fungle
+
                     UpdateSystemPatch.CheckAndOpenDoorsRange(__instance, amount, 64, 71);
                 }
 

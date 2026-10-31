@@ -19,14 +19,14 @@ internal class Fireworker : RoleBase
         FireEnd = 16,
         CanUseKill = Initial | FireEnd
     }
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Fireworker;
     [Obfuscation(Exclude = true)]
     private const int Id = 3200;
 
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
-    //==================================================================\\
+
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => nowFireworkerCount[player.PlayerId] == 0 ? CustomButton.Get("FireworkD") : CustomButton.Get("FireworkP");
 
     private static OptionItem FireworkerCount;

@@ -1,9 +1,6 @@
 using Hazel;
 using UnityEngine;
 
-//Thanks EHR - https://github.com/Gurge44/EndlessHostRoles/blob/main/Modules/Extensions/HazelExtensions.cs
-
-
 namespace TONE.Modules
 {
     public static class HazelExtensions
@@ -24,8 +21,6 @@ namespace TONE.Modules
             writer.Write(color.b);
             writer.Write(color.a);
         }
-
-        // -------------------------------------------------------------------------------------------------------------------------
 
         public static Vector2 ReadVector2(this MessageReader reader) => NetHelpers.ReadVector2(reader);
 

@@ -41,9 +41,6 @@ public static class NameNotifyManager
             Notice[pc.PlayerId].Add(newNotification);
         }
 
-        //var newNotification = (text, Utils.TimeStamp + (long)time);
-        //Notice[pc.PlayerId].Add(newNotification);
-
         SendRPC(pc.PlayerId);
         Utils.NotifyRoles(SpecifySeer: pc, SpecifyTarget: pc);
 

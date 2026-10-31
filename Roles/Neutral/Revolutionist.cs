@@ -11,20 +11,18 @@ namespace TONE.Roles.Neutral;
 
 internal class Revolutionist : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Revolutionist;
     private const int Id = 15200;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralChaos;
-    //==================================================================\\
 
     private static OptionItem RevolutionistDrawTime;
     private static OptionItem RevolutionistCooldown;
     private static OptionItem RevolutionistDrawCount;
     private static OptionItem RevolutionistKillProbability;
     private static OptionItem RevolutionistVentCountDown;
-
 
     public static readonly Dictionary<(byte, byte), bool> IsDraw = [];
     private static readonly Dictionary<byte, (PlayerControl, float)> RevolutionistTimer = [];

@@ -9,7 +9,7 @@ class CanUsePatch
     public static bool Prefix(Console __instance, [HarmonyArgument(0)] NetworkedPlayerInfo pc, [HarmonyArgument(1)] out bool canUse, [HarmonyArgument(2)] out bool couldUse)
     {
         canUse = couldUse = false;
-        // Even if you return this one with false, anything usable (buttons, etc.) other than tasks (including sabots) will remain usable.
+
         return __instance.AllowImpostor || Utils.HasTasks(PlayerControl.LocalPlayer.Data, false);
     }
 }
@@ -35,40 +35,31 @@ class CanUseVentPatch
 
         PlayerControl playerControl = pc.Object;
 
-        // First half, Mod-specific processing
-
-        // Determine if vent is available based on custom role
-        // always true for engineer-based roles
         couldUse = playerControl.CanUseImpostorVentButton() || (pc.Role.Role == RoleTypes.Engineer && pc.Role.CanUse(__instance.CastFast<IUsable>()));
 
         canUse = couldUse;
-        // Not available if custom roles are not available
+
         if (!canUse)
         {
             return false;
         }
 
-        // Mod's own processing up to this point
-        // Replace vanilla processing from here
-
         IUsable usableVent = __instance.CastFast<IUsable>();
-        // Distance between vent and player
+
         float actualDistance = float.MaxValue;
 
         couldUse =
-            // true for classic and for vanilla HnS
+
             GameManager.Instance.LogicUsables.CanUse(usableVent, playerControl) &&
-            // CanUse(usableVent) && Ignore because the decision is based on custom role, not vanilla role
-            // there is no vent task in the target vent or you are in the target vent now
+
             (!playerControl.MustCleanVent(__instance.Id) || (playerControl.inVent && Vent.currentVent == __instance)) &&
             playerControl.IsAlive() &&
             (playerControl.CanMove || playerControl.inVent);
 
-        // Check vent cleaning
         if (ShipStatus.Instance.Systems.TryGetValue(SystemTypes.Ventilation, out var systemType))
         {
             VentilationSystem ventilationSystem = systemType.CastFast<VentilationSystem>();
-            // If someone is cleaning a vent, you can't get into that vent
+
             if (ventilationSystem != null && ventilationSystem.IsVentCurrentlyBeingCleaned(__instance.Id))
             {
                 couldUse = false;
@@ -94,13 +85,12 @@ public static class PlayerPurchasesDataPatch
     public static bool Prefix(ref bool __result)
     {
 #if PC
-        // ⚠️ RunLoginPatch（绕过 EOS 登录）只在 PC 端编译（见 ClientPatch.cs 的 #if Windows）。
-        //    安卓端该类型不存在，所以这段必须一并排除，否则安卓平台编译失败。
+
         if (RunLoginPatch.ClickCount < 20) return true;
         __result = true;
         return false;
 #else
-        // 安卓端不做「绕过购买校验」，保持游戏原行为。
+
         return true;
 #endif
     }

@@ -8,17 +8,16 @@ namespace TONE.Roles.Crewmate;
 
 internal class Altruist : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Altruist;
     private const int Id = 29800;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Altruist);
     public override CustomRoles ThisRoleBase => Options.UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
-    //==================================================================\\
 
     private static OptionItem RevivedDeadBodyCannotBeReported;
-    //private static OptionItem KillerAlwaysCanGetAlertAndArrow;
+
     private static OptionItem ImpostorsCanGetsAlert;
     private static OptionItem ImpostorsCanGetsArrow;
     private static OptionItem NeutralKillersCanGetsAlert;
@@ -28,7 +27,6 @@ internal class Altruist : RoleBase
 
     private bool IsRevivingMode = true;
     private byte RevivedPlayerId = byte.MaxValue;
-    //private readonly static HashSet<byte> AllRevivedPlayerId = [];
 
     public override void SetupCustomOption()
     {
@@ -52,7 +50,7 @@ internal class Altruist : RoleBase
     public override void Init()
     {
         RevivedPlayerId = byte.MaxValue;
-        //AllRevivedPlayerId.Clear();
+
         IsRevivingMode = true;
     }
 
@@ -101,7 +99,6 @@ internal class Altruist : RoleBase
             var deadBodyObject = deadBody.GetDeadBody();
 
             RevivedPlayerId = deadPlayerId;
-            //AllRevivedPlayerId.Add(deadPlayerId);
 
             _Player.SetDeathReason(PlayerState.DeathReason.Sacrificed);
             _Player.SetRealKiller(_Player);

@@ -8,7 +8,7 @@ namespace TONE.Roles.Crewmate;
 
 internal class CopyCat : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.CopyCat;
     private const int Id = 11500;
     public static readonly HashSet<byte> playerIdList = [];
@@ -16,7 +16,6 @@ internal class CopyCat : RoleBase
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem CopyCrewVar;
@@ -61,10 +60,9 @@ internal class CopyCat : RoleBase
         CurrentKillCooldown = KillCooldown.GetFloat();
         OldAddons[playerId] = [];
     }
-    public override void Remove(byte playerId) //only to be used when copycat's role is going to be changed permanently
+    public override void Remove(byte playerId)
     {
-        // Copy cat role wont be removed for now i guess
-        // playerIdList.Remove(playerId);
+
     }
     public static bool CanCopyTeamChangingAddon() => CopyTeamChangingAddon.GetBool();
     public static bool NoHaveTask(byte playerId, bool ForRecompute) => playerIdList.Contains(playerId) && (playerId.GetPlayer().GetCustomRole().IsDesyncRole() || ForRecompute);
@@ -88,7 +86,6 @@ internal class CopyCat : RoleBase
                 }
                 continue;
             }
-            ////////////           /*remove the settings for current role*/             /////////////////////
 
             if (change && !(!pc.IsAlive() && pcRole is CustomRoles.Retributionist))
             {
@@ -114,7 +111,7 @@ internal class CopyCat : RoleBase
         if (role.IsGhostRole()) return true;
 
         return role is CustomRoles.CopyCat or
-            CustomRoles.Doomsayer or // CopyCat cannot guessed roles because he can be know others roles players
+            CustomRoles.Doomsayer or
             CustomRoles.EvilGuesser or
             CustomRoles.NiceGuesser or
             CustomRoles.Famine;
@@ -134,52 +131,52 @@ internal class CopyCat : RoleBase
         {
             role = role switch
             {
-                CustomRoles.Stealth or CustomRoles.Medusa or CustomRoles.Pitfall => CustomRoles.Grenadier, // 隐形者，美杜莎 => 掷雷兵
-                CustomRoles.TimeThief => CustomRoles.TimeManager, // 蚀时者 => 时间操控者
-                CustomRoles.Consigliere => CustomRoles.Overseer, // 军师 => 预言家
-                CustomRoles.Mercenary or CustomRoles.Wraith => CustomRoles.Addict, // 嗜血杀手，幽魂 => 瘾君子
-                CustomRoles.Miner => CustomRoles.Mole, // 矿工 => 鼹鼠
-                CustomRoles.Godfather => CustomRoles.ChiefOfPolice, // 教父 => 警察局长
-                CustomRoles.Twister => CustomRoles.TimeMaster, // 龙卷风 => 时间之主
-                CustomRoles.Disperser or CustomRoles.RiftMaker => CustomRoles.Transporter, // 分散者，裂缝制造者 => 传送师
-                CustomRoles.Eraser or CustomRoles.Bandit => CustomRoles.Cleanser, // 抹除者，强盗 => 清洗者
-                CustomRoles.Visionary => CustomRoles.Oracle, // 幻想家 => 神谕
-                CustomRoles.Workaholic or CustomRoles.Philosopher => CustomRoles.Snitch, // 工作狂，哲学家 => 告密者
-                CustomRoles.Sunnyboy => CustomRoles.Doctor, // 阳光开朗大男孩 => 法医
-                CustomRoles.Councillor => CustomRoles.Justice, // 邪恶法官 => 正义法官
-                CustomRoles.Taskinator => CustomRoles.Benefactor, // 任务执行者 => 恩人
-                CustomRoles.EvilTracker => CustomRoles.TrackerTONE, // 邪恶追踪者 => 侦查员
-                CustomRoles.AntiAdminer => CustomRoles.Telecommunication, // 监管者 => 通信员
-                CustomRoles.Pursuer => CustomRoles.Deceiver, // 起诉人 => 赝品商
-                CustomRoles.CursedWolf => CustomRoles.Veteran, // 呪狼 => 老兵
-                CustomRoles.Swooper => CustomRoles.Chameleon, // 隐匿者 => 变色龙
-                CustomRoles.Vindicator or CustomRoles.Pickpocket => CustomRoles.Mayor, // 卫道士，小偷 => 市长
-                CustomRoles.Opportunist or CustomRoles.BloodKnight or CustomRoles.Wildling => CustomRoles.Guardian, // 投机者，嗜血骑士，野人 => 守护者
-                CustomRoles.Cultist or CustomRoles.Virus or CustomRoles.Gangster or CustomRoles.Ritualist or CustomRoles.WitchDoctor => CustomRoles.Admirer, // 魅魔，病毒，歹徒，大祭司，巫医 => 仰慕者
-                CustomRoles.Arrogance or CustomRoles.Juggernaut or CustomRoles.Berserker => CustomRoles.Reverie, // 狂妄杀手，天启，狂战士 => 遐想者
-                CustomRoles.Baker when Baker.CurrentBread() is 0 => CustomRoles.Overseer, // 面包师 0 => 预言家
-                CustomRoles.Baker when Baker.CurrentBread() is 1 => CustomRoles.Deputy, // 面包师 1 => 捕快
-                CustomRoles.Baker when Baker.CurrentBread() is 2 => CustomRoles.Medic, // 面包师 2 => 医生
-                CustomRoles.PotionMaster when PotionMaster.CurrentPotion() is 0 => CustomRoles.Overseer, // 药剂师 0 => 预言家
-                CustomRoles.PotionMaster when PotionMaster.CurrentPotion() is 1 => CustomRoles.Medic, // 药剂师 1 => 医生
-                CustomRoles.Sacrifist => CustomRoles.Alchemist, // 献祭者 => 炼金术士
-                CustomRoles.MoonDancer or CustomRoles.Harvester => CustomRoles.Merchant, // 月光舞者，收割者 => 商人
-                CustomRoles.Jinx => CustomRoles.Crusader, // 扫把星 => 十字军
-                CustomRoles.Trickster or CustomRoles.Illusionist => CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate() && !BlackList(role)).ToList().RandomElement(), // 骗术师，幻术师 => 随机
-                CustomRoles.Instigator => CustomRoles.Requiter, // 教唆者 => 清算者
-                CustomRoles.Jackal => CustomRoles.ChiefOfPolice, // 豺狼 => 警察局长
-                CustomRoles.Sidekick or CustomRoles.SerialKiller => CustomRoles.Sheriff, // 跟班，连环杀手 => 警长
-                CustomRoles.Underdog or CustomRoles.Logos => CustomRoles.Brave, // 失败者，逻各斯 => 勇者
-                CustomRoles.Saboteur => CustomRoles.Mechanic, // 破坏者 => 修理工
-                CustomRoles.PlagueBearer => CustomRoles.Socialite, // 瘟疫使者 => 社交达人
-                CustomRoles.Demon => CustomRoles.Spy, // 玩家 => 间谍
-                CustomRoles.Maverick => CustomRoles.Vigilante, // 独行者 => 义务警员
-                CustomRoles.EvilHacker or CustomRoles.Glitch => CustomRoles.NiceHacker, // 邪恶黑客，混沌 => 正义黑客
-                CustomRoles.Inhibitor => CustomRoles.Catalyst, // 抑制者 => 催化者
+                CustomRoles.Stealth or CustomRoles.Medusa or CustomRoles.Pitfall => CustomRoles.Grenadier,
+                CustomRoles.TimeThief => CustomRoles.TimeManager,
+                CustomRoles.Consigliere => CustomRoles.Overseer,
+                CustomRoles.Mercenary or CustomRoles.Wraith => CustomRoles.Addict,
+                CustomRoles.Miner => CustomRoles.Mole,
+                CustomRoles.Godfather => CustomRoles.ChiefOfPolice,
+                CustomRoles.Twister => CustomRoles.TimeMaster,
+                CustomRoles.Disperser or CustomRoles.RiftMaker => CustomRoles.Transporter,
+                CustomRoles.Eraser or CustomRoles.Bandit => CustomRoles.Cleanser,
+                CustomRoles.Visionary => CustomRoles.Oracle,
+                CustomRoles.Workaholic or CustomRoles.Philosopher => CustomRoles.Snitch,
+                CustomRoles.Sunnyboy => CustomRoles.Doctor,
+                CustomRoles.Councillor => CustomRoles.Justice,
+                CustomRoles.Taskinator => CustomRoles.Benefactor,
+                CustomRoles.EvilTracker => CustomRoles.TrackerTONE,
+                CustomRoles.AntiAdminer => CustomRoles.Telecommunication,
+                CustomRoles.Pursuer => CustomRoles.Deceiver,
+                CustomRoles.CursedWolf => CustomRoles.Veteran,
+                CustomRoles.Swooper => CustomRoles.Chameleon,
+                CustomRoles.Vindicator or CustomRoles.Pickpocket => CustomRoles.Mayor,
+                CustomRoles.Opportunist or CustomRoles.BloodKnight or CustomRoles.Wildling => CustomRoles.Guardian,
+                CustomRoles.Cultist or CustomRoles.Virus or CustomRoles.Gangster or CustomRoles.Ritualist or CustomRoles.WitchDoctor => CustomRoles.Admirer,
+                CustomRoles.Arrogance or CustomRoles.Juggernaut or CustomRoles.Berserker => CustomRoles.Reverie,
+                CustomRoles.Baker when Baker.CurrentBread() is 0 => CustomRoles.Overseer,
+                CustomRoles.Baker when Baker.CurrentBread() is 1 => CustomRoles.Deputy,
+                CustomRoles.Baker when Baker.CurrentBread() is 2 => CustomRoles.Medic,
+                CustomRoles.PotionMaster when PotionMaster.CurrentPotion() is 0 => CustomRoles.Overseer,
+                CustomRoles.PotionMaster when PotionMaster.CurrentPotion() is 1 => CustomRoles.Medic,
+                CustomRoles.Sacrifist => CustomRoles.Alchemist,
+                CustomRoles.MoonDancer or CustomRoles.Harvester => CustomRoles.Merchant,
+                CustomRoles.Jinx => CustomRoles.Crusader,
+                CustomRoles.Trickster or CustomRoles.Illusionist => CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate() && !BlackList(role)).ToList().RandomElement(),
+                CustomRoles.Instigator => CustomRoles.Requiter,
+                CustomRoles.Jackal => CustomRoles.ChiefOfPolice,
+                CustomRoles.Sidekick or CustomRoles.SerialKiller => CustomRoles.Sheriff,
+                CustomRoles.Underdog or CustomRoles.Logos => CustomRoles.Brave,
+                CustomRoles.Saboteur => CustomRoles.Mechanic,
+                CustomRoles.PlagueBearer => CustomRoles.Socialite,
+                CustomRoles.Demon => CustomRoles.Spy,
+                CustomRoles.Maverick => CustomRoles.Vigilante,
+                CustomRoles.EvilHacker or CustomRoles.Glitch => CustomRoles.NiceHacker,
+                CustomRoles.Inhibitor => CustomRoles.Catalyst,
                 _ => role
             };
         }
-        // Copy random role
+
         if (!role.IsCrewmate() && CopyCatFailedMode.GetInt() == 1) role = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate() && !BlackList(role)).ToList().RandomElement();
         if (Lich.IsCursed(target)) role = CustomRoles.Lich;
         if (role.IsCrewmate() && (role.IsEnable() || !CopyOnlyEnabledRoles.GetBool()))
@@ -228,12 +225,12 @@ internal class CopyCat : RoleBase
         }
         switch (CopyCatFailedMode.GetInt())
         {
-            case 0: // Only notify
+            case 0:
                 killer.Notify(GetString("CopyCatCanNotCopy"));
                 killer.ResetKillCooldown();
                 killer.SetKillCooldown();
                 break;
-            case 2: // Misfire
+            case 2:
                 killer.SetDeathReason(PlayerState.DeathReason.Misfire);
                 killer.RpcMurderPlayer(killer);
                 break;

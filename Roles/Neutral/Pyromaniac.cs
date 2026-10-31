@@ -7,13 +7,13 @@ namespace TONE.Roles.Neutral;
 
 internal class Pyromaniac : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Pyromaniac;
     private const int Id = 17800;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;
-    //==================================================================\\
+
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Pyromaniac");
 
     private static OptionItem KillCooldown;
@@ -42,7 +42,7 @@ internal class Pyromaniac : RoleBase
     }
     public override void Add(byte playerId)
     {
-        // Double Trigger
+
         var pc = Utils.GetPlayerById(playerId);
         pc.AddDoubleTrigger();
     }

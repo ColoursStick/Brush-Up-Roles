@@ -263,7 +263,6 @@ namespace TONE.Modules.Rpc
 
             firstAlivePlayer.Data.PlayerName = title;
 
-            // writer.StartMessage((byte)GameDataTypes.RpcFlag);
             writer.WritePacked(firstAlivePlayer.NetId);
             writer.Write((byte)RpcCalls.SetName);
             writer.Write(firstAlivePlayer.Data.NetId);
@@ -275,17 +274,10 @@ namespace TONE.Modules.Rpc
                 case QuickChatSpamMode.QuickChatSpam_Disabled:
                     Logger.Info("QuickChatSpam disabled but trying to spam?", "SendQuickChatSpam");
                     goto case QuickChatSpamMode.QuickChatSpam_Random20;
-                // Send as random 20 here
+
                 case QuickChatSpamMode.QuickChatSpam_Random20:
                     var random = IRandom.Instance;
                     var stringNamesValues = Enum.GetValues(typeof(StringNames)).Cast<StringNames>().Except(badSpam).ToArray();
-                    // Logger.Info($"Found {stringNamesValues.Length} spam keys.", "SendQuickChatSpam");
-
-                    // foreach (StringNames value in stringNamesValues)
-                    // {
-                    //     string translation = DestroyableSingleton<TranslationController>.Instance.GetString(value);
-                    //     if (translation.Contains("{0}")) Logger.Info($"StringNames.{value},", "SendQuickChatSpam");
-                    // }
 
                     for (int i = 0; i < 21; i++)
                     {
@@ -343,7 +335,7 @@ namespace TONE.Modules.Rpc
             writer.Write((byte)RpcCalls.SetName);
             writer.Write(firstAlivePlayer.Data.NetId);
             writer.Write(name);
-            // writer.EndMessage();
+
         }
     }
 }

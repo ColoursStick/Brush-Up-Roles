@@ -9,7 +9,6 @@ public class Antidote : IAddon
     public static bool IsEnable = false;
     public AddonTypes Type => AddonTypes.Mixed;
 
-
     private static OptionItem AntidoteCDOpt;
     private static OptionItem AntidoteCDReset;
 
@@ -73,14 +72,13 @@ public class Antidote : IAddon
     {
         if (KilledAntidote.ContainsKey(killer.PlayerId))
         {
-            // Key already exists, update the value
+
             KilledAntidote[killer.PlayerId] += 1;
         }
         else
         {
-            // Key doesn't exist, add the key-value pair
+
             KilledAntidote.Add(killer.PlayerId, 1);
         }
     }
 }
-

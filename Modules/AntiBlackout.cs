@@ -13,19 +13,13 @@ namespace TONE;
 
 public static class AntiBlackout
 {
-    ///<summary>
-    /// Check num alive Impostors & Crewmates & NeutralKillers & Coven
-    ///</summary>
-    public static bool BlackOutIsActive => false; /*!Options.DisableAntiBlackoutProtects.GetBool() && CheckBlackOut();*/
 
-    //this is simply just called in less places, because antiblackout with role-basis changing is OP
+    public static bool BlackOutIsActive => false;
+
     public static int ExilePlayerId = -1;
     public static bool SkipTasks = false;
     public static bool ResetName = true;
 
-    ///<summary>
-    /// Count alive players and check black out 
-    ///</summary>
     public static bool CheckBlackOut()
     {
         HashSet<byte> Impostors = [];
@@ -36,22 +30,18 @@ public static class AntiBlackout
         var lastExiled = ExileControllerWrapUpPatch.AntiBlackout_LastExiled;
         foreach (var pc in Main.EnumerateAlivePlayerControls())
         {
-            // if player is ejected, do not count him as alive
+
             if (lastExiled != null && pc.PlayerId == lastExiled.PlayerId) continue;
 
-            // Impostors
             if (pc.Is(Custom_Team.Impostor) && !Main.PlayerStates[pc.PlayerId].IsNecromancer && !pc.Is(CustomRoles.Narc))
                 Impostors.Add(pc.PlayerId);
 
-            // Only Neutral killers
             else if ((pc.IsNeutralKiller() || pc.IsNeutralApocalypse()) && !Main.PlayerStates[pc.PlayerId].IsNecromancer)
                 NeutralKillers.Add(pc.PlayerId);
 
-            //Coven
             else if (pc.Is(Custom_Team.Coven) || Main.PlayerStates[pc.PlayerId].IsNecromancer)
                 Coven.Add(pc.PlayerId);
 
-            // Crewmate
             else Crewmates.Add(pc.PlayerId);
         }
 
@@ -67,23 +57,18 @@ public static class AntiBlackout
 
         var BlackOutIsActive = false;
 
-        // All real imposotrs is dead
         if (!BlackOutIsActive)
             BlackOutIsActive = numAliveImpostors <= 0;
 
-        // Alive Impostors > or = others team count
         if (!BlackOutIsActive)
             BlackOutIsActive = (numAliveNeutralKillers + numAliveCrewmates + numAliveCoven) <= numAliveImpostors;
 
-        // One Impostor and one Neutral Killer is alive, and living Crewmates very few
         if (!BlackOutIsActive)
             BlackOutIsActive = numAliveNeutralKillers == 1 && numAliveImpostors == 1 && numAliveCrewmates <= 2;
 
-        // One Neutral Killer and one Coven is alive, and living Crewmates very few
         if (!BlackOutIsActive)
             BlackOutIsActive = numAliveNeutralKillers == 1 && numAliveCoven == 1 && numAliveCrewmates <= 2;
 
-        // One Coven and one Impostor is alive, and living Crewmates very few
         if (!BlackOutIsActive)
             BlackOutIsActive = numAliveCoven == 1 && numAliveImpostors == 1 && numAliveCrewmates <= 2;
 
@@ -124,7 +109,7 @@ public static class AntiBlackout
 
         if (ExilePlayerId == PlayerControl.LocalPlayer.PlayerId)
         {
-            // Dead > Modded > not Impostor/Shapeshifter/Phantom/Viper
+
             dummyImp = Main.EnumeratePlayerControls()
                 .Where(pc => pc.PlayerId != PlayerControl.LocalPlayer.PlayerId && pc.GetCustomRole().GetRoleTypes() != RoleTypes.Detective)
                 .OrderByDescending(pc => !pc.IsAlive())
@@ -214,7 +199,7 @@ public static class AntiBlackout
     }
     public static void OnDisconnect(NetworkedPlayerInfo player)
     {
-        // Execution conditions: Client is the host, IsDead is overridden, player is already disconnected
+
         if (!AmongUsClient.Instance.AmHost || !IsCached || !player.Disconnected) return;
         isDeadCache[player.PlayerId] = (true, true);
         RevivePlayersAndSetDummyImp();
@@ -233,7 +218,7 @@ public static class AntiBlackout
             if (pc.IsHost()) continue;
 
             var sender = CustomRpcSender.Create("AntiBlack RpcVotingComplete." + pc.PlayerId, SendOption.Reliable);
-            if (pc.IsNonHostModdedClient()) //For mod client show real result
+            if (pc.IsNonHostModdedClient())
             {
                 sender.AutoStartRpc(__instance.NetId, (byte)RpcCalls.VotingComplete, pc.GetClientId());
                 {
@@ -251,7 +236,7 @@ public static class AntiBlackout
                     sender.EndRpc();
                 }
             }
-            else //For vanilla client show a tie
+            else
             {
                 sender.AutoStartRpc(__instance.NetId, (byte)RpcCalls.VotingComplete, pc.GetClientId());
                 {
@@ -320,7 +305,7 @@ public static class AntiBlackout
 
         foreach (var ((seerId, targetId), (roletype, _)) in RpcSetRoleReplacer.RoleMap)
         {
-            // skip host
+
             if (seerId == PlayerControl.LocalPlayer.PlayerId) continue;
 
             var seer = seerId.GetPlayer();
@@ -412,7 +397,7 @@ public static class AntiBlackout
     }
     public static void ResetAfterMeeting()
     {
-        // add 1 second delay
+
         _ = new LateTask(() =>
         {
             SkipTasks = false;

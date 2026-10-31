@@ -5,17 +5,15 @@ namespace TONE.Roles.Impostor;
 
 internal class Morphling : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Morphling;
     private const int Id = 3500;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
-    //===========================SETUP================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem ShapeshiftCD;
     private static OptionItem ShapeshiftDur;
-
 
     public override void SetupCustomOption()
     {

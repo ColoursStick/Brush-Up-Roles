@@ -165,28 +165,6 @@ namespace TONE.Modules.Rpc
         private readonly int snAlert;
     }
 
-    /*class RpcSetLoversPlayers : BaseModdedRpc
-    {
-        public override byte RpcType => (byte)CustomRPC.SetLoversPlayers;
-        public RpcSetLoversPlayers(uint netId, int count, HashSet<PlayerControl> loversList) : base(netId)
-        {
-            this.count = count;
-            this.loversList = loversList;
-        }
-
-        public override void SerializeRpcValues(MessageWriter msg)
-        {
-            msg.Write(count);
-            foreach (var lp in loversList)
-            {
-                msg.Write(lp.PlayerId);
-            }
-        }
-
-        private readonly int count;
-        private readonly HashSet<PlayerControl> loversList;
-    }*/
-
     class RpcSetLoverPairs : BaseModdedRpc
     {
         public override byte RpcType => (byte)CustomRPC.SetLoverPairs;
@@ -571,7 +549,7 @@ namespace TONE.Modules.Rpc
         private readonly byte targetId;
         private readonly string shieldedPlayers;
     }
-    class RpcSetMarkedPlayer : BaseModdedRpc // Ninja
+    class RpcSetMarkedPlayer : BaseModdedRpc
     {
         public override byte RpcType => (byte)CustomRPC.SetMarkedPlayer;
         public RpcSetMarkedPlayer(uint netId, byte playerId, byte targetId) : base(netId)

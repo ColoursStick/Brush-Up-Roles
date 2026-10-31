@@ -1,6 +1,5 @@
 namespace TONE;
 
-//参考元:https://github.com/yukieiji/ExtremeRoles/blob/master/ExtremeRoles/Patches/AirshipStatusPatch.cs
 [HarmonyPatch(typeof(AirshipStatus), nameof(AirshipStatus.PrespawnStep))]
 public static class AirshipStatusPrespawnStepPatch
 {
@@ -11,7 +10,7 @@ public static class AirshipStatusPrespawnStepPatch
         if (PlayerControl.LocalPlayer.Is(CustomRoles.GM))
         {
             RandomSpawn.AirshipSpawn(PlayerControl.LocalPlayer);
-            // GM skips gushing screen
+
             return false;
         }
         return true;

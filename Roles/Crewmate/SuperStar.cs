@@ -7,14 +7,13 @@ namespace TONE.Roles.Crewmate;
 
 internal class SuperStar : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.SuperStar;
     private const int Id = 7150;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
-    //==================================================================\\
 
-    public static OptionItem EveryOneKnowSuperStar; // You should always have this enabled TBHHH 💀💀
+    public static OptionItem EveryOneKnowSuperStar;
     private static OptionItem ImpKnowSuperStarDead;
     private static OptionItem NeutralKnowSuperStarDead;
     private static OptionItem CovenKnowSuperStarDead;
@@ -44,10 +43,9 @@ internal class SuperStar : RoleBase
 
     public override bool GlobalKillFlashCheck(PlayerControl killer, PlayerControl target, PlayerControl seer)
     {
-        // if SuperStar killed and seer is SuperStar, return true for show kill flash
+
         if (target.PlayerId == _Player.PlayerId && seer.PlayerId == _Player.PlayerId) return true;
 
-        // Hide kill flash for some team
         if (!ImpKnowSuperStarDead.GetBool() && seer.GetCustomRole().IsImpostor()) return false;
         if (!NeutralKnowSuperStarDead.GetBool() && seer.GetCustomRole().IsNeutral()) return false;
         if (!CovenKnowSuperStarDead.GetBool() && seer.GetCustomRole().IsCoven()) return false;
@@ -62,7 +60,7 @@ internal class SuperStar : RoleBase
 
         if (inMeeting)
         {
-            //Death Message
+
             foreach (var pc in Main.EnumeratePlayerControls())
             {
                 if (!ImpKnowSuperStarDead.GetBool() && pc.IsPlayerImpostorTeam()) continue;

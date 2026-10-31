@@ -8,12 +8,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Speaker : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Speaker;
     private const int Id = 1600;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem SkillLimit;

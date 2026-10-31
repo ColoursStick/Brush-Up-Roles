@@ -9,12 +9,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Nemesis : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Nemesis;
     private const int Id = 3600;
     public override CustomRoles ThisRoleBase => LegacyNemesis.GetBool() ? CustomRoles.Shapeshifter : CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
-    //==================================================================\\
 
     private static OptionItem NemesisCanKillNum;
     public static OptionItem PreventSeeRolesBeforeSkillUsedUp;
@@ -189,7 +188,6 @@ internal class Nemesis : RoleBase
     {
         if (Main.PlayerStates == null) return false;
 
-        //  Number of Living Impostors excluding Nemesis
         int LivingImpostorsNum = 0;
         foreach (var player in Main.EnumerateAlivePlayerControls())
         {
@@ -197,8 +195,6 @@ internal class Nemesis : RoleBase
             if (role != CustomRoles.Nemesis && role.IsImpostor() && !player.Is(CustomRoles.Narc)) LivingImpostorsNum++;
         }
 
-        // if Nemesis is Narc, they can use kill buttom when all Sheriffs are dead
-        // if not, they can use kill button when LivingImpostorNum is 0
         return pc.Is(CustomRoles.Narc) ? !CustomRoles.Sheriff.RoleExist() : LivingImpostorsNum <= 0;
     }
 

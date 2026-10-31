@@ -14,13 +14,12 @@ namespace TONE.Roles.Coven;
 
 internal class MoonDancer : CovenManager
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.MoonDancer;
     private const int Id = 30500;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenUtility;
-    //==================================================================\\
 
     private static OptionItem BatonPassCooldown;
     private static OptionItem BlastOffChance;
@@ -276,7 +275,7 @@ internal class MoonDancer : CovenManager
                 addon = harmful.RandomElement();
             }
 
-            if (addon != 0) // not default value
+            if (addon != 0)
             {
                 player.RpcSetCustomRole(addon, false, false);
                 Logger.Info("Addon Passed.", "MoonDancer");

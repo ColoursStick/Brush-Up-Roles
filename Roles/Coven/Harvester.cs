@@ -8,13 +8,12 @@ namespace TONE.Roles.Coven;
 
 internal class Harvester : CovenManager
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Harvester;
     private const int Id = 31600;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenUtility;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem SwapCooldown;
@@ -103,7 +102,7 @@ internal class Harvester : CovenManager
         var harvester = GetPlayerById(SwapPlayers.Keys.First());
         if (harvester == null) return;
         if (!harvester.IsAlive()) return;
-        // this code is so bad, but it works
+
         bool stealRecruiting = CanStealRecruiting.GetBool();
         if (killer.IsPlayerCoven())
         {

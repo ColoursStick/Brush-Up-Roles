@@ -3,7 +3,6 @@ using System.Text.Json;
 
 namespace TONE.Modules;
 
-// https://github.com/tukasa0001/TownOfHost/blob/main/Modules/OptionSaver.cs
 public static class OptionSaver
 {
     private static readonly DirectoryInfo SaveDataDirectoryInfo = new(@$"{Main.Path}/BrushUpRoles-DATA/SaveData/");
@@ -20,7 +19,7 @@ public static class OptionSaver
             OptionSaverFileInfo.Create().Dispose();
         }
     }
-    /// <summary>Generate object for json serialization from current options</summary>
+
     private static SerializableOptionsData GenerateOptionsData()
     {
         Dictionary<int, int> singleOptions = [];
@@ -46,12 +45,12 @@ public static class OptionSaver
             PresetOptions = presetOptions,
         };
     }
-    /// <summary>Read deserialized object and set option values</summary>
+
     private static void LoadOptionsData(SerializableOptionsData serializableOptionsData)
     {
         if (serializableOptionsData.Version != Version)
         {
-            // If you want to provide a method for migrating between versions in the future, you can distribute the conversion method for each version here
+
             Logger.Info($"Loaded option version {serializableOptionsData.Version} does not match current version {Version}, overwriting with default value", "Option Saver");
             Save();
             return;
@@ -77,7 +76,7 @@ public static class OptionSaver
             }
         }
     }
-    /// <summary>Save current options to json file</summary>
+
     public static void Save()
     {
         if (AmongUsClient.Instance != null && !AmongUsClient.Instance.AmHost) return;
@@ -92,11 +91,11 @@ public static class OptionSaver
             Logger.Error($"Error: {error}", "OptionSaver.Save");
         }
     }
-    /// <summary>Read options from json file</summary>
+
     public static void Load()
     {
         var jsonString = File.ReadAllText(OptionSaverFileInfo.FullName);
-        // if empty, do not read, save default value
+
         if (jsonString.Length <= 0)
         {
             Logger.Info("Save default value as option data is empty", "Option Saver");
@@ -107,16 +106,15 @@ public static class OptionSaver
     }
 
     [Obfuscation(Exclude = true, ApplyToMembers = true)]
-    /// <summary>Optional data suitable for json storage</summary>
+
     public class SerializableOptionsData
     {
         public int Version { get; init; }
-        /// <summary>Non-preset options</summary>
+
         public Dictionary<int, int> SingleOptions { get; init; }
-        /// <summary>Options in the preset</summary>
+
         public Dictionary<int, int[]> PresetOptions { get; init; }
     }
 
-    /// <summary>Raise the number here when making incompatible changes to the format of an option (e.g., changing the number of presets)</summary>
     public static readonly int Version = 2;
 }

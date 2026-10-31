@@ -7,9 +7,6 @@ using TONE.Roles.Impostor;
 
 namespace TONE;
 
-//ÕÅé×Çâ
-//https://github.com/Koke1024/Town-Of-Moss/blob/main/TownOfMoss/Patches/MeltDownBoost.cs
-
 public class SabotageSystemPatch
 {
     private static bool SetDurationForReactorSabotage = true;
@@ -24,7 +21,6 @@ public class SabotageSystemPatch
             if (!Options.SabotageTimeControl.GetBool()) return;
             if (GameStates.AirshipIsActive) return;
 
-            // If Reactor sabotage is end
             if (!__instance.IsActive || !SetDurationForReactorSabotage)
             {
                 if (!SetDurationForReactorSabotage && !__instance.IsActive)
@@ -38,19 +34,18 @@ public class SabotageSystemPatch
             Logger.Info($" {SetDurationForReactorSabotage}", "ReactorSystemTypePatch - SetDurationCriticalSabotage");
             SetDurationForReactorSabotage = false;
 
-            // Set time limit reactor (The Skeld/Mira HQ/Polus/The Fungle)
             switch (ShipStatus.Instance.Type)
             {
-                case ShipStatus.MapType.Ship: //The Skeld
+                case ShipStatus.MapType.Ship:
                     __instance.Countdown = Options.SkeldReactorTimeLimit.GetFloat();
                     return;
-                case ShipStatus.MapType.Hq: //Mira HQ
+                case ShipStatus.MapType.Hq:
                     __instance.Countdown = Options.MiraReactorTimeLimit.GetFloat();
                     return;
-                case ShipStatus.MapType.Pb: //Polus
+                case ShipStatus.MapType.Pb:
                     __instance.Countdown = Options.PolusReactorTimeLimit.GetFloat();
                     return;
-                case ShipStatus.MapType.Fungle: //The Fungle
+                case ShipStatus.MapType.Fungle:
                     __instance.Countdown = Options.FungleReactorTimeLimit.GetFloat();
                     return;
                 default:
@@ -66,7 +61,6 @@ public class SabotageSystemPatch
             if (!Options.SabotageTimeControl.GetBool()) return;
             if (!GameStates.AirshipIsActive) return;
 
-            // If Reactor sabotage is end (Airship)
             if (!__instance.IsActive || ShipStatus.Instance == null || !SetDurationForReactorSabotage)
             {
                 if (!SetDurationForReactorSabotage && !__instance.IsActive)
@@ -80,7 +74,6 @@ public class SabotageSystemPatch
             Logger.Info($" {SetDurationForReactorSabotage}", "HeliSabotageSystemPatch - SetDurationCriticalSabotage");
             SetDurationForReactorSabotage = false;
 
-            // Set time limit reactor (The Airship)
             __instance.Countdown = Options.AirshipReactorTimeLimit.GetFloat();
         }
     }
@@ -92,7 +85,6 @@ public class SabotageSystemPatch
             if (!Options.SabotageTimeControl.GetBool()) return;
             if (Utils.GetActiveMapName() is MapNames.Polus or MapNames.Airship or MapNames.Fungle) return;
 
-            // If O2 sabotage is end
             if (!__instance.IsActive || !SetDurationForO2Sabotage)
             {
                 if (!SetDurationForO2Sabotage && !__instance.IsActive)
@@ -106,13 +98,12 @@ public class SabotageSystemPatch
             Logger.Info($" {SetDurationForO2Sabotage}", "LifeSuppSystemType - SetDurationCriticalSabotage");
             SetDurationForO2Sabotage = false;
 
-            // Set time limit reactor (The Skeld/Mira HQ)
             switch (ShipStatus.Instance.Type)
             {
-                case ShipStatus.MapType.Ship: // The Skeld
+                case ShipStatus.MapType.Ship:
                     __instance.Countdown = Options.SkeldO2TimeLimit.GetFloat();
                     return;
-                case ShipStatus.MapType.Hq: // Mira HQ
+                case ShipStatus.MapType.Hq:
                     __instance.Countdown = Options.MiraO2TimeLimit.GetFloat();
                     return;
                 default:
@@ -131,7 +122,7 @@ public class SabotageSystemPatch
             {
                 if ((!pc.Is(Custom_Team.Impostor) || Main.PlayerStates[pc.PlayerId].IsNecromancer) && pc.HasDesyncRole())
                 {
-                    // Need for hiding player names if player is desync Impostor
+
                     Utils.NotifyRoles(SpecifySeer: pc, ForceLoop: false, MushroomMixupIsActive: true, SendOption: SendOption.None);
                 }
             }
@@ -149,7 +140,6 @@ public class SabotageSystemPatch
             if (!Options.SabotageTimeControl.GetBool()) return;
             if (!GameStates.FungleIsActive) return;
 
-            // If Mushroom Mixup sabotage is end
             if (!__instance.IsActive || !SetDurationMushroomMixupSabotage)
             {
                 if (!SetDurationMushroomMixupSabotage && !__instance.IsActive)
@@ -163,14 +153,12 @@ public class SabotageSystemPatch
             Logger.Info($" {SetDurationMushroomMixupSabotage}", "MushroomMixupSabotageSystem - SetDurationCriticalSabotage");
             SetDurationMushroomMixupSabotage = false;
 
-            // Set duration Mushroom Mixup (The Fungle)
             __instance.currentSecondsUntilHeal = Options.FungleMushroomMixupDuration.GetFloat();
         }
         public static void Postfix(MushroomMixupSabotageSystem __instance, bool __state)
         {
             if (GameStates.IsHideNSeek) return;
 
-            // if Mushroom Mixup Sabotage is end
             if (__instance.IsActive != __state && !Main.MeetingIsStarted)
             {
                 Logger.Info($" IsEnd", "MushroomMixupSabotageSystem.Deteriorate.Postfix");
@@ -179,13 +167,12 @@ public class SabotageSystemPatch
                 {
                     _ = new LateTask(() =>
                     {
-                        // After MushroomMixup sabotage, shapeshift cooldown sets to 0
+
                         foreach (PlayerControl pc in Main.EnumerateAlivePlayerControls())
                         {
-                            // Do Unshift, because mushroom mixup revert all shapeshifted players
+
                             pc.DoUnShiftState(true);
 
-                            // Reset Ability Cooldown To Default For Living Players
                             if (pc.GetCustomRole().GetRoleTypes() != RoleTypes.Engineer)
                             {
                                 pc.RpcResetAbilityCooldown();
@@ -199,7 +186,7 @@ public class SabotageSystemPatch
                     {
                         if ((!pc.Is(Custom_Team.Impostor) || Main.PlayerStates[pc.PlayerId].IsNecromancer) && pc.HasDesyncRole())
                         {
-                            // Need for display player names if player is desync Impostor
+
                             Utils.NotifyRoles(SpecifySeer: pc, ForceLoop: false, SendOption: SendOption.None);
                         }
                     }
@@ -226,13 +213,11 @@ public class SabotageSystemPatch
                 return true;
             }
 
-            // No matter if the blackout sabotage is sounded (beware of misdirection as it flies under the host's name)
             if (amount.HasBit(SwitchSystem.DamageSystem))
             {
                 return true;
             }
 
-            // Cancel if player can't fix a specific outage on Airship
             if (GameStates.AirshipIsActive)
             {
                 var truePosition = player.GetCustomPosition();
@@ -248,16 +233,9 @@ public class SabotageSystemPatch
 
             if (Options.BlockDisturbancesToSwitches.GetBool())
             {
-                // Shift 1 to the left by amount
-                // Each digit corresponds to each switch
-                // Far left switch - (amount: 0) 00001
-                // Far right switch - (amount: 4) 10000
-                // ref: SwitchSystem.RepairDamage, SwitchMinigame.FixedUpdate
+
                 var switchedKnob = (byte)(0b_00001 << amount);
 
-                // ExpectedSwitches: Up and down state of switches when all are on
-                // ActualSwitches: Actual up/down state of switch
-                // if Expected and Actual are the same for the operated knob, the knob is already fixed
                 if ((__instance.ActualSwitches & switchedKnob) == (__instance.ExpectedSwitches & switchedKnob))
                 {
                     return false;
@@ -312,9 +290,8 @@ public class SabotageSystemPatch
             Logger.Info("Lights sabotage fixed", "ElectricTask");
         }
     }
-    // https://github.com/tukasa0001/TownOfHost/blob/357f7b5523e4bdd0bb58cda1e0ff6cceaa84813d/Patches/SabotageSystemPatch.cs
-    // Method called when sabotage occurs
-    [HarmonyPatch(typeof(SabotageSystemType), nameof(SabotageSystemType.UpdateSystem))] // SetInitialSabotageCooldown - set sabotage cooldown in start game
+
+    [HarmonyPatch(typeof(SabotageSystemType), nameof(SabotageSystemType.UpdateSystem))]
     public static class SabotageSystemTypeRepairDamagePatch
     {
         public static bool isCooldownModificationEnabled;
@@ -370,13 +347,12 @@ public class SabotageSystemPatch
 
         public static void Postfix(SabotageSystemType __instance, bool __runOriginal)
         {
-            // __runOriginal - the result that was returned from Prefix
+
             if (!AmongUsClient.Instance.AmHost || GameStates.IsHideNSeek || !__runOriginal || !isCooldownModificationEnabled)
             {
                 return;
             }
 
-            // Set cooldown sabotages
             __instance.Timer = modifiedCooldownSec;
             __instance.IsDirty = true;
         }
@@ -393,7 +369,6 @@ public class SabotageSystemPatch
                     newReader.Recycle();
                 }
 
-                // When the camera is disabled, the vanilla player opens the camera so it does not blink.
                 if (amount == SecurityCameraSystemType.IncrementOp)
                 {
                     var camerasDisabled = Utils.GetActiveMapName() switch
@@ -412,7 +387,7 @@ public class SabotageSystemPatch
     [HarmonyPatch(typeof(DoorsSystemType), nameof(DoorsSystemType.UpdateSystem))]
     public static class DoorsSystemTypePatch
     {
-        public static void Prefix(/*DoorsSystemType __instance,*/ PlayerControl player, MessageReader msgReader)
+        public static void Prefix( PlayerControl player, MessageReader msgReader)
         {
             byte amount;
             {

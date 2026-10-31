@@ -2,7 +2,7 @@ namespace TONE.Roles.Crewmate;
 
 internal class TimeManager : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.TimeManager;
     private const int Id = 9800;
     private static readonly HashSet<byte> playerIdList = [];
@@ -10,7 +10,6 @@ internal class TimeManager : RoleBase
 
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
-    //==================================================================\\
 
     public static OptionItem IncreaseMeetingTime;
     public static OptionItem MeetingTimeLimit;

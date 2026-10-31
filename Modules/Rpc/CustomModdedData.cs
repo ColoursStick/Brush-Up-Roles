@@ -6,10 +6,10 @@ using System;
 
 namespace TONE.Modules.Rpc
 {
-    // Used to serialize multiple gamedata calls in a single message item
+
     public abstract class CustomModdedData : BaseGameDataMessage
     {
-        // Refer BaseModdedRpc for how to code this dogshit framework
+
         public CustomModdedData(IntPtr ptr) : base(ptr) { }
 
         public override GameDataTypes GameDataType => GameDataTypes.Invalid;
@@ -26,13 +26,12 @@ namespace TONE.Modules.Rpc
         {
             msg.CancelMessage();
             msg.StartMessage((byte)this.FirstDataType);
-            // Logger.Info($"Serializing CustomModdedData: {this.FirstDataType}", "CustomModdedData.SerializeValues");
+
             SerializeCustomValues(msg);
         }
 
         [HideFromIl2Cpp]
         public abstract void SerializeCustomValues(MessageWriter msg);
-        // Vanilla code will start first game data message and end it for you.
-        // See RpcSetOutfit for example.
+
     }
 }

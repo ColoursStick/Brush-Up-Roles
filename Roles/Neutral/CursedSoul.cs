@@ -9,13 +9,12 @@ namespace TONE.Roles.Neutral;
 
 internal class CursedSoul : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.CursedSoul;
     private const int Id = 14000;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralEvil;
-    //==================================================================\\
 
     private static OptionItem CurseCooldown;
     private static OptionItem CurseCooldownIncrese;
@@ -64,7 +63,7 @@ internal class CursedSoul : RoleBase
             if (addon is CustomRoles.Admired)
             {
                 Admirer.AdmiredList[killer.PlayerId].Add(target.PlayerId);
-                Admirer.SendRPC(killer.PlayerId, target.PlayerId); //Sync playerId list
+                Admirer.SendRPC(killer.PlayerId, target.PlayerId);
             }
 
             Utils.NotifyRoles(SpecifySeer: target, SpecifyTarget: killer, ForceLoop: true);

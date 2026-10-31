@@ -7,13 +7,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Catalyst : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Catalyst;
     private const int Id = 33300;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
-    //==================================================================\\
 
     private static OptionItem CatalyzeCooldown;
     private static OptionItem CatalyzeMax;
@@ -61,7 +60,7 @@ internal class Catalyst : RoleBase
             }
             else
             {
-                // Target is immune to catalyze
+
                 killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Catalyst), GetString("CatalystInvalidTarget")));
             }
         }
@@ -73,5 +72,5 @@ internal class Catalyst : RoleBase
     {
         hud.KillButton.OverrideText(GetString("CatalystCatalyzeText"));
     }
-    // public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Catalyze");
+
 }

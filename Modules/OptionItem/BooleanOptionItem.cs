@@ -30,13 +30,11 @@ public class BooleanOptionItem(int id, string name, bool defaultValue, TabGroup 
         return opt;
     }
 
-    // Getter
     public override string GetString()
     {
         return Translator.GetString(GetBool() ? TEXT_true : TEXT_false);
     }
 
-    // Setter
     public override void SetValue(int value, bool doSync = true)
     {
         base.SetValue(value % 2 == 0 ? 0 : 1, doSync);

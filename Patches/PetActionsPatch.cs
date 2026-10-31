@@ -4,11 +4,6 @@ using TONE.Roles.Core;
 using TONE.Roles.Neutral;
 
 namespace TONE.Patches;
-/*
- * HUGE THANKS TO
- * ImaMapleTree / 단풍잎 / Tealeaf
- * FOR THE CODE
- */
 
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.TryPet))]
 internal static class LocalPetPatch

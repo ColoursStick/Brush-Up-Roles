@@ -23,7 +23,6 @@ class EndGamePatch
     {
         GameStates.InGame = false;
 
-        // if game is H&S or Host no have mod
         if (!GameStates.IsModHost || GameStates.IsHideNSeek) return;
 
         Logger.Info("-----------Game over-----------", "Phase");
@@ -32,7 +31,7 @@ class EndGamePatch
         {
             if (AmongUsClient.Instance.AmHost && GhostRoleAssign.GhostGetPreviousRole != null)
             {
-                foreach (var pvc in GhostRoleAssign.GhostGetPreviousRole.Keys) // Sets role back to original so it shows up in /l results.
+                foreach (var pvc in GhostRoleAssign.GhostGetPreviousRole.Keys)
                 {
                     if (!Main.PlayerStates.TryGetValue(pvc, out var state) || !state.MainRole.IsGhostRole()) continue;
                     if (!GhostRoleAssign.GhostGetPreviousRole.TryGetValue(pvc, out CustomRoles prevrole)) continue;
@@ -134,7 +133,6 @@ class EndGamePatch
             if (Options.DefaultKillCooldown <= 150f)
                 Main.NormalOptions.KillCooldown = Options.DefaultKillCooldown;
 
-        //winnerListÒâ¬Òé╗ÒââÒâê
         EndGameResult.CachedWinners = new Il2CppSystem.Collections.Generic.List<CachedPlayerData>();
         var winner = new List<PlayerControl>();
         foreach (var pc in Main.EnumeratePlayerControls())
@@ -149,13 +147,12 @@ class EndGamePatch
         Main.winnerNameList.Clear();
         Main.winnerList.Clear();
 
-        // Remove duplicates
         winner = winner.Distinct().ToList();
 
         foreach (var pc in winner.ToArray())
         {
             if (CustomWinnerHolder.WinnerTeam is not CustomWinner.Draw && pc.Is(CustomRoles.GM)) continue;
-            // Check "Contains" to avoid adding players twice
+
             if (Main.winnerList.Contains(pc.PlayerId)) continue;
 
             EndGameResult.CachedWinners.Add(new CachedPlayerData(pc.Data));
@@ -178,7 +175,6 @@ class EndGamePatch
             Main.RealOptionsData.Restore(GameOptionsManager.Instance.CurrentGameOptions);
             GameOptionsSender.AllSenders.Clear();
             GameOptionsSender.AllSenders.Add(new NormalGameOptionsSender());
-            /* Send SyncSettings RPC */
 
             Main.Instance.StartCoroutine(dbConnect.Init());
         }
@@ -194,9 +190,6 @@ class SetEverythingUpPatch
     {
         if (GameStates.IsHideNSeek) return;
         if (!Main.playerVersion.ContainsKey(AmongUsClient.Instance.HostId)) return;
-        //#######################################
-        //      ==Victory faction display==
-        //#######################################
 
         __instance.WinText.alignment = TextAlignmentOptions.Right;
 
@@ -204,7 +197,7 @@ class SetEverythingUpPatch
         WinnerTextObject.transform.localScale = new(0.6f, 0.6f, 0.6f);
         WinnerTextObject.transform.position = new(__instance.WinText.transform.position.x + 2.4f, __instance.WinText.transform.position.y - 0.5f, __instance.WinText.transform.position.z);
 
-        var WinnerText = WinnerTextObject.GetComponent<TextMeshPro>(); //Get components of the same type as WinText
+        var WinnerText = WinnerTextObject.GetComponent<TextMeshPro>();
         WinnerText.fontSizeMin = 3f;
         WinnerText.text = "";
 
@@ -245,7 +238,7 @@ class SetEverythingUpPatch
         {
             CustomWinnerText = GetWinnerRoleName(winnerRole);
             CustomWinnerColor = Utils.GetRoleColorCode(winnerRole);
-            //     __instance.WinText.color = Utils.GetRoleColor(winnerRole);
+
             __instance.BackgroundBar.material.color = Utils.GetRoleColor(winnerRole);
             if (winnerRole.IsNeutral())
             {
@@ -290,9 +283,9 @@ class SetEverythingUpPatch
                 WinnerText.color = Color.gray;
                 break;
             case CustomWinner.NiceMini:
-                //    __instance.WinText.color = Utils.GetRoleColor(CustomRoles.Mini);
+
                 __instance.BackgroundBar.material.color = Utils.HexToColor("edc240");
-                //    WinnerText.text = GetString("NiceMiniDied");
+
                 WinnerText.color = Utils.HexToColor("edc240");
                 break;
             case CustomWinner.Neutrals:
@@ -344,13 +337,7 @@ class SetEverythingUpPatch
 
     EndOfText:
 
-        LastWinsText = WinnerText.text/*.RemoveHtmlTags()*/;
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        //########################################
-        //     ==The final result indicates==
-        //########################################
+        LastWinsText = WinnerText.text;
 
         GC.Collect();
         Resources.UnloadUnusedAssets();
@@ -386,8 +373,5 @@ class SetEverythingUpPatch
 
         Utils.ShowLastRoles(sendMessage: false);
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        //Utils.ApplySuffix();
     }
 }

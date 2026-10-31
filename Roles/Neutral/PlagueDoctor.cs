@@ -10,17 +10,15 @@ using static TONE.Translator;
 
 namespace TONE.Roles.Neutral;
 
-// https://github.com/tukasa0001/TownOfHost/blob/main/Roles/Neutral/PlagueDoctor.cs
 internal class PlagueDoctor : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.PlagueDoctor;
     private const int Id = 27600;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.PlagueDoctor);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralEvil;
-    //==================================================================\\
 
     private static OptionItem OptionInfectLimit;
     private static OptionItem OptionInfectWhenKilled;
@@ -81,7 +79,6 @@ internal class PlagueDoctor : RoleBase
 
         InfectActive = true;
 
-        // Fixed airship respawn selection delay
         if (Main.NormalOptions.MapId == 4)
             InfectInactiveTime += 5f;
 
@@ -102,7 +99,7 @@ internal class PlagueDoctor : RoleBase
     }
     public bool CanInfect(PlayerControl player)
     {
-        // Not a plague doctor, or capable of self-infection and infected person created
+
         return player != _Player || (CanInfectSelf && player.GetAbilityUseLimit() == 0);
     }
     public void SendRPC(byte targetId, float rate)
@@ -149,7 +146,7 @@ internal class PlagueDoctor : RoleBase
     {
         if (LateCheckWin)
         {
-            // After hanging/killing, check the victory conditions just to be sure.
+
             LateCheckWin = false;
             CheckWin();
         }
@@ -157,22 +154,21 @@ internal class PlagueDoctor : RoleBase
 
         if (InfectInfos.TryGetValue(player.PlayerId, out var rate) && rate >= 100)
         {
-            // In case of an infected person
+
             var changed = false;
             var inVent = player.inVent;
             List<PlayerControl> updates = [];
             foreach (PlayerControl target in Main.EnumerateAlivePlayerControls())
             {
-                // Plague doctors are excluded if they cannot infect themselves.
+
                 if (!CanInfect(target)) continue;
-                // Excluded if inside or outside the vent
+
                 if (!CanInfectVent && target.inVent != inVent) continue;
 
                 InfectInfos.TryGetValue(target.PlayerId, out var oldRate);
-                // Exclude infected people
+
                 if (oldRate >= 100) continue;
 
-                // Exclude players outside the range
                 var distance = Vector3.Distance(player.transform.position, target.transform.position);
                 if (distance > InfectDistance) continue;
 
@@ -189,7 +185,7 @@ internal class PlagueDoctor : RoleBase
             }
             if (changed)
             {
-                //If someone is infected
+
                 CheckWin();
                 PlayerControl Plaguer = _Player;
                 foreach (PlayerControl x in updates.ToArray())
@@ -201,7 +197,7 @@ internal class PlagueDoctor : RoleBase
     }
     public override void AfterMeetingTasks()
     {
-        // You may win if a non-infected person is hanged.
+
         LateCheckWin = true;
 
         _ = new LateTask(() =>
@@ -263,7 +259,7 @@ internal class PlagueDoctor : RoleBase
     {
         if (_Player == null) return;
         if (!AmongUsClient.Instance.AmHost) return;
-        // Invalid if someone's victory is being processed
+
         if (CustomWinnerHolder.WinnerTeam != CustomWinner.Default) return;
 
         if (Main.EnumerateAlivePlayerControls().All(p => p.Is(CustomRoles.PlagueDoctor) || IsInfected(p.PlayerId)))

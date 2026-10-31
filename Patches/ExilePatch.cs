@@ -12,13 +12,12 @@ class ExileControllerWrapUpPatch
     [HarmonyPatch(typeof(ExileController), nameof(ExileController.Begin))]
     class ExileControllerBeginPatch
     {
-        // This patch is to show exile string for modded players
-        // Due to Innersloth anti-cheat updates, this is visible only to the host
+
         public static void Postfix(ExileController __instance, [HarmonyArgument(0)] ExileController.InitProperties init)
         {
             if (GameModeBase.GetGameMode() is CustomGameMode.Standard && init != null && init.outfit != null && (AmongUsClient.Instance.AmHost || !Main.CurrentServerIsVanilla))
                 __instance.completeString = CheckForEndVotingPatch.TempExileMsg;
-            // TempExileMsg for client is sent in RpcClose
+
         }
     }
 
@@ -101,7 +100,6 @@ class ExileControllerWrapUpPatch
     {
         if (AntiBlackout.BlackOutIsActive) exiled = AntiBlackout_LastExiled;
 
-        // Still not springing up in Airship
         if (!GameStates.AirshipIsActive)
         {
             foreach (var state in Main.PlayerStates.Values)
@@ -140,15 +138,12 @@ class ExileControllerWrapUpPatch
             Main.RefixCooldownDelay = Options.DefaultKillCooldown - 3f;
         }
 
-
         foreach (var player in Main.EnumeratePlayerControls())
         {
             player.GetRoleClass()?.OnPlayerExiled(player, exiled);
 
-            // Check for remove Pet
             player.RpcRemovePet();
 
-            // Set UnShift after meeting
             player.DoUnShiftState();
         }
 
@@ -160,7 +155,7 @@ class ExileControllerWrapUpPatch
 
     public static void WrapUpFinalizer(NetworkedPlayerInfo exiled)
     {
-        // Even if an exception occurs in WrapUpPostfix, this is the only part that will be executed reliably
+
         if (AmongUsClient.Instance.AmHost)
         {
             _ = new LateTask(() =>
@@ -171,9 +166,9 @@ class ExileControllerWrapUpPatch
                 AntiBlackout.SendGameData();
                 AntiBlackout.SetRealPlayerRoles();
 
-                if ((AntiBlackout.BlackOutIsActive || Main.LIMap) && // State in which the expulsion target is overwritten (need not be executed if the expulsion target is not overwritten)
-                    exiled != null && // Exiled is not null
-                    exiled.Object != null) //exiled.Object is not null
+                if ((AntiBlackout.BlackOutIsActive || Main.LIMap) &&
+                    exiled != null &&
+                    exiled.Object != null)
                 {
                     exiled.Object.RpcExileV2();
                     exiled.Object.SetDeathReason(PlayerState.DeathReason.Vote);
@@ -201,7 +196,6 @@ class ExileControllerWrapUpPatch
                     state.deathReason = x.Value;
                     player?.RpcExileV3();
 
-                    // Just to be sure
                     _ = new LateTask(() => player?.RpcExile(), 0.5f, "Extra Exile to be Sure");
 
                     if (x.Value == PlayerState.DeathReason.Suicide)
@@ -226,10 +220,6 @@ class ExileControllerWrapUpPatch
                 Main.LastMeetingEnded = Utils.TimeStamp;
             }, 1f, "AfterMeetingDeathPlayers Task");
         }
-
-        //This should happen shortly after the Exile Controller wrap up finished for clients
-        //For Certain Laggy clients 0.8f delay is still not enough. The finish time can differ
-        //If the delay is too long, it will influence other normal players' view
 
         GameStates.AlreadyDied |= !Utils.IsAllAlive;
         RemoveDisableDevicesPatch.UpdateDisableDevices();

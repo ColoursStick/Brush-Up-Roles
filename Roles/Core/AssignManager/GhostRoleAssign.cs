@@ -44,7 +44,6 @@ public static class GhostRoleAssign
 
         var getplrRole = player.GetCustomRole();
 
-        // Neutral Apocalypse can't get ghost roles
         if (getplrRole.IsNA() || getplrRole.IsTNA() && !Main.PlayerStates[player.PlayerId].IsNecromancer) return;
 
         if (Main.PlayerStates[player.PlayerId].IsNecromancer)
@@ -53,7 +52,6 @@ public static class GhostRoleAssign
             return;
         }
 
-        // Roles can win after death, should not get ghost roles
         if (getplrRole is CustomRoles.GM
             or CustomRoles.Nemesis
             or CustomRoles.Retributionist
@@ -155,7 +153,7 @@ public static class GhostRoleAssign
             if (ChosenRole.IsGhostRole())
             {
                 CrewCount++;
-                getCount[ChosenRole]--; // Only deduct if role has been set.
+                getCount[ChosenRole]--;
                 player.GetRoleClass().OnRemove(player.PlayerId);
                 player.RpcSetCustomRole(ChosenRole);
                 player.GetRoleClass().OnAdd(player.PlayerId);
@@ -236,7 +234,7 @@ public static class GhostRoleAssign
     {
         if (Options.CustomGhostRoleCounts.Any())
             Options.CustomGhostRoleCounts.Keys.Do(ghostRole
-                => getCount.TryAdd(ghostRole, ghostRole.GetCount())); // Add new count Instance (Optionitem gets constantly refreshed)
+                => getCount.TryAdd(ghostRole, ghostRole.GetCount()));
 
         foreach (var role in getCount)
         {
@@ -272,6 +270,5 @@ public static class GhostRoleAssign
 
         }, 0.1f, $"SetGuardianAngel for playerId: {__instance.PlayerId}");
     }
-
 
 }

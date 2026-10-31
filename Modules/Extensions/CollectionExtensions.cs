@@ -2,18 +2,9 @@ using System;
 
 namespace TONE;
 
-// Credit: Endless Host Roles by Gurge44
-// Reference: https://github.com/Gurge44/EndlessHostRoles/blob/main/Modules/Extensions/CollectionExtensions.cs
 public static class CollectionExtensions
 {
-    /// <summary>
-    /// Returns the key of a dictionary by its value
-    /// </summary>
-    /// <param name="dictionary">The <see cref="Dictionary{TKey,TValue}"/> to search</param>
-    /// <param name="value">The <typeparamref name="TValue"/> used to search for the corresponding key</param>
-    /// <typeparam name="TKey">The type of the keys in the <paramref name="dictionary"/></typeparam>
-    /// <typeparam name="TValue">The type of the values in the <paramref name="dictionary"/></typeparam>
-    /// <returns>The key of the <paramref name="dictionary"/> that corresponds to the given <paramref name="value"/>, or the default value of <typeparamref name="TKey"/> if the <paramref name="value"/> is not found in the <paramref name="dictionary"/></returns>
+
     public static TKey GetKeyByValue<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value)
     {
         foreach (KeyValuePair<TKey, TValue> pair in dictionary)
@@ -26,24 +17,13 @@ public static class CollectionExtensions
 
         return default;
     }
-    /// <summary>
-    ///     Sets the value for all existing keys in a dictionary to a specific value
-    /// </summary>
-    /// <param name="dictionary"></param>
-    /// <param name="value"></param>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
+
     public static void SetAllValues<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value)
     {
         foreach (TKey key in dictionary.Keys.ToArray())
             dictionary[key] = value;
     }
-    /// <summary>
-    /// Returns a random element from a collection
-    /// </summary>
-    /// <param name="collection">The collection</param>
-    /// <typeparam name="T">The type of the collection</typeparam>
-    /// <returns>A random element from the collection, or the default value of <typeparamref name="T"/> if the collection is empty</returns>
+
     public static T RandomElement<T>(this IList<T> collection)
     {
         if (collection.Count == 0) return default;
@@ -55,25 +35,12 @@ public static class CollectionExtensions
 
         return collection.ToList().RandomElement();
     }
-    /// <summary>
-    /// Combines multiple collections into a single collection
-    /// </summary>
-    /// <param name="firstCollection">The collection to start with</param>
-    /// <param name="collections">The other collections to add to <paramref name="firstCollection"/></param>
-    /// <typeparam name="T">The type of the elements in the collections to combine</typeparam>
-    /// <returns>A collection containing all elements of <paramref name="firstCollection"/> and all <paramref name="collections"/></returns>
+
     public static IEnumerable<T> CombineWith<T>(this IEnumerable<T> firstCollection, params IEnumerable<T>[] collections)
     {
         return firstCollection.Concat(collections.SelectMany(x => x));
     }
 
-    /// <summary>
-    /// Shuffles all elements in a collection randomly
-    /// </summary>
-    /// <typeparam name="T">The type of the collection</typeparam>
-    /// <param name="collection">The collection to be shuffled</param>
-    /// <param name="random">An instance of a randomizer algorithm</param>
-    /// <returns>The shuffled collection</returns>
     public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> collection, IRandom random)
     {
         var list = collection.ToList();
@@ -86,12 +53,7 @@ public static class CollectionExtensions
         }
         return list;
     }
-    /// <summary>
-    /// Shuffles all elements in a collection randomly
-    /// </summary>
-    /// <typeparam name="T">The type of the collection</typeparam>
-    /// <param name="collection">The collection to be shuffled</param>
-    /// <returns>The shuffled collection</returns>
+
     public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> collection)
     {
         var list = collection.ToList();
@@ -105,33 +67,19 @@ public static class CollectionExtensions
         return list;
     }
 
-    /// <summary>
-    /// Filters a IEnumerable(<typeparamref name="TDelegate"/>) of any duplicates
-    /// </summary>
-    /// <typeparam name="TDelegate">The type of the delegates in the collection</typeparam>
-    /// <returns>A HashSet(<typeparamref name="TDelegate"/>) without duplicate object references nor static duplicates.</returns>
     public static HashSet<TDelegate> FilterDuplicates<TDelegate>(this IEnumerable<TDelegate> collection) where TDelegate : Delegate
     {
-        // Filter out delegates which do not have a object reference (static methods)
+
         var filteredCollection = collection.Where(d => d.Target != null);
 
-        // Group by the target object (the instance the method belongs to) and select distinct
         var distinctDelegates = filteredCollection
             .GroupBy(d => d.Target.GetType())
             .Select(g => g.First())
-            .Concat(collection.Where(x => x.Target == null)); // adds back static methods
+            .Concat(collection.Where(x => x.Target == null));
 
         return distinctDelegates.ToHashSet();
     }
 
-    /// <summary>
-    /// Determines whether a collection contains any elements that satisfy a predicate and returns the first element that satisfies the predicate
-    /// </summary>
-    /// <param name="collection">The collection to search</param>
-    /// <param name="predicate">The predicate to check for each element</param>
-    /// <param name="element">The first element that satisfies the predicate, or the default value of <typeparamref name="T"/> if no elements satisfy the predicate</param>
-    /// <typeparam name="T">The type of the elements in the collection</typeparam>
-    /// <returns><c>true</c> if the collection contains any elements that satisfy the predicate, <c>false</c> otherwise</returns>
     public static bool Find<T>(this IEnumerable<T> collection, Func<T, bool> predicate, out T element)
     {
         if (collection is List<T> list)
@@ -163,16 +111,6 @@ public static class CollectionExtensions
         return false;
     }
 
-    /// <summary>
-    ///     Splits a collection into two integers based on a predicate
-    /// </summary>
-    /// <param name="predicate">The predicate to split the collection by</param>
-    /// <param name="collection">The collection</param>
-    /// <typeparam name="T">The type of the collection</typeparam>
-    /// <returns>
-    ///     A tuple containing two integers: one that is the number of elements that satisfy the predicate, and one that is the number of elements that
-    ///     do not
-    /// </returns>
     public static (int TrueCount, int FalseCount) SplitCount<T>(this IEnumerable<T> collection, Func<T, bool> predicate)
     {
         var int1 = 0;
@@ -189,18 +127,6 @@ public static class CollectionExtensions
         return (int1, int2);
     }
 
-    /// <summary>
-    ///     Determines whether a collection contains any elements that satisfy a predicate and returns the first element that
-    ///     satisfies the predicate
-    /// </summary>
-    /// <param name="collection">The collection to search</param>
-    /// <param name="predicate">The predicate to check for each element</param>
-    /// <param name="element">
-    ///     The first element that satisfies the predicate, or the default value of <typeparamref name="T" />
-    ///     if no elements satisfy the predicate
-    /// </param>
-    /// <typeparam name="T">The type of the elements in the collection</typeparam>
-    /// <returns><c>true</c> if the collection contains any elements that satisfy the predicate, <c>false</c> otherwise</returns>
     public static bool FindFirst<T>(this IEnumerable<T> collection, Func<T, bool> predicate, out T element)
     {
         if (collection is List<T> list)
@@ -233,21 +159,11 @@ public static class CollectionExtensions
         return false;
     }
 
-    /// <summary>
-    /// Return the first byte of a HashSet(Byte)
-    /// </summary>
     public static byte First(this HashSet<byte> source)
         => source.ToArray().First();
 
     #region Partition
 
-    /// <summary>
-    ///     Partitions a collection into a specified number of parts
-    /// </summary>
-    /// <param name="collection">The collection to partition</param>
-    /// <param name="parts">The number of parts to partition the collection into</param>
-    /// <typeparam name="T">The type of the elements in the collection</typeparam>
-    /// <returns>A collection of collections, each containing a part of the original collection</returns>
     public static IEnumerable<IEnumerable<T>> Partition<T>(this IEnumerable<T> collection, int parts)
     {
         List<T> list = collection.ToList();
@@ -268,13 +184,6 @@ public static class CollectionExtensions
         }
     }
 
-    /// <summary>
-    ///     Partitions a list into a specified number of parts
-    /// </summary>
-    /// <param name="collection">The list to partition</param>
-    /// <param name="parts">The number of parts to partition the list into</param>
-    /// <typeparam name="T">The type of the elements in the list</typeparam>
-    /// <returns>A list of lists, each containing a part of the original list</returns>
     public static IEnumerable<IEnumerable<T>> Partition<T>(this IList<T> collection, int parts)
     {
         int length = collection.Count;
@@ -298,41 +207,16 @@ public static class CollectionExtensions
 
     #region Without
 
-    /// <summary>
-    ///     Removes an element from a collection
-    /// </summary>
-    /// <param name="collection">The collection to remove the element from</param>
-    /// <param name="element">The element to remove</param>
-    /// <typeparam name="T">The type of the elements in the collection</typeparam>
-    /// <returns>
-    ///     A collection containing all elements of <paramref name="collection" /> except for <paramref name="element" />
-    /// </returns>
     public static IEnumerable<T> Without<T>(this IEnumerable<T> collection, T element)
     {
         return collection.Where(x => !x.Equals(element));
     }
 
-    /// <summary>
-    ///     Removes an element from a collection
-    /// </summary>
-    /// <param name="collection">The collection to remove the element from</param>
-    /// <param name="element">The element to remove</param>
-    /// <returns>
-    ///     A collection containing all elements of <paramref name="collection" /> except for <paramref name="element" />
-    /// </returns>
     public static IEnumerable<PlayerControl> Without(this IEnumerable<PlayerControl> collection, PlayerControl element)
     {
         return collection.Where(x => x.PlayerId != element.PlayerId);
     }
 
-    /// <summary>
-    ///     Removes an element from a collection
-    /// </summary>
-    /// <param name="collection">The collection to remove the element from</param>
-    /// <param name="element">The element to remove</param>
-    /// <returns>
-    ///     A collection containing all elements of <paramref name="collection" /> except for <paramref name="element" />
-    /// </returns>
     public static IEnumerable<PlainShipRoom> Without(this IEnumerable<PlainShipRoom> collection, PlainShipRoom element)
     {
         return collection.Where(x => x != element);

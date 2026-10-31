@@ -10,7 +10,7 @@ namespace TONE.Roles.Impostor;
 
 internal class Witch : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Witch;
     private const int Id = 2500;
     private static readonly HashSet<byte> playerIdList = [];
@@ -18,7 +18,6 @@ internal class Witch : RoleBase
 
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     public static OptionItem ModeSwitchActionOpt;
     private static OptionItem CanKillTNA;

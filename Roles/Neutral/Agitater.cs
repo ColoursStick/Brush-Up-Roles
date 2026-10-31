@@ -9,13 +9,12 @@ namespace TONE.Roles.Neutral;
 
 internal class Agitater : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Agitater;
     private const int Id = 15800;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;
-    //==================================================================\\
 
     private static OptionItem BombExplodeCooldown;
     private static OptionItem PassCooldown;
@@ -29,7 +28,6 @@ internal class Agitater : RoleBase
     public static bool AgitaterHasBombed = false;
     public static long? CurrentBombedPlayerTime = new();
     public static long? AgitaterBombedTime = new();
-
 
     public override void SetupCustomOption()
     {
@@ -175,7 +173,6 @@ internal class Agitater : RoleBase
         if (target.PlayerId == LastBombedPlayer) return;
         if (!AgitaterCanGetBombed.GetBool() && target.Is(CustomRoles.Agitater)) return;
 
-
         if (target.Is(CustomRoles.Pestilence))
         {
             target.RpcMurderPlayer(player);
@@ -186,7 +183,6 @@ internal class Agitater : RoleBase
         CurrentBombedPlayer = target.PlayerId;
         CurrentBombedPlayerTime = now;
         Utils.MarkEveryoneDirtySettings();
-
 
         player.Notify(GetString("AgitaterPassNotify"));
         target.Notify(GetString("AgitaterTargetNotify"), hasPriority: true);

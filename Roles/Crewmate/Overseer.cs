@@ -13,13 +13,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Overseer : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Overseer;
     private const int Id = 12200;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
-    //==================================================================\\
 
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("prophecies");
 
@@ -29,8 +28,6 @@ internal class Overseer : RoleBase
 
     private static OptionItem OverseerCooldown;
     private static OptionItem OverseerRevealTime;
-
-    //private static byte CurrentRevealTarget = byte.MaxValue;
 
     private static readonly List<CustomRoles> randomRolesForTrickster =
     [
@@ -60,7 +57,7 @@ internal class Overseer : RoleBase
         CustomRoles.FortuneTeller,
         CustomRoles.Oracle,
         CustomRoles.Tracefinder,
-        //CustomRoles.Glitch,
+
         CustomRoles.Justice,
         CustomRoles.Mortician,
         CustomRoles.Medium,
@@ -70,7 +67,7 @@ internal class Overseer : RoleBase
         CustomRoles.Retributionist,
         CustomRoles.Guardian,
         CustomRoles.Spiritualist,
-        //CustomRoles.Tracker,
+
     ];
 
     public override void SetupCustomOption()
@@ -212,7 +209,7 @@ internal class Overseer : RoleBase
                 if (dis <= range)
                 {
                     OverseerTimer[playerId] = (farTarget, farTime + Time.fixedDeltaTime);
-                    //SendTimerRPC(1, playerId, farTarget, farTime + Time.fixedDeltaTime);
+
                 }
                 else
                 {
@@ -241,11 +238,10 @@ internal class Overseer : RoleBase
         SendTimerRPC(0, byte.MaxValue);
     }
 
-    private static string GetRandomCrewRoleString() // Random role for trickster
+    private static string GetRandomCrewRoleString()
     {
         var randomRole = randomRolesForTrickster.RandomElement();
 
-        //string roleName = GetRoleName(randomRole);
         string RoleText = ColorString(GetRoleColor(randomRole), GetString(randomRole.GetActualRoleName()));
 
         return RoleText;

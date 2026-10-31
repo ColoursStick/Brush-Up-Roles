@@ -11,17 +11,15 @@ namespace TONE.Roles.Coven;
 
 internal class Necromancer : CovenManager
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Necromancer;
     private const int Id = 17100;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenUtility;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
-    //private static OptionItem CanVent;
-    //private static OptionItem HasImpostorVision;
+
     private static OptionItem RevengeTime;
     private static OptionItem AbilityDuration;
     private static OptionItem AbilityCooldown;
@@ -50,8 +48,7 @@ internal class Necromancer : CovenManager
         RevengeTime = IntegerOptionItem.Create(Role, Id + 11, OptionName.NecromancerRevengeTime, new(0, 60, 1), 30, false)
             .SetValueFormat(OptionFormat.Seconds);
         PreventKillerButtoning = BooleanOptionItem.Create(Role, Id + 16, OptionName.Necromancer_PreventKillerButtoning, true, false).SetParent(RevengeTime);
-        //CanVent = BooleanOptionItem.Create(Id + 12, GeneralOption.CanVent, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Necromancer]);
-        //HasImpostorVision = BooleanOptionItem.Create(Id + 13, GeneralOption.ImpostorVision, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Necromancer]);
+
         AbilityDuration = FloatOptionItem.Create(Role, Id + 14, GeneralOption.AbilityDuration, new(0f, 300f, 2.5f), 60f, false)
             .SetValueFormat(OptionFormat.Seconds);
         AbilityCooldown = FloatOptionItem.Create(Role, Id + 15, GeneralOption.AbilityCooldown, new(0f, 180f, 2.5f), 30f, false)
@@ -237,7 +234,7 @@ internal class Necromancer : CovenManager
             CustomRoles.CursedSoul or
             CustomRoles.Provocateur or
             CustomRoles.Specter or
-            // Just in case
+
             CustomRoles.GM or
             CustomRoles.Killer or
             CustomRoles.Coven or

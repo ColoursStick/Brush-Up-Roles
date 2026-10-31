@@ -10,12 +10,11 @@ namespace TONE.Roles.Neutral;
 
 internal class TreasureHunter : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.TreasureHunter;
     private const int Id = 33900;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralChaos;
-    //==================================================================\\
 
     public static OptionItem TreasureNum;
 
@@ -91,7 +90,6 @@ internal class TreasureHunter : RoleBase
         var ProgressText = new StringBuilder();
         Color TextColor = GetRoleColor(CustomRoles.TreasureHunter).ShadeColor(0.25f);
 
-        //ProgressText.Append(GetTaskCount(playerId, comms));
         ProgressText.Append(ColorString(TextColor, ColorString(Color.white, " - ") + $"({playerId.GetAbilityUseLimit()}/{TreasureNum.GetInt()})"));
         return ProgressText.ToString();
     }

@@ -7,14 +7,13 @@ namespace TONE.Roles.Crewmate;
 
 internal class Crusader : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Crusader;
     private const int Id = 10400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Crusader);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
-    //==================================================================\\
 
     private static OptionItem SkillLimitOpt;
     private static OptionItem SkillCooldown;
@@ -61,11 +60,11 @@ internal class Crusader : RoleBase
     {
         if (!ForCrusade.Contains(target.PlayerId)) return false;
 
-        var crusader = _Player; //this method is added by localplayer's ROLEBASE instance, so the player will always be the current crusader running the code.
+        var crusader = _Player;
         if (!crusader.IsAlive() || crusader.PlayerId == target.PlayerId) return false;
 
         var killerRole = killer.GetCustomRole();
-        // Not should kill
+
         if (killerRole is CustomRoles.Taskinator
             or CustomRoles.Bodyguard
             or CustomRoles.Deputy
@@ -90,7 +89,6 @@ internal class Crusader : RoleBase
 
             return true;
         }
-
 
         return false;
     }

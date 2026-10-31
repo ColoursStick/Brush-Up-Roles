@@ -1,6 +1,5 @@
 using static TONE.Options;
 
-
 namespace TONE.Roles.AddOns.Common;
 
 public class Rebound : IAddon

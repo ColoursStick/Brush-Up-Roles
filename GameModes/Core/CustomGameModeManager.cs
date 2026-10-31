@@ -14,7 +14,7 @@ public enum CustomGameMode
     BonfireNight = 0x06,
     CopsAndRobbers = 0x07,
 
-    HidenSeekTONE = 0x99, // HidenSeekTONE must be after other game modes
+    HidenSeekTONE = 0x99,
     All = int.MaxValue
 }
 
@@ -34,6 +34,6 @@ public static class CustomGameModeManager
         "TagMode",
         "RoundUp",
 
-        "Hide&SeekTONE", // HidenSeekTONE must be after other game modes
+        "Hide&SeekTONE",
     ];
 }

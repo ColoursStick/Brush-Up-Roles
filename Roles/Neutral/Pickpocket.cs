@@ -8,14 +8,13 @@ namespace TONE.Roles.Neutral;
 
 internal class Pickpocket : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Pickpocket;
     private const int Id = 17400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Pickpocket);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem CanVent;

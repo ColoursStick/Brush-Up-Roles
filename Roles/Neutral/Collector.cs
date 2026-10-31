@@ -8,13 +8,11 @@ namespace TONE.Roles.Neutral;
 internal class Collector : RoleBase
 {
 
-    //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Collector;
     private const int Id = 14700;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Collector);
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralChaos;
-    //==================================================================\\
 
     private static OptionItem CollectorCollectAmount;
 

@@ -36,7 +36,7 @@ internal class RoundUp : Standard
         NeutralCanBecomeDeputy = BooleanOptionItem.Create(Id + 3, "RoundUp_NeutralCanBecomeDeputy", true, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.RoundUp)
             .SetColor(new Color32(248, 216, 110, byte.MaxValue));
-        // BUR: 本模组已移除巫师阵营，该选项无意义
+
         CovenCanBecomeDeputy = BooleanOptionItem.Create(Id + 4, "RoundUp_CovenCanBecomeDeputy", true, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.RoundUp)
             .SetColor(new Color32(248, 216, 110, byte.MaxValue))
@@ -61,9 +61,7 @@ internal class RoundUp : Standard
             Deputy = player.PlayerId;
             PlayerOutfit = new NetworkedPlayerInfo.PlayerOutfit()
             .Set(player.GetRealName(), player.CurrentOutfit.ColorId, player.CurrentOutfit.HatId, player.CurrentOutfit.SkinId, player.CurrentOutfit.VisorId, player.CurrentOutfit.PetId, player.CurrentOutfit.NamePlateId);
-            /*var tempOutfit = PlayerOutfit;
-            tempOutfit.HatId = "hat_pk02_TenGallonHat";
-            player.SetNewOutfit(tempOutfit, false, false);*/
+
             if (AmongUsClient.Instance.AmHost) player.RpcSetHat("hat_pk02_TenGallonHat");
             Logger.Info($"{player.GetNameWithRole()} Become RDeputy", "Round Up");
         }
@@ -178,7 +176,7 @@ internal class RoundUp : Standard
         string result = string.Empty;
         for (int i = 0; i < mc.Count; i++)
         {
-            result += mc[i];//匹配结果是完整的数字，此处可以不做拼接的
+            result += mc[i];
         }
 
         if (int.TryParse(result, out int num) && num <= byte.MaxValue)
@@ -187,15 +185,12 @@ internal class RoundUp : Standard
         }
         else
         {
-            //并不是玩家编号，判断是否颜色
-            //byte color = GetColorFromMsg(msg);
-            //好吧我不知道怎么取某位玩家的颜色，等会了的时候再来把这里补上
+
             id = byte.MinValue;
             error = GetString("RoundUp_Help");
             return false;
         }
 
-        //判断选择的玩家是否合理
         PlayerControl target = id.GetPlayer();
         if (target == null || !target.IsAlive())
         {

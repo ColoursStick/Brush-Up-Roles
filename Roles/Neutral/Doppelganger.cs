@@ -8,14 +8,13 @@ namespace TONE.Roles.Neutral;
 
 internal class Doppelganger : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Doppelganger;
     private const int Id = 25000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Doppelganger);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem CanVent;
@@ -67,7 +66,6 @@ internal class Doppelganger : RoleBase
         var targetSkin = new NetworkedPlayerInfo.PlayerOutfit()
             .Set(tname, target.CurrentOutfit.ColorId, target.CurrentOutfit.HatId, target.CurrentOutfit.SkinId, target.CurrentOutfit.VisorId, target.CurrentOutfit.PetId, target.CurrentOutfit.NamePlateId);
         var targetLvl = target.Data.PlayerLevel;
-
 
         target.SetNewOutfit(killerSkin, newLevel: killerLvl);
         Main.OvverideOutfit[target.PlayerId] = (killerSkin, Main.PlayerStates[killer.PlayerId].NormalOutfit.PlayerName);

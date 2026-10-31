@@ -6,18 +6,16 @@ using TONE.Roles.Core;
 using static TONE.Options;
 using static TONE.Translator;
 
-
 namespace TONE.Roles.Neutral;
 
 internal class Lawyer : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Lawyer;
     private const int Id = 13100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Lawyer);
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
-    //==================================================================\\
 
     private static OptionItem CanTargetImpostor;
     private static OptionItem CanTargetNeutralKiller;
@@ -117,7 +115,6 @@ internal class Lawyer : RoleBase
             {
                 Logger.Info($"Wow, not target for lawyer to select! Changing lawyer role to other", "Lawyer");
 
-                // Unable to find a target? Try to turn to changerole or opportunist
                 var changedRole = ShouldChangeRoleAfterTargetDeath.GetBool() ? CRoleChangeRoles[ChangeRolesAfterTargetKilled.GetValue()] : CustomRoles.Opportunist;
 
                 lawyer.GetRoleClass()?.OnRemove(playerId);

@@ -5,7 +5,7 @@ namespace TONE.Roles.Vanilla;
 
 internal class NoisemakerTONE : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.NoisemakerTONE;
     private const int Id = 6230;
     private static readonly HashSet<byte> playerIdList = [];
@@ -13,7 +13,6 @@ internal class NoisemakerTONE : RoleBase
 
     public override CustomRoles ThisRoleBase => CustomRoles.Noisemaker;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateVanilla;
-    //==================================================================\\
 
     private static OptionItem ImpostorAlert;
     private static OptionItem AlertDuration;
@@ -42,7 +41,7 @@ internal class NoisemakerTONE : RoleBase
         AURoleOptions.NoisemakerAlertDuration = AlertDuration.GetInt();
 
         var playerRole = player.GetCustomRole();
-        // When impostor alert is off, and player is desync crewamte, make impostor alert as true
+
         if (player.HasDesyncRole() && !playerRole.IsImpostorTeamV3() && !ImpostorAlert.GetBool())
         {
             AURoleOptions.NoisemakerImpostorAlert = true;

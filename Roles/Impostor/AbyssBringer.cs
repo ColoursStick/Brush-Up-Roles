@@ -8,15 +8,13 @@ using static TONE.Options;
 
 namespace TONE.Roles.Impostor;
 
-//EHR - https://github.com/Gurge44/EndlessHostRoles/blob/main/Roles/Impostor/Abyssbringer.cs
 internal class AbyssBringer : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Abyssbringer;
     const int Id = 31300;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     public static bool ShouldDespawnCNOOnMeeting => (DespawnMode)BlackHoleDespawnMode.GetValue() == DespawnMode.AfterMeeting;
 
@@ -82,7 +80,6 @@ internal class AbyssBringer : RoleBase
         {
             return;
         }
-        // When no player exists, Instantly spawm and despawn networked object will cause error spam
 
         if (BlackHoles.Count >= BlackHoleCountLimit.GetInt())
         {
@@ -99,7 +96,7 @@ internal class AbyssBringer : RoleBase
         BlackHoles.Add(shapeshifter.PlayerId, new(new(pos), Utils.TimeStamp, pos, roomName, 0));
         SendCreateBlackholeRPC();
         shapeshifter.SetKillCooldown();
-        // Utils.SendRPC(CustomRPC.SyncRoleSkill, shapeshifter.PlayerId, 1, pos, roomName);
+
     }
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {
@@ -181,7 +178,7 @@ internal class AbyssBringer : RoleBase
         }
         else
         {
-            // No players to follow, despawn
+
             RemoveBlackHole();
             Notify();
         }

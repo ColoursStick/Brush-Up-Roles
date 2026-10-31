@@ -5,12 +5,11 @@ namespace TONE.Roles.Vanilla;
 
 internal class ViperTONE : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.ViperTONE;
     private const int Id = 35000;
     public override CustomRoles ThisRoleBase => CustomRoles.Viper;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorVanilla;
-    //==================================================================\\
 
     public static OptionItem ViperDissolveTime;
 

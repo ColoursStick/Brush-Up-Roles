@@ -14,7 +14,6 @@ public static class ObjectHelper
     }
     public static void DestroyTranslator(this MonoBehaviour obj) => obj.gameObject.DestroyTranslator();
 
-    // From: Project Lotus - by Discussions
     public static bool HasParentInHierarchy(this GameObject obj, string parentPath)
     {
         string[] pathParts = parentPath.Split('/');

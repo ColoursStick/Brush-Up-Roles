@@ -5,16 +5,14 @@ using UnityEngine;
 
 namespace TONE.Roles.Impostor;
 
-// https://github.com/tukasa0001/TownOfHost/blob/main/Roles/Impostor/Stealth.cs
 internal class Stealth : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Stealth;
     private const int Id = 27400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Stealth);
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
-    //==================================================================\\
 
     private static OptionItem optionExcludeImpostors;
     private static OptionItem optionDarkenDuration;
@@ -56,7 +54,7 @@ internal class Stealth : RoleBase
 
         return true;
     }
-    /// <summary>Get all players in the same room as you</summary>
+
     private PlayerControl[] FindPlayersInSameRoom(PlayerControl killedPlayer)
     {
         var room = killedPlayer.GetPlainShipRoom();
@@ -69,7 +67,7 @@ internal class Stealth : RoleBase
         RpcDarken(roomName);
         return Main.EnumerateAlivePlayerControls().Where(player => player != _Player && player.Collider.IsTouching(roomArea)).ToArray();
     }
-    /// <summary>Give the given player zero visibility for <see cref="darkenDuration"/> seconds.</summary>
+
     private void DarkenPlayers(PlayerControl[] playersToDarken)
     {
         darkenedPlayers = [.. playersToDarken];
@@ -81,12 +79,11 @@ internal class Stealth : RoleBase
     }
     public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
     {
-        // when you're darkening someone
+
         if (darkenedPlayers == null) return;
 
-        // reduce timer
         darkenTimer -= Time.fixedDeltaTime;
-        // When the timer reaches 0, return everyone's vision and reset the timer and darkening player.
+
         if (darkenTimer <= 0)
         {
             ResetDarkenState();
@@ -116,7 +113,7 @@ internal class Stealth : RoleBase
         var roomId = reader.ReadByte();
         darkenedRoom = roomId == byte.MaxValue ? null : (SystemTypes)roomId;
     }
-    /// <summary>Removes the darkening effect that has occurred.</summary>
+
     private void ResetDarkenState()
     {
         if (darkenedPlayers != null)
@@ -137,7 +134,6 @@ internal class Stealth : RoleBase
         seen ??= seer;
         var Player = _Player;
 
-        // During the meeting, unless it's my suffix or it's dark everywhere, I won't show anything.
         if (!HasEnabled || isForMeeting || seer != Player || seen != Player || !darkenedRoom.HasValue)
         {
             return string.Empty;

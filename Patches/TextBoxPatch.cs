@@ -6,8 +6,6 @@ using UnityEngine;
 
 namespace TONE.Patches;
 
-// Originally code by Gurge44. Reference: https://github.com/Gurge44/EndlessHostRoles/blob/main/Patches/TextBoxPatch.cs
-
 public static class TextBoxPatch
 {
     private static TextMeshPro PlaceHolderText;
@@ -227,7 +225,7 @@ public static class TextBoxPatch
                     {
                         Dictionary<byte, string> allIds = Main.EnumeratePlayerControls().ToDictionary(x => x.PlayerId, x => x.PlayerId.ColoredPlayerName());
                         additionalInfo = $"<b><u>{Translator.GetString("PlayerIdList").TrimEnd(' ')}</u></b>\n{string.Join('\n', allIds.Select(x => $"<b>{x.Key}</b> \uffeb <b>{x.Value}</b>"))}";
-                        // OptionShower.CurrentPage = 0;
+
                     }
 
                     continue;
@@ -335,39 +333,3 @@ public static class TextBoxPatch
         if (AdditionalInfoText) AdditionalInfoText.transform.SetAsLastSibling();
     }
 }
-
-//Thanks https://github.com/NuclearPowered/Reactor/blob/master/Reactor/Patches/Fixes/CursorPosPatch.cs
-
-//2024.8.13 break this
-
-/// <summary>
-/// "Fixes" an issue where empty TextBoxes have wrong cursor positions.
-/// </summary>
-/*[HarmonyPatch(typeof(TextMeshProExtensions), nameof(TextMeshProExtensions.CursorPos), typeof(TextMeshPro))]
-[HarmonyPatch(typeof(TextMeshProExtensions), nameof(TextMeshProExtensions.CursorPos), typeof(TextMeshPro), typeof(int))]
-internal static class CursorPosPatch
-{
-    public static bool Prefix(TextMeshPro self, ref Vector2 __result)
-    {
-        if (self.textInfo == null || self.textInfo.lineCount == 0 || self.textInfo.lineInfo[0].characterCount <= 0)
-        {
-            __result = self.GetTextInfo(" ").lineInfo.First().lineExtents.max;
-            return false;
-        }
-
-        return true;
-    }
-} */
-
-
-
-/* Originally by KARPED1EM. Reference: https://github.com/KARPED1EM/TownOfNext/blob/TONX/TONX/Patches/TextBoxPatch.cs */
-/*[HarmonyPatch(typeof(TextBoxTMP))]
-public class TextBoxPatch
-{
-    [HarmonyPatch(nameof(TextBoxTMP.SetText)), HarmonyPrefix]
-    public static void ModifyCharacterLimit(TextBoxTMP __instance)
-    {
-        __instance.characterLimit = 1200;
-    }
-}*/

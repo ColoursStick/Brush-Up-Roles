@@ -4,60 +4,7 @@ namespace TONE;
 
 public static class SpamManager
 {
-    //private static readonly string BANEDWORDS_FILE_PATH = "./BrushUpRoles-DATA/BanWords.txt";
-    //public static List<string> BanWords = new();
-    //public static void Init()
-    //{
-    //    CreateIfNotExists();
-    //    BanWords = ReturnAllNewLinesInFile(BANEDWORDS_FILE_PATH);
-    //}
-    //public static void CreateIfNotExists()
-    //{
-    //    if (!File.Exists(BANEDWORDS_FILE_PATH))
-    //    {
-    //        try
-    //        {
-    //            if (!Directory.Exists(@"BrushUpRoles-DATA")) Directory.CreateDirectory(@"BrushUpRoles-DATA");
-    //            if (File.Exists(@"./BanWords.txt")) File.Move(@"./BanWords.txt", BANEDWORDS_FILE_PATH);
-    //            else
-    //            {
-    //                string fileName;
-    //                string[] name = CultureInfo.CurrentCulture.Name.Split("-");
-    //                if (name.Count() >= 2)
-    //                    fileName = name[0] switch
-    //                    {
-    //                        "zh" => "SChinese",
-    //                        "ru" => "Russian",
-    //                        _ => "English"
-    //                    };
-    //                else fileName = "English";
-    //                Logger.Warn($"创建新的 BanWords 文件：{fileName}", "SpamManager");
-    //                File.WriteAllText(BANEDWORDS_FILE_PATH, GetResourcesTxt($"TONE.Resources.Config.BanWords.{fileName}.txt"));
-    //            }
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            Logger.Exception(ex, "SpamManager");
-    //        }
-    //    }
-    //}
-    //private static string GetResourcesTxt(string path)
-    //{
-    //    var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(path);
-    //    stream.Position = 0;
-    //    using StreamReader reader = new(stream, Encoding.UTF8);
-    //    return reader.ReadToEnd();
-    //}
-    //public static List<string> ReturnAllNewLinesInFile(string filename)
-    //{
-    //    if (!File.Exists(filename)) return new List<string>();
-    //    using StreamReader sr = new(filename, Encoding.GetEncoding("UTF-8"));
-    //    string text;
-    //    List<string> sendList = new();
-    //    while ((text = sr.ReadLine()) != null)
-    //        if (text.Length > 1 && text != "") sendList.Add(text.Replace("\\n", "\n").ToLower());
-    //    return sendList;
-    //}
+
     public static bool CheckSpam(PlayerControl player, string text)
     {
         if (player.PlayerId == PlayerControl.LocalPlayer.PlayerId) return false;
@@ -86,23 +33,6 @@ public static class SpamManager
                 return true;
             }
         }
-
-        //bool banned = BanWords.Any(text.Contains);
-
-        //if (!banned) return false;
-
-        //if (Options.AutoWarnStopWords.GetBool()) msg = string.Format(GetString("Message.WarnWhoSayBanWord"), name);
-        //if (Options.AutoKickStopWords.GetBool())
-        //{
-        //    if (!Main.SayBanwordsTimes.ContainsKey(player.GetClientId())) Main.SayBanwordsTimes.Add(player.GetClientId(), 0);
-        //    Main.SayBanwordsTimes[player.GetClientId()]++;
-        //    msg = string.Format(GetString("Message.WarnWhoSayBanWordTimes"), name, Main.SayBanwordsTimes[player.GetClientId()]);
-        //    if (Main.SayBanwordsTimes[player.GetClientId()] > Options.AutoKickStopWordsTimes.GetInt())
-        //    {
-        //        msg = string.Format(GetString("Message.KickWhoSayBanWordAfterWarn"), name, Main.SayBanwordsTimes[player.GetClientId()]);
-        //        kick = true;
-        //    }
-        //}
 
         if (msg != "")
         {
@@ -266,8 +196,6 @@ public static class SpamManager
         if (text == "开阿") return true;
         if (text == "kai") return true;
         if (text == "kaishi") return true;
-
-        //if (text.Length >= 3) return false;
 
         if (text.Contains('了')) return false;
         if (text.Contains('没')) return false;

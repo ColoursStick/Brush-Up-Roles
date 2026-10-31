@@ -135,19 +135,14 @@ public class Lovers : IAddon
 
                 if (isExiled)
                 {
-                    //if (Main.PlayersDiedInMeeting.Contains(deathId))
-                    //{
+
                     partnerPlayer.RpcExileV3();
                     if (MeetingHud.Instance?.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted)
                     {
                         MeetingHud.Instance?.CheckForEndVoting();
                     }
                     _ = new LateTask(() => HudManager.Instance?.SetHudActive(false), 0.3f, "SetHudActive in LoversSuicide", shoudLog: false);
-                    //}
-                    //else
-                    //{
-                    //CheckForEndVotingPatch.TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.FollowingSuicide, partnerPlayer.PlayerId);
-                    //}
+
                 }
                 else
                 {
@@ -200,7 +195,7 @@ public class Lovers : IAddon
         var eligiblePairs = LoversPlayers.Where(x => x.Key.PlayerId < x.Value.PlayerId && !Utils.IsSameTeammate(x.Key, x.Value, neu: false) && (!LoverSuicide.GetBool() || (x.Key.IsAlive() && x.Value.IsAlive()))).ToList();
 
         if (!eligiblePairs.Any()) return;
-        // if not (some lovers dead and lovers suicide)
+
         if (CustomWinnerHolder.WinnerTeam is CustomWinner.Crewmate or CustomWinner.Impostor or CustomWinner.Jackal or CustomWinner.Pelican or CustomWinner.Coven)
         {
             CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Lovers);
@@ -240,7 +235,7 @@ public class Lovers : IAddon
 
     public static bool LoversMsg(PlayerControl pc, string msg, bool check = true)
     {
-        //if (!AmongUsClient.Instance.AmHost) return false;
+
         if (!GameStates.IsMeeting || !pc) return false;
         if (!pc.Is(CustomRoles.Lovers)) return false;
         if (!PrivateChat.GetBool()) return false;

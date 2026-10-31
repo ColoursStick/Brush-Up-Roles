@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace TONE;
 
-//锟斤拷源锟斤拷https://github.com/tukasa0001/TownOfHost/pull/1265
 [HarmonyPatch(typeof(OptionsMenuBehaviour), nameof(OptionsMenuBehaviour.Start))]
 public static class OptionsMenuBehaviourStartPatch
 {
@@ -21,7 +20,7 @@ public static class OptionsMenuBehaviourStartPatch
     private static ClientOptionItem ForceOwnLanguageRoleName;
     private static ClientOptionItem EnableCustomButton;
     private static ClientOptionItem EnableCustomSoundEffect;
-    //private static ClientOptionItem EnableCustomDecorations;
+
     private static ClientOptionItem EnableMapVentIcon;
     private static ClientOptionItem EnableCommandHelper;
     private static ClientOptionItem EnableClientControlGUI;
@@ -90,13 +89,7 @@ public static class OptionsMenuBehaviourStartPatch
         {
             ShowTextOverlay = ClientOptionItem.Create("ShowTextOverlay", Main.ShowTextOverlay, __instance);
         }
-        // Brush Up Roles：姓名上方那个「模组客户端」标签会一闪一闪（它依赖 playerVersion 表，
-        // 而那张表是靠版本握手异步填的），体验很差，这里直接不提供该开关，
-        // 并在 Config 里把默认值改成 false。
-        //if (ShowModdedClientText == null || ShowModdedClientText.ToggleButton == null)
-        //{
-        //    ShowModdedClientText = ClientOptionItem.Create("ShowModdedClientText", Main.ShowModdedClientText, __instance);
-        //}
+
         if (HorseMode == null || HorseMode.ToggleButton == null)
         {
             HorseMode = ClientOptionItem.Create("HorseMode", Main.HorseMode, __instance, SwitchHorseMode);
@@ -173,10 +166,6 @@ public static class OptionsMenuBehaviourStartPatch
             EnableCustomSoundEffect = ClientOptionItem.Create("EnableCustomSoundEffect", Main.EnableCustomSoundEffect, __instance);
         }
 
-        /*if (EnableCustomDecorations == null || EnableCustomDecorations.ToggleButton == null)
-        {
-            EnableCustomDecorations = ClientOptionItem.Create("EnableCustomDecorations", Main.EnableCustomDecorations, __instance);
-        }*/
         if (EnableMapVentIcon == null || EnableMapVentIcon.ToggleButton == null)
         {
             EnableMapVentIcon = ClientOptionItem.Create("EnableMapVentIcon", Main.EnableMapVentIcon, __instance);

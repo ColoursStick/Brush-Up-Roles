@@ -11,13 +11,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class FortuneTeller : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.FortuneTeller;
     private const int Id = 8000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.FortuneTeller);
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
-    //==================================================================\\
 
     private static OptionItem CheckLimitOpt;
     private static OptionItem RoleNumber;
@@ -124,7 +123,6 @@ internal class FortuneTeller : RoleBase
                 msg = string.Format(GetString("FortuneTellerCheck.TaskDone"), target.GetRealName(), GetString(CustomRoles.Sheriff.ToString()));
             else
                 msg = string.Format(GetString("FortuneTellerCheck.TaskDone"), target.GetRealName(), GetString(target.GetCustomRole().ToString()));
-
 
             if (Lich.IsCursed(target))
                 msg = string.Format(GetString("FortuneTellerCheck.TaskDone"), target.GetRealName(), GetString(CustomRoles.Lich.ToString()));

@@ -8,13 +8,12 @@ namespace TONE.Roles.Impostor;
 
 internal class YinYanger : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.YinYanger;
     const int Id = 29100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.YinYanger);
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     public static OptionItem KillCooldown;
     public static Dictionary<byte, (PlayerControl yin, PlayerControl yang)> Yanged = [];

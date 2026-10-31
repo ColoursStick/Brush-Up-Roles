@@ -21,4 +21,3 @@ public class Watcher : IAddon
     { }
     public static void RevealVotes(IGameOptions opt) => opt.SetBool(BoolOptionNames.AnonymousVotes, false);
 }
-

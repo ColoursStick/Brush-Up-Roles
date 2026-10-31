@@ -10,13 +10,13 @@ namespace TONE.Roles.Impostor;
 
 internal class Anonymous : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Anonymous;
     private const int Id = 5300;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Anonymous);
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
-    //==================================================================\\
+
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Hack");
 
     private static OptionItem HackCooldown;
@@ -76,7 +76,6 @@ internal class Anonymous : RoleBase
 
         var targetId = byte.MaxValue;
 
-        // Finding real killer
         foreach (var db in DeadBodyList)
         {
             var dp = Utils.GetPlayerById(db);
@@ -84,11 +83,9 @@ internal class Anonymous : RoleBase
             if (dp.GetRealKiller().PlayerId == shapeshifter.PlayerId) targetId = db;
         }
 
-        // No body found. Look for another body
         if (targetId == byte.MaxValue && DeadBodyList.Any())
             targetId = DeadBodyList.RandomElement();
 
-        // Anonymous report Self
         if (targetId == byte.MaxValue)
             _ = new LateTask(() => ssTarget?.NoCheckStartMeeting(ssTarget?.Data), 0.15f, "Anonymous Hacking Report Self");
         else

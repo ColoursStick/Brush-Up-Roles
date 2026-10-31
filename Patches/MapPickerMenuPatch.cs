@@ -3,8 +3,6 @@ using UnityEngine.SceneManagement;
 
 namespace TONE.Patches;
 
-// Thanks: https://github.com/SubmergedAmongUs/Submerged/blob/4a5a6b47cbed526670ae4b7eae76acd7c42e35de/Submerged/UI/Patches/MapSelectButtonPatches.cs#L49
-// And thanks: https://github.com/AU-Avengers/TOU-Mira/blob/main/TownOfUs/Patches/AprilFools/DleksMapOptionPickerPatches.cs
 [HarmonyPatch]
 public static class GameOptionsMapPickerPatch
 {
@@ -46,7 +44,7 @@ public static class GameOptionsMapPickerPatch
         {
             if (AllMapButton != null)
             {
-                // Dleks Button
+
                 {
                     var dleksButton_MapButton = __instance.mapButtons[dleksPos];
                     dleksButton_MapButton.Button.OnClick.RemoveAllListeners();

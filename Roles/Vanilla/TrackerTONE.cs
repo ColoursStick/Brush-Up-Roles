@@ -4,12 +4,11 @@ namespace TONE.Roles.Vanilla;
 
 internal class TrackerTONE : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.TrackerTONE;
     private const int Id = 6250;
     public override CustomRoles ThisRoleBase => CustomRoles.Tracker;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateVanilla;
-    //==================================================================\\
 
     private static OptionItem TrackCooldown;
     private static OptionItem TrackDuration;

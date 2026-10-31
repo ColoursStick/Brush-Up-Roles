@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace TONE.Modules;
 
-// Credit: EHR by Gurge44: https://github.com/Gurge44/EndlessHostRoles
 public static class KillTimerManager
 {
     public static readonly Dictionary<byte, float> AllKillTimers = [];

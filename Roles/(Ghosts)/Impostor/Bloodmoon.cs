@@ -12,13 +12,12 @@ namespace TONE.Roles._Ghosts_.Impostor;
 
 internal class Bloodmoon : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Bloodmoon;
     private const int Id = 28100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Bloodmoon);
     public override CustomRoles ThisRoleBase => CustomRoles.GuardianAngel;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorGhosts;
-    //==================================================================\\
 
     public static OptionItem KillCooldown;
     public static OptionItem CanKillNum;
@@ -48,7 +47,7 @@ internal class Bloodmoon : RoleBase
         CustomRoleManager.OnFixedUpdateOthers.Add(OnFixedUpdateOther);
         CustomRoleManager.CheckDeadBodyOthers.Add(CheckDeadBody);
     }
-    // EAC bans players when GA uses sabotage
+
     public override bool CanUseSabotage(PlayerControl pc) => false;
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {

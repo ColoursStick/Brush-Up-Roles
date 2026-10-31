@@ -5,7 +5,6 @@ using static TONE.Translator;
 
 namespace TONE;
 
-// Thanks: https://github.com/Yumenopai/TownOfHost_Y/blob/main/Patches/GameSettingMenuPatch.cs
 [HarmonyPatch(typeof(GameSettingMenu))]
 public class GameSettingMenuPatch
 {
@@ -36,11 +35,9 @@ public class GameSettingMenuPatch
             CustomGameMode.TagMode => TabGroupValues.Skip(2).ToArray(),
             CustomGameMode.BonfireNight => TabGroupValues.Skip(2).ToArray(),
             CustomGameMode.CopsAndRobbers => TabGroupValues.Skip(4).ToArray(),
-            // Brush Up Roles：本模组不提供巫师阵营，直接不生成该页签
+
             _ => [TabGroup.CovenRoles]
         };
-
-        // https://gyazo.com/a8f6ec93e44eca8e6febb7d2e91c3750 So much empy space, I think this definetevly calls for HnS roles 😼
 
         ModSettingsButtons = [];
         foreach (var tab in EnumHelper.GetAllValues<TabGroup>().Except(ExludeList))
@@ -133,14 +130,6 @@ public class GameSettingMenuPatch
 
         __instance.MenuDescriptionText.m_marginWidth = 2.5f;
 
-        //gameSettingButton.activeTextColor = gameSettingButton.inactiveTextColor = Color.black;
-        //gameSettingButton.selectedTextColor = Color.blue;
-
-        //var vanillaActiveButton = Utils.LoadSprite($"TownOfHost_Y.Resources.Tab_Active_VanillaGameSettings.png", 100f);
-        //gameSettingButton.inactiveSprites.GetComponent<SpriteRenderer>().sprite = Utils.LoadSprite($"TownOfHost_Y.Resources.Tab_Small_VanillaGameSettings.png", 100f);
-        //gameSettingButton.activeSprites.GetComponent<SpriteRenderer>().sprite = vanillaActiveButton;
-        //gameSettingButton.selectedSprites.GetComponent<SpriteRenderer>().sprite = vanillaActiveButton;
-
         gameSettingButton.transform.localPosition = ButtonPositionLeft;
         gameSettingButton.transform.localScale = ButtonSize;
 
@@ -168,14 +157,14 @@ public class GameSettingMenuPatch
         preset.transform.localScale = new Vector3(0.65f, 0.63f, 1f);
         var SpriteRenderer = preset.GetComponentInChildren<SpriteRenderer>();
         SpriteRenderer.color = Color.white;
-        //SpriteRenderer.material = null;
+
         SpriteRenderer.sprite = Utils.LoadSprite("TONE.Resources.Images.PresetBox.png", 55f);
 
         Color clr = new(-1, -1, -1);
         var PLabel = preset.GetComponentInChildren<TextMeshPro>();
         PLabel.DestroyTranslator();
         PLabel.SetText(GetString($"Preset_{OptionItem.CurrentPreset + 1}"));
-        //PLabel.font = PLuLabel.font; 
+
         float size = DestroyableSingleton<TranslationController>.Instance.currentLanguage.languageID switch
         {
             SupportedLangs.Russian => 1.45f,
@@ -188,7 +177,6 @@ public class GameSettingMenuPatch
         GMinus.gameObject.SetActive(true);
         GMinus.transform.localScale = new Vector3(0.08f, 0.4f, 1f);
 
-
         var MLabel = GMinus.transform.Find("FontPlacer/Text_TMP").GetComponent<TextMeshPro>();
         MLabel.alignment = TextAlignmentOptions.Center;
         MLabel.DestroyTranslator();
@@ -197,7 +185,6 @@ public class GameSettingMenuPatch
         MLabel.color = new Color(255f, 255f, 255f);
         MLabel.SetFaceColor(new Color(255f, 255f, 255f));
         MLabel.transform.localScale = new Vector3(12f, 4f, 1f);
-
 
         var Minus = GMinus.GetComponent<PassiveButton>();
         Minus.OnClick.RemoveAllListeners();
@@ -220,8 +207,6 @@ public class GameSettingMenuPatch
         Minus.inactiveSprites.GetComponent<SpriteRenderer>().color = new Color32(55, 59, 60, 255);
         Minus.activeSprites.GetComponent<SpriteRenderer>().color = new Color32(61, 62, 63, 255);
         Minus.selectedSprites.GetComponent<SpriteRenderer>().color = new Color32(55, 59, 60, 255);
-
-
 
         var PlusFab = Object.Instantiate(GMinus, preset.transform);
         var PLuLabel = PlusFab.transform.Find("FontPlacer/Text_TMP").GetComponent<TextMeshPro>();
@@ -260,7 +245,6 @@ public class GameSettingMenuPatch
         TextField.name = "InputField";
 
         InputField = TextField;
-
 
         var button = TextField.transform.FindChild("ChatSendButton");
 
@@ -311,7 +295,7 @@ public class GameSettingMenuPatch
             if (!SearchWinners.Any() || !ModSettingsTabs.TryGetValue((TabGroup)(ModGameOptionsMenu.TabIndex - 3), out var settingsTab) || settingsTab == null)
             {
                 HiddenBySearch.Clear();
-                Logger.SendInGame(GetString("SearchNoResult")); // okay so showpopup nor this will overlay the menu, but I use this just for the sound lol
+                Logger.SendInGame(GetString("SearchNoResult"));
                 return;
             }
 

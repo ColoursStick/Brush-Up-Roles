@@ -6,13 +6,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Addict : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Addict;
     private const int Id = 6300;
     public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
-    //==================================================================\\
 
     public static OptionItem VentCooldown;
     private static OptionItem TimeLimit;
@@ -116,7 +115,6 @@ internal class Addict : RoleBase
         SuicideTimer[pc.PlayerId] = 0f;
         ImmortalTimer[pc.PlayerId] = 0f;
 
-        //   Main.AllPlayerSpeed[pc.PlayerId] = SpeedWhileImmortal.GetFloat();
         pc.MarkDirtySettings();
     }
 

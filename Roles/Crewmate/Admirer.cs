@@ -10,14 +10,13 @@ namespace TONE.Roles.Crewmate;
 
 internal class Admirer : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Admirer;
     private const int Id = 24800;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Admirer);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
-    //==================================================================\\
 
     private static OptionItem AdmireCooldown;
     private static OptionItem KnowTargetRole;
@@ -113,7 +112,7 @@ internal class Admirer : RoleBase
                 if (KnowTargetRole.GetBool())
                 {
                     AdmiredList[killer.PlayerId].Add(target.PlayerId);
-                    SendRPC(killer.PlayerId, target.PlayerId); //Sync playerId list
+                    SendRPC(killer.PlayerId, target.PlayerId);
                 }
             }
             else goto AdmirerFailed;

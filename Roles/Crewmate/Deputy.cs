@@ -8,13 +8,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Deputy : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Deputy;
     private const int Id = 7800;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
-    //==================================================================\\
 
     private static OptionItem HandcuffCooldown;
     private static OptionItem HandcuffMax;
@@ -67,7 +66,7 @@ internal class Deputy : RoleBase
             }
             else
             {
-                // Target already have a handcuff
+
                 killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Deputy), GetString("DeputyInvalidTarget")));
             }
         }

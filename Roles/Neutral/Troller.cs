@@ -9,13 +9,12 @@ namespace TONE.Roles.Neutral;
 
 internal class Troller : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Troller;
     private const int Id = 28700;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Troller);
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
-    //==================================================================\\
 
     private static OptionItem TrollsPerRound;
     private static OptionItem CanHaveCallMeetingEvent;
@@ -36,7 +35,7 @@ internal class Troller : RoleBase
         CooldownsResetToDefault,
         CooldownsResetToZero,
         LoseAddon,
-        /* GetBadAddon, */
+
         TelepostEveryoneToVents,
         PullEveryone,
         TwistEveryone,
@@ -192,7 +191,7 @@ internal class Troller : RoleBase
                         var mapId = GetActiveMapId();
 
                         shipStatusDisabled.RpcUpdateSystem(CurrentActiveSabotage, 16);
-                        if (mapId is 1 or 5) // Mira HQ or The Fungle
+                        if (mapId is 1 or 5)
                             shipStatusDisabled.RpcUpdateSystem(CurrentActiveSabotage, 17);
                         break;
                 }
@@ -284,8 +283,7 @@ internal class Troller : RoleBase
                 var pcCallMeeting = Main.EnumerateAlivePlayerControls().RandomElement();
                 pcCallMeeting.NoCheckStartMeeting(null);
                 break;
-                //case Events.GetBadAddon:
-                //    break;
+
         }
 
         return true;

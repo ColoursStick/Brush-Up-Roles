@@ -7,12 +7,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Miner : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Miner;
     private const int Id = 4200;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
-    //==================================================================\\
 
     private static OptionItem MinerSSCD;
     private static OptionItem MinerMode;

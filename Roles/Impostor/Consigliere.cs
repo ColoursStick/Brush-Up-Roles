@@ -7,12 +7,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Consigliere : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Consigliere;
     private const int Id = 3100;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem DivinationMaxCount;
@@ -101,7 +100,6 @@ internal class Consigliere : RoleBase
 
             if (!cs.GetPlayer().IsAlive() && !RevealsPersist.GetBool()) result = false;
 
-            // when seer is Sheriff or ChiefOfPolice and Consigliere is not Narc,seer shouldn't see target's role
             if (imp.IsPolice() && !cs.GetPlayer().Is(CustomRoles.Narc)) result = false;
         }
         return result;

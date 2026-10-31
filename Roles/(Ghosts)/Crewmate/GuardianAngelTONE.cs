@@ -6,13 +6,12 @@ namespace TONE.Roles._Ghosts_.Crewmate;
 
 internal class GuardianAngelTONE : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.GuardianAngelTONE;
     private const int Id = 20900;
 
     public override CustomRoles ThisRoleBase => CustomRoles.GuardianAngel;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateGhosts;
-    //==================================================================\\
 
     private static OptionItem AbilityCooldown;
     private static OptionItem ProtectDur;

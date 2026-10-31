@@ -11,14 +11,13 @@ namespace TONE.Roles.Neutral;
 
 internal class Shroud : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Shroud;
     private const int Id = 18000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Shroud);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;
-    //==================================================================\\
 
     private static OptionItem ShroudCooldown;
     private static OptionItem CanVent;
@@ -44,7 +43,7 @@ internal class Shroud : RoleBase
     }
     private void SendRPC(byte shroudId, byte targetId, byte typeId)
     {
-        var writer = MessageWriter.Get(SendOption.Reliable);// syncShroud
+        var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(typeId);
         writer.Write(shroudId);
         writer.Write(targetId);

@@ -6,14 +6,13 @@ namespace TONE.Roles.Neutral;
 
 internal class Shaman : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Shaman;
     private const int Id = 13600;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Shaman);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
-    //==================================================================\\
 
     private static OptionItem VoodooCooldown;
 

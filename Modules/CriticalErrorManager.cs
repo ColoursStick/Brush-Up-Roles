@@ -108,7 +108,7 @@ public static class CriticalErrorManager
                 }
                 else if (GameStartManager.Instance != null)
                 {
-                    // We imagine rpc is received when starting game in lobby, not fucked yet
+
                     if (AmongUsClient.Instance.AmHost)
                     {
                         GameStartManager.Instance.ResetStartState();

@@ -15,7 +15,7 @@ public class FallFromLadder
         if (!Options.LadderDeath.GetBool() || player.myPlayer.Is(CustomRoles.Solsticer)) return;
         var sourcePos = source.transform.position;
         var targetPos = source.Destination.transform.position;
-        //降りているのかを検知
+
         if (sourcePos.y > targetPos.y)
         {
             int chance = IRandom.Instance.Next(1, 101);
@@ -33,7 +33,7 @@ public class FallFromLadder
             if (Utils.GetDistance(TargetLadderData[player.PlayerId], player.transform.position) < 0.5f)
             {
                 if (player.Data.IsDead) return;
-                // To put in LateTask, put in a death decision first
+
                 player.Data.IsDead = true;
                 _ = new LateTask(() =>
                 {

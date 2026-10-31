@@ -3,22 +3,6 @@ using static CosmeticsLayer;
 
 namespace TONE.Patches;
 
-/*[HarmonyPatch(typeof(AprilFoolsMode), nameof(AprilFoolsMode.ShouldShowAprilFoolsToggle))]
-public static class ShouldShowTogglePatch
-{
-    public static void Postfix(ref bool __result)
-    {
-        __result = false;
-    }
-}
-[HarmonyPatch(typeof(AprilFoolsMode), nameof(AprilFoolsMode.ShouldClassicMode))]
-public static class ShouldClassicModePatch
-{
-    public static void Postfix(ref bool __result)
-    {
-        __result = Main.ClassicMode.Value || AprilFoolsMode.ShouldShowAprilFoolsToggle() && AprilFoolsMode.IsAprilFoolsModeToggledOn;
-    }
-}*/
 #region GameManager Patches
 [HarmonyPatch(typeof(NormalGameManager), nameof(NormalGameManager.GetBodyType))]
 public static class GetNormalBodyType_Patch
@@ -121,7 +105,7 @@ public static class LongBoiPatches
     [HarmonyPrefix]
     public static bool LongBoyAwake_Prefix(LongBoiPlayerBody __instance)
     {
-        //Fixes base-game layer issues
+
         if (!AprilFoolsMode.ShouldLongAround() && !Main.LongMode.Value) return false;
         __instance.cosmeticLayer.OnSetBodyAsGhost += (Action)__instance.SetPoolableGhost;
         __instance.cosmeticLayer.OnColorChange += (Action<int>)__instance.SetHeightFromColor;
@@ -134,7 +118,7 @@ public static class LongBoiPatches
     [HarmonyPrefix]
     public static bool LongBoyStart_Prefix(LongBoiPlayerBody __instance)
     {
-        //Fixes more runtime issues
+
         if (!AprilFoolsMode.ShouldLongAround() && !Main.LongMode.Value)
         {
             __instance.ShouldLongAround = false;
@@ -163,8 +147,7 @@ public static class LongBoiPatches
         }
         return false;
     }
-    // Fix System.IndexOutOfRangeException: Index was outside the bounds of the array
-    // When colorIndex is 255 them heightsPerColor[255] gets exception
+
     [HarmonyPatch(nameof(LongBoiPlayerBody.SetHeightFromColor))]
     [HarmonyPrefix]
     public static bool SetHeightFromColor_Prefix(int colorIndex)
@@ -175,10 +158,9 @@ public static class LongBoiPatches
     [HarmonyPrefix]
     public static bool LongBoyNeckSize_Prefix(LongBoiPlayerBody __instance, ref float distance)
     {
-        //Remove the limit of neck size to prevent issues in TONE HnS
 
         __instance.targetHeight = distance / 10f + 0.5f;
-        __instance.SetupNeckGrowth(true, true); //se quiser sim mano
+        __instance.SetupNeckGrowth(true, true);
         return false;
     }
 

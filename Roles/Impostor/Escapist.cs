@@ -8,12 +8,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Escapist : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Escapist;
     private const int Id = 4000;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
-    //==================================================================\\
 
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {

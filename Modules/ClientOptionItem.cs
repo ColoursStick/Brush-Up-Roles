@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace TONE;
 
-//来源：https://github.com/tukasa0001/TownOfHost/pull/1265
 public class ClientOptionItem
 {
     public ConfigEntry<bool> Config;
@@ -25,7 +24,6 @@ public class ClientOptionItem
 
             var mouseMoveToggle = optionsMenuBehaviour.DisableMouseMovement;
 
-            // 1つ目のボタンの生成時に背景も生成
             if (CustomBackground == null)
             {
                 CustomBackground = Object.Instantiate(optionsMenuBehaviour.Background, optionsMenuBehaviour.transform);
@@ -82,8 +80,6 @@ public class ClientOptionItem
                 OptionButtons = [];
             }
 
-
-            // ボタン生成
             ToggleButton = Object.Instantiate(mouseMoveToggle, CustomBackground.transform);
             OptionButtons.Add(ToggleButton);
 

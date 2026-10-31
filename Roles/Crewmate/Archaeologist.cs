@@ -14,14 +14,13 @@ namespace TONE.Roles.Crewmate;
 
 internal class Archaeologist : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Archaeologist;
     private const int Id = 32100;
     public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override bool IsExperimental => true;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
-    //==================================================================\\
 
     private static List<CustomRoles> addons = [];
     private static readonly HashSet<byte> SlateRoles = [];
@@ -44,7 +43,6 @@ internal class Archaeologist : RoleBase
     private static bool HasGrail = false;
     private static bool LifeConnection = false;
     private static float Votes = 0;
-
 
     public override void SetupCustomOption()
     {
@@ -132,16 +130,16 @@ internal class Archaeologist : RoleBase
         }
         switch (AntiqueID)
         {
-            case 1: // 灵魂回响镜 - 知道何时有玩家死亡
+            case 1:
                 player.RpcGuardAndKill();
                 player.RpcSetCustomRole(CustomRoles.Seer, false, false);
                 break;
-            case 2: // 复活圣杯 - 复活一名死亡的玩家
+            case 2:
                 player.RpcGuardAndKill();
                 player.Notify(GetString("GrailNeedReport"), 5f);
                 HasGrail = true;
                 break;
-            case 3: // 相位斗篷 - 使你短暂隐形
+            case 3:
                 player.RpcGuardAndKill();
                 player.RpcMakeInvisible();
                 player.Notify(GetString("SwooperInvisState"), InvisDuration.GetFloat() - 1);
@@ -153,7 +151,7 @@ internal class Archaeologist : RoleBase
                     player.Notify(GetString("SwooperInvisStateOut"), 5f);
                 }, InvisDuration.GetFloat());
                 break;
-            case 4: // 引力石板 - 将所有玩家拉向自己位置
+            case 4:
                 player.RpcGuardAndKill();
                 foreach (var target in Main.EnumerateAlivePlayerControls())
                 {
@@ -161,7 +159,7 @@ internal class Archaeologist : RoleBase
                     target.RPCPlayCustomSound("Teleport");
                 }
                 break;
-            case 5: // 寒冰宝珠 - 冻结附近玩家
+            case 5:
                 player.RpcGuardAndKill();
                 foreach (var target in Main.EnumerateAlivePlayerControls())
                 {
@@ -181,7 +179,7 @@ internal class Archaeologist : RoleBase
                     }, FreezeTime.GetFloat());
                 }
                 break;
-            case 6: // 战争号角 - 所有玩家移动速度提升
+            case 6:
                 player.RpcGuardAndKill();
                 foreach (var target in Main.EnumerateAlivePlayerControls())
                 {
@@ -197,7 +195,7 @@ internal class Archaeologist : RoleBase
                     }, BugleTime.GetFloat());
                 }
                 break;
-            case 7: // 智慧卷轴 - 帮一名玩家完成一个任务
+            case 7:
                 player.RpcGuardAndKill();
                 var randomPlayer = Main.EnumerateAlivePlayerControls().Where(pc => player.PlayerId != pc.PlayerId && pc.Is(Custom_Team.Crewmate) && Utils.HasTasks(pc.Data, false)).ToList().RandomElement();
 
@@ -216,22 +214,22 @@ internal class Archaeologist : RoleBase
                     randomPlayer.Notify(GetString("TaskManager_CompletedRandomTaskForPlayer"));
                 }
                 break;
-            case 8: // 能量水晶 - 恢复所有船员的技能使用次数
+            case 8:
                 player.RpcGuardAndKill();
                 foreach (var target in Main.EnumeratePlayerControls().Where(x => x.IsPlayerCrewmateTeam()))
                     target.RpcIncreaseAbilityUseLimitBy(1);
                 break;
-            case 9: // 激励圣物 - 会议投票时获得额外投票权
+            case 9:
                 player.RpcGuardAndKill();
                 player.Notify(GetString("VotesIncreased"));
                 Votes += CrystalExtraVotes.GetFloat();
                 break;
-            case 10: // 契约卷轴 - 与一名玩家建立生命链接
+            case 10:
                 player.RpcGuardAndKill();
                 player.Notify(GetString("LifeConnection"));
                 LifeConnection = true;
                 break;
-            case 11: // 牺牲匕首 - 牺牲自己，为内鬼增加负面效果，为船员增加正面效果
+            case 11:
                 player.RpcGuardAndKill();
                 player.RpcMurderPlayer(player);
                 player.SetDeathReason(PlayerState.DeathReason.Sacrifice);
@@ -247,7 +245,7 @@ internal class Archaeologist : RoleBase
                     target.RpcSetCustomRole(addon);
                 }
                 break;
-            case 12: // 太阳护符 - 使自己获得伤害免疫
+            case 12:
                 player.RpcGuardAndKill();
                 IsProtected = true;
                 player.RPCPlayCustomSound("Shield");
@@ -260,7 +258,7 @@ internal class Archaeologist : RoleBase
 
                 }, TalismanDuration.GetInt(), "Archaeologist Shield Is Out");
                 break;
-            case 13: // 真理石板 - 揭示一名玩家的真实身份
+            case 13:
                 player.RpcGuardAndKill();
                 var pcList = Main.EnumerateAlivePlayerControls().Where(pc => pc.PlayerId != player.PlayerId && !pc.GetCustomRole().IsRevealingRole(pc)).ToList();
 
@@ -272,24 +270,24 @@ internal class Archaeologist : RoleBase
                     SendRPC(player);
                 }
                 break;
-            case 14: // 时光沙漏 - 重置所有玩家的击杀/技能冷却时间
+            case 14:
                 player.RpcGuardAndKill();
                 foreach (var target in Main.EnumerateAlivePlayerControls()) target.SetKillCooldown();
                 break;
-            case 15: // 净化水晶 - 远程修复一次破坏
+            case 15:
                 player.RpcGuardAndKill();
                 FixNextSabo = true;
                 FixAllSabotage();
                 break;
-            case 16: // 无线按钮 - 召开一次会议
+            case 16:
                 if (!UsePets.GetBool()) player?.MyPhysics?.RpcBootFromVent(vent.Id);
                 player?.NoCheckStartMeeting(null);
                 break;
-            case 17: // 万能钥匙 - 打开所有的门
+            case 17:
                 player.Notify(GetString("ArOpenAllDoors"));
                 DoorsReset.OpenAllDoors();
                 break;
-            case 18: // 秩序之铃 - 重置破坏冷却时间
+            case 18:
                 player.Notify(GetString("ArResetSabotageCooldown"));
                 var sabotageSystemType = ShipStatus.Instance.Systems[SystemTypes.Sabotage].CastFast<SabotageSystemType>();
                 sabotageSystemType.Timer = SabotageSystemTypeRepairDamagePatch.isCooldownModificationEnabled
@@ -297,7 +295,7 @@ internal class Archaeologist : RoleBase
                     : 30f;
                 sabotageSystemType.IsDirty = true;
                 break;
-            default: // just in case
+            default:
                 break;
         }
 
@@ -348,61 +346,61 @@ internal class Archaeologist : RoleBase
         var str = new StringBuilder();
         switch (AntiqueID)
         {
-            case 1: // 灵魂回响镜
+            case 1:
                 str.Append(GetString("PotionStore") + GetString("Ara"));
                 break;
-            case 2: // 复活圣杯
+            case 2:
                 str.Append(GetString("PotionStore") + GetString("Arb"));
                 break;
-            case 3: // 相位斗篷
+            case 3:
                 str.Append(GetString("PotionStore") + GetString("Arc"));
                 break;
-            case 4: // 引力石板
+            case 4:
                 str.Append(GetString("PotionStore") + GetString("Ard"));
                 break;
-            case 5: // 寒冰宝珠
+            case 5:
                 str.Append(GetString("PotionStore") + GetString("Are"));
                 break;
-            case 6: // 战争号角
+            case 6:
                 str.Append(GetString("PotionStore") + GetString("Arf"));
                 break;
-            case 7: // 智慧卷轴
+            case 7:
                 str.Append(GetString("PotionStore") + GetString("Arg"));
                 break;
-            case 8: // 能量水晶
+            case 8:
                 str.Append(GetString("PotionStore") + GetString("Arh"));
                 break;
-            case 9: // 激励圣物
+            case 9:
                 str.Append(GetString("PotionStore") + GetString("Ari"));
                 break;
-            case 10: // 契约卷轴
+            case 10:
                 str.Append(GetString("PotionStore") + GetString("Arj"));
                 break;
-            case 11: // 牺牲匕首
+            case 11:
                 str.Append(GetString("PotionStore") + GetString("Ark"));
                 break;
-            case 12: // 太阳护符
+            case 12:
                 str.Append(GetString("PotionStore") + GetString("Arl"));
                 break;
-            case 13: // 真理石板
+            case 13:
                 str.Append(GetString("PotionStore") + GetString("Arm"));
                 break;
-            case 14: // 时光沙漏
+            case 14:
                 str.Append(GetString("PotionStore") + GetString("Arn"));
                 break;
-            case 15: // 净化水晶
+            case 15:
                 str.Append(GetString("PotionStore") + GetString("Aro"));
                 break;
-            case 16: // 无线按钮
+            case 16:
                 str.Append(GetString("PotionStore") + GetString("Arp"));
                 break;
-            case 17: // 万能钥匙
+            case 17:
                 str.Append(GetString("PotionStore") + GetString("Arq"));
                 break;
-            case 18: // 秩序之铃
+            case 18:
                 str.Append(GetString("PotionStore") + GetString("Arr"));
                 break;
-            default: // just in case
+            default:
                 break;
         }
         if (FixNextSabo) str.Append(GetString("PotionStore") + GetString("Aro"));
@@ -452,61 +450,61 @@ internal class Archaeologist : RoleBase
 
         switch (AntiqueID)
         {
-            case 1: // 灵魂回响镜 - 知道何时有玩家死亡
+            case 1:
                 player.Notify(GetString("GotMirror"), 15f);
                 break;
-            case 2: // 复活圣杯 - 复活一名死亡的玩家
+            case 2:
                 player.Notify(GetString("GotGrail"), 15f);
                 break;
-            case 3: // 相位斗篷 - 使你短暂隐形
+            case 3:
                 player.Notify(GetString("GotCloak"), 15f);
                 break;
-            case 4: // 引力石板 - 将所有玩家拉向自己位置
+            case 4:
                 player.Notify(GetString("GotFlagstone"), 15f);
                 break;
-            case 5: // 寒冰宝珠 - 冻结附近玩家
+            case 5:
                 player.Notify(GetString("GotOrbs"), 15f);
                 break;
-            case 6: // 战争号角 - 所有玩家移动速度提升
+            case 6:
                 player.Notify(GetString("GotBugle"), 15f);
                 break;
-            case 7: // 智慧卷轴 - 帮一名船员完成一个任务
+            case 7:
                 player.Notify(GetString("GotReel"), 15f);
                 break;
-            case 8: // 能量水晶 - 恢复所有船员的技能使用次数
+            case 8:
                 player.Notify(GetString("GotCrystal"), 15f);
                 break;
-            case 9: // 激励圣物 - 会议投票时获得额外投票权
+            case 9:
                 player.Notify(GetString("GotRelic"), 15f);
                 break;
-            case 10: // 契约卷轴 - 与一名玩家建立生命链接
+            case 10:
                 player.Notify(GetString("GotIndenture"), 15f);
                 break;
-            case 11: // 牺牲匕首 - 牺牲自己，为内鬼增加负面效果，为船员增加正面效果
+            case 11:
                 player.Notify(GetString("GotDagger"), 15f);
                 break;
-            case 12: // 太阳护符 - 使自己获得伤害免疫
+            case 12:
                 player.Notify(GetString("GotTalisman"), 15f);
                 break;
-            case 13: // 真理石板 - 揭示一名玩家的真实身份
+            case 13:
                 player.Notify(GetString("GotTruth"), 15f);
                 break;
-            case 14: // 时光沙漏 - 重置所有玩家的技能冷却时间
+            case 14:
                 player.Notify(GetString("GotHourglass"), 15f);
                 break;
-            case 15: // 净化水晶 - 远程修复一次破坏
+            case 15:
                 player.Notify(GetString("GotProphecy"), 15f);
                 break;
-            case 16: // 无线按钮 - 召开一次会议
+            case 16:
                 player.Notify(GetString("GetButton"), 15f);
                 break;
-            case 17: // 万能钥匙 - 打开所有的门
+            case 17:
                 player.Notify(GetString("GetKey"), 15f);
                 break;
-            case 18: // 秩序之铃 - 重置破坏冷却时间
+            case 18:
                 player.Notify(GetString("GetBell"), 15f);
                 break;
-            default: // just in case
+            default:
                 break;
         }
 
@@ -536,7 +534,7 @@ internal class Archaeologist : RoleBase
                 var mapId = Utils.GetActiveMapId();
 
                 shipStatusDisabled.RpcUpdateSystem(CurrentActiveSabotage, 16);
-                if (mapId is 1 or 5) // Mira HQ or The Fungle
+                if (mapId is 1 or 5)
                     shipStatusDisabled.RpcUpdateSystem(CurrentActiveSabotage, 17);
                 break;
             case SystemTypes.Electrical:

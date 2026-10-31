@@ -13,13 +13,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Alchemist : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Alchemist;
     private const int Id = 6400;
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
-    //==================================================================\\
 
     private static List<byte> PlayerIdList => Main.PlayerStates.Values.Where(x => x.MainRole == CustomRoles.Alchemist).Select(x => x.PlayerId).ToList();
     private static OptionItem VentCooldown;
@@ -105,33 +104,33 @@ internal class Alchemist : RoleBase
 
         switch (PotionID)
         {
-            case 1: // Shield
+            case 1:
                 player.Notify(GetString("AlchemistGotShieldPotion"), 15f);
                 break;
-            case 2: // Suicide
+            case 2:
                 player.Notify(GetString("AlchemistGotSuicidePotion"), 15f);
                 break;
-            case 3: // TP to random player
+            case 3:
                 player.Notify(GetString("AlchemistGotTPPotion"), 15f);
                 break;
-            case 4: // Speed
+            case 4:
                 player.Notify(GetString("AlchemistGotSpeedPotion"), 15f);
                 break;
-            case 5: // Quick fix next sabo
+            case 5:
                 FixNextSabo = true;
                 PotionID = 10;
                 player.Notify(GetString("AlchemistGotQFPotion"), 15f);
                 break;
-            case 6: // Bloodthirst
+            case 6:
                 player.Notify(GetString("AlchemistGotBloodthirstPotion"), 15f);
                 break;
-            case 7: // Increased vision
+            case 7:
                 player.Notify(GetString("AlchemistGotSightPotion"), 15f);
                 break;
             case 8:
                 player.Notify(GetString("AlchemistGotInvisibility"), 15f);
                 break;
-            default: // just in case
+            default:
                 break;
         }
 
@@ -275,7 +274,7 @@ internal class Alchemist : RoleBase
 
         switch (PotionID)
         {
-            case 1: // Shield
+            case 1:
                 IsProtected = true;
                 player.RPCPlayCustomSound("Shield");
                 player.Notify(GetString("AlchemistShielded"), ShieldDuration.GetInt());
@@ -287,7 +286,7 @@ internal class Alchemist : RoleBase
 
                 }, ShieldDuration.GetInt(), "Alchemist Shield Is Out");
                 break;
-            case 2: // Suicide
+            case 2:
                 player.MyPhysics.RpcBootFromVent(vent.Id);
                 _ = new LateTask(() =>
                 {
@@ -297,7 +296,7 @@ internal class Alchemist : RoleBase
 
                 }, 1f, "Alchemist Is Poisoned");
                 break;
-            case 3: // TP to random player
+            case 3:
                 _ = new LateTask(() =>
                 {
                     List<PlayerControl> AllAlivePlayer = [.. Main.EnumerateAlivePlayerControls().Where(x => x.CanBeTeleported() && x.PlayerId != player.PlayerId).ToArray()];
@@ -306,7 +305,7 @@ internal class Alchemist : RoleBase
                     player.RPCPlayCustomSound("Teleport");
                 }, 2f, "Alchemist teleported to random player");
                 break;
-            case 4: // Increased speed.;
+            case 4:
                 int SpeedDuration = 10;
                 player.Notify(GetString("AlchemistHasSpeed"));
                 var tempSpeed = Main.AllPlayerSpeed[player.PlayerId];
@@ -319,17 +318,17 @@ internal class Alchemist : RoleBase
                     player.MarkDirtySettings();
                 }, SpeedDuration, "Alchemist: Set Speed to default");
                 break;
-            case 5: // Quick fix next sabo
-                // Done when making the potion
+            case 5:
+
                 break;
-            case 6: // Bloodthirst
+            case 6:
                 player.Notify(GetString("AlchemistPotionBloodthirst"));
                 if (!IsBloodthirst(player.PlayerId))
                 {
                     BloodthirstList.TryAdd(player.PlayerId, player.PlayerId);
                 }
                 break;
-            case 7: // Increased vision
+            case 7:
                 VisionPotionActive = true;
                 player.MarkDirtySettings();
                 player.Notify(GetString("AlchemistHasVision"), VisionDuration.GetFloat());
@@ -342,11 +341,10 @@ internal class Alchemist : RoleBase
                 }, VisionDuration.GetFloat(), "Alchemist Vision Is Out");
                 break;
             case 8:
-                // Invisibility
-                // Handled in CoEnterVent
+
                 break;
             case 10:
-            default: // just in case
+            default:
                 player.Notify("NoPotion");
                 break;
         }
@@ -392,34 +390,34 @@ internal class Alchemist : RoleBase
         {
             switch (PotionID)
             {
-                case 1: // Shield
+                case 1:
                     str.Append(GetString("PotionStore") + GetString("StoreShield"));
                     break;
-                case 2: // Suicide
+                case 2:
                     str.Append(GetString("PotionStore") + GetString("StoreSuicide"));
                     break;
-                case 3: // TP to random player
+                case 3:
                     str.Append(GetString("PotionStore") + GetString("StoreTP"));
                     break;
-                case 4: // Increased Speed
+                case 4:
                     str.Append(GetString("PotionStore") + GetString("StoreSP"));
                     break;
-                case 5: // Quick fix next sabo
+                case 5:
                     str.Append(GetString("PotionStore") + GetString("StoreQF"));
                     break;
-                case 6: // Bloodthirst
+                case 6:
                     str.Append(GetString("PotionStore") + GetString("StoreBL"));
                     break;
-                case 7: // Increased vision
+                case 7:
                     str.Append(GetString("PotionStore") + GetString("StoreNS"));
                     break;
-                case 8: // Invisibility
+                case 8:
                     str.Append(GetString("PotionStore") + GetString("StoreINV"));
                     break;
                 case 10:
                     str.Append(GetString("PotionStore") + GetString("StoreNull"));
                     break;
-                default: // just in case
+                default:
                     break;
             }
             if (FixNextSabo) str.Append(GetString("WaitQFPotion"));
@@ -439,28 +437,28 @@ internal class Alchemist : RoleBase
 
         switch (PotionID)
         {
-            case 1: // Shield
+            case 1:
                 str.Append("<color=#00ff97>✚</color>");
                 break;
-            case 2: // Suicide
+            case 2:
                 str.Append("<color=#478800>⁂</color>");
                 break;
-            case 3: // TP to random player
+            case 3:
                 str.Append("<color=#42d1ff>§</color>");
                 break;
-            case 4: // Increased Speed
+            case 4:
                 str.Append("<color=#77e0cb>»</color>");
                 break;
-            case 5: // Quick fix next sabo
+            case 5:
                 str.Append("<color=#3333ff>★</color>");
                 break;
-            case 6: // Bloodthirst
+            case 6:
                 str.Append("<color=#691a2e>乂</color>");
                 break;
-            case 7: // Increased vision
+            case 7:
                 str.Append("<color=#663399>◉</color>");
                 break;
-            case 8: //Invisibility
+            case 8:
                 str.Append("<color=#b3b3b3>◌</color>");
                 break;
             default:

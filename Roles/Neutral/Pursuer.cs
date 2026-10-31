@@ -8,14 +8,13 @@ namespace TONE.Roles.Neutral;
 
 internal class Pursuer : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Pursuer;
     private const int Id = 13400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Pursuer);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
-    //==================================================================\\
 
     private static OptionItem PursuerSkillCooldown;
     private static OptionItem PursuerSkillLimitTimes;
@@ -80,7 +79,7 @@ internal class Pursuer : RoleBase
         Logger.Info($"Counterfeiters {pc.GetRealName()} sell counterfeits to {target.GetRealName()}", "Pursuer");
         return false;
     }
-    public override bool CheckMurderOnOthersTarget(PlayerControl pc, PlayerControl _)  // Target of Pursuer attempt to murder someone
+    public override bool CheckMurderOnOthersTarget(PlayerControl pc, PlayerControl _)
     {
         if (!IsClient(pc.PlayerId) || notActiveList.Contains(pc.PlayerId)) return false;
 

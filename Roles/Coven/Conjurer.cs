@@ -17,13 +17,13 @@ internal class Conjurer : CovenManager
         NecroMark,
         NecroBomb
     }
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Conjurer;
     private const int Id = 30300;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenKilling;
-    //==================================================================\\
+
     private static OptionItem ConjureCooldown;
     private static OptionItem ConjureRadius;
     private static OptionItem NecroRadius;
@@ -41,7 +41,6 @@ internal class Conjurer : CovenManager
     public static byte NecroBombHolder = byte.MaxValue;
     private static readonly Dictionary<byte, List<Vector3>> ConjPosition = [];
     private static readonly Dictionary<byte, ConjState> state = [];
-
 
     public override void SetupCustomOption()
     {

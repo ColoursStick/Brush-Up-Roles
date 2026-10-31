@@ -11,13 +11,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Swapper : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Swapper;
     private const int Id = 12400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Swapper);
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
-    //==================================================================\\
 
     private static OptionItem SwapMax;
     private static OptionItem CanSwapSelf;
@@ -111,7 +110,6 @@ internal class Swapper : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("SpecialMeeting2"));
                     return true;
                 }
-                //Swapper skill limit is changed in after meeting task
 
                 var dp = target;
                 if (pc.PlayerId == dp.PlayerId && !CanSwapSelf.GetBool())
@@ -212,7 +210,6 @@ internal class Swapper : RoleBase
         var pid = _state.PlayerId;
         if (ResultSent.Contains(pid)) return;
 
-        //idk why this would be triggered repeatedly.
         var pc = pid.GetPlayer();
         if (pc == null || !pc.IsAlive()) return;
 
@@ -269,7 +266,7 @@ internal class Swapper : RoleBase
         string result = string.Empty;
         for (int i = 0; i < mc.Count; i++)
         {
-            result += mc[i];//匹配结果是完整的数字，此处可以不做拼接的
+            result += mc[i];
         }
 
         if (int.TryParse(result, out int num) && num <= byte.MaxValue)
@@ -278,15 +275,12 @@ internal class Swapper : RoleBase
         }
         else
         {
-            //并不是玩家编号，判断是否颜色
-            //byte color = GetColorFromMsg(msg);
-            //好吧我不知道怎么取某位玩家的颜色，等会了的时候再来把这里补上
+
             id = byte.MinValue;
             error = GetString("SwapHelp");
             return false;
         }
 
-        //判断选择的玩家是否合理
         PlayerControl target = id.GetPlayer();
         if (target == null || !target.IsAlive())
         {

@@ -4,7 +4,7 @@ namespace TONE.Roles.Crewmate;
 
 internal class Observer : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Observer;
     private const int Id = 9000;
     private static readonly HashSet<byte> playerIdList = [];
@@ -12,7 +12,6 @@ internal class Observer : RoleBase
 
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
-    //==================================================================\\
 
     public override void SetupCustomOption()
     {

@@ -2,12 +2,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Scavenger : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Scavenger;
     private const int Id = 4400;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
-    //==================================================================\\
 
     private static OptionItem ScavengerKillCooldown;
     private static OptionItem ScavengerHasCustomDeathReason;

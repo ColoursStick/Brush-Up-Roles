@@ -11,7 +11,7 @@ namespace TONE.Roles.Impostor;
 
 internal class Sniper : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Sniper;
     private const int Id = 2400;
     private static readonly HashSet<byte> PlayerIdList = [];
@@ -19,7 +19,6 @@ internal class Sniper : RoleBase
 
     public override CustomRoles ThisRoleBase => UsePhantomBasis.GetBool() ? CustomRoles.Phantom : CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem SniperBulletCount;
     private static OptionItem SniperPrecisionShooting;
@@ -30,7 +29,6 @@ internal class Sniper : RoleBase
     private static OptionItem SniperCooldown;
     private static OptionItem SniperRadius;
     private static OptionItem ArrowDuration;
-    //private static OptionItem AlwaysShowShapeshiftAnimations;
 
     private static readonly Dictionary<byte, byte> snipeTarget = [];
     private static readonly Dictionary<byte, Vector3> snipeBasePosition = [];
@@ -63,7 +61,7 @@ internal class Sniper : RoleBase
             .SetValueFormat(OptionFormat.Multiplier);
         ArrowDuration = FloatOptionItem.Create(Id + 18, "ArrowDuration", (0f, 180f, 2.5f), 10f, TabGroup.ImpostorRoles, false).SetParent(UsePhantomBasis)
             .SetValueFormat(OptionFormat.Seconds);
-        //AlwaysShowShapeshiftAnimations = BooleanOptionItem.Create(Id + 15, GeneralOption.ShowShapeshiftAnimations, true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sniper]);
+
     }
     public override void Init()
     {
@@ -126,9 +124,9 @@ internal class Sniper : RoleBase
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.ShapeshifterCooldown = /*!AlwaysShowShapeshiftAnimations.GetBool() ? 1f :*/ Options.DefaultShapeshiftCooldown.GetFloat();
+        AURoleOptions.ShapeshifterCooldown =  Options.DefaultShapeshiftCooldown.GetFloat();
         AURoleOptions.PhantomCooldown = SniperCooldown.GetFloat();
-        //AURoleOptions.ShapeshifterDuration = 1f;
+
     }
     public override bool CanUseKillButton(PlayerControl pc)
     {
@@ -268,7 +266,6 @@ internal class Sniper : RoleBase
 
         if (sniperId.GetAbilityUseLimit() <= 0) return;
 
-        // first shapeshift
         if (shapeshifting)
         {
             meetingReset = false;

@@ -22,11 +22,11 @@ public static class TagManager
 
             if (!Directory.Exists(dataDirectory)) Directory.CreateDirectory(dataDirectory);
             var defaultTagMsg = GetResourcesTxt($"TONE.Resources.Config.TagTemplate.txt");
-            if (!File.Exists(templateFilePath)) // Default tag
+            if (!File.Exists(templateFilePath))
             {
                 using FileStream fs = File.Create(templateFilePath);
             }
-            File.WriteAllText(templateFilePath, defaultTagMsg); // Overwriting default template
+            File.WriteAllText(templateFilePath, defaultTagMsg);
         }
         catch (Exception ex)
         {
@@ -42,7 +42,6 @@ public static class TagManager
         return reader.ReadToEnd();
     }
 
-    // Check for the friend's tag file in any folder (not just in the root directory)
     public static bool CheckFriendCode(string friendCode, bool log = false)
     {
         var folderPaths = Directory.GetDirectories(TAGS_FILE_PATH)
@@ -126,14 +125,13 @@ public static class TagManager
         if (color.IsNullOrWhiteSpace() && !tagName.IsNullOrWhiteSpace()) return tagName;
         if (tagName.IsNullOrWhiteSpace()) return "";
 
-        //static color
         if (!Options.GradientTagsOpt.GetBool())
         {
             string startColorCode = "ffff00";
             if (Utils.CheckColorHex(color)) startColorCode = color;
             tag = $"<color=#{startColorCode}>{tagName}</color>";
         }
-        // gradient color
+
         else
         {
             string startColorCode = "ffff00";

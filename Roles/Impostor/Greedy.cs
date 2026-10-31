@@ -3,15 +3,13 @@ using TONE.Modules.Rpc;
 
 namespace TONE.Roles.Impostor;
 
-// Thanks： https://github.com/Yumenopai/TownOfHost_Y
 internal class Greedy : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Greedy;
     private const int Id = 1500;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem OddKillCooldown;
     private static OptionItem EvenKillCooldown;

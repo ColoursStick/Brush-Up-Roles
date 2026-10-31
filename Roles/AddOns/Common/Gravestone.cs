@@ -20,4 +20,3 @@ public class Gravestone : IAddon
     { }
     public static bool EveryoneKnowRole(PlayerControl player) => player.Is(CustomRoles.Gravestone) && !player.IsAlive();
 }
-

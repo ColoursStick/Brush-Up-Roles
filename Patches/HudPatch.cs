@@ -27,7 +27,7 @@ class HudManagerUpdatePatch
 
         var player = PlayerControl.LocalPlayer;
         if (player == null) return;
-        //Õúüµè£Òüæ
+
         if (Input.GetKeyDown(KeyCode.LeftControl))
         {
             if ((!AmongUsClient.Instance.IsGameStarted || !GameStates.IsOnlineGame)
@@ -36,7 +36,7 @@ class HudManagerUpdatePatch
                 player.Collider.offset = new Vector2(0f, 127f);
             }
         }
-        //Õúüµè£Òüæ×ğúÚÖñ
+
         if (player.Collider.offset.y == 127f)
         {
             if (!Input.GetKey(KeyCode.LeftControl) || (AmongUsClient.Instance.IsGameStarted && GameStates.IsOnlineGame))
@@ -58,9 +58,9 @@ class HudManagerUpdatePatch
                     TempLowerInfoText = new GameObject("CountdownText");
                     TempLowerInfoText.transform.position = new Vector3(0f, -2f, 1f);
                     LowerInfoText = TempLowerInfoText.AddComponent<TextMeshPro>();
-                    //LowerInfoText.text = string.Format(GetString("CountdownText"));
+
                     LowerInfoText.alignment = TextAlignmentOptions.Center;
-                    //LowerInfoText = Object.Instantiate(__instance.KillButton.buttonLabelText);
+
                     LowerInfoText.transform.parent = __instance.transform;
                     LowerInfoText.transform.localPosition = new Vector3(0, -2f, 0);
                     LowerInfoText.overflowMode = TextOverflowModes.Overflow;
@@ -74,14 +74,13 @@ class HudManagerUpdatePatch
             }
             if (player.IsAlive())
             {
-                // Set default
+
                 __instance.KillButton?.OverrideText(player.GetCustomRole().GetRoleTypes() is RoleTypes.Viper ? GetString("ViperKillButtonText") : GetString("KillButtonText"));
                 __instance.ReportButton?.OverrideText(GetString("ReportButtonText"));
                 __instance.SabotageButton?.OverrideText(GetString("SabotageButtonText"));
 
                 player.GetRoleClass()?.SetAbilityButtonText(__instance, player.PlayerId);
 
-                // Set lower info text for modded players
                 if (LowerInfoText == null)
                 {
                     LowerInfoText = Object.Instantiate(__instance.KillButton.cooldownTimerText, __instance.transform, true);
@@ -125,7 +124,6 @@ class HudManagerUpdatePatch
                 __instance.ImpostorVentButton.ToggleVisible(player.CanUseImpostorVentButton());
                 player.Data.Role.CanVent = player.CanUseVents();
 
-                // Sometimes sabotage button was visible for modded clients
                 if (!player.CanUseSabotage())
                     __instance.SabotageButton.Hide();
             }
@@ -135,10 +133,9 @@ class HudManagerUpdatePatch
                 __instance.ImpostorVentButton.Hide();
                 __instance.KillButton.Hide();
                 __instance.AbilityButton.Show();
-                //__instance.AbilityButton.OverrideText(GetString(StringNames.HauntAbilityName));
+
             }
         }
-
 
         if (Input.GetKeyDown(KeyCode.Y) && AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay)
         {
@@ -179,7 +176,7 @@ class HudManagerUpdatePatch
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.ToggleHighlight))]
 class ToggleHighlightPatch
 {
-    public static void Postfix(PlayerControl __instance /*, [HarmonyArgument(0)] bool active, [HarmonyArgument(1)] RoleTeamTypes team*/)
+    public static void Postfix(PlayerControl __instance )
     {
         if (GameStates.IsHideNSeek) return;
 
@@ -212,7 +209,7 @@ class SetHudActivePatch
     public static bool IsActive = false;
     public static void Postfix(HudManager __instance, [HarmonyArgument(0)] PlayerControl player, [HarmonyArgument(2)] bool isActive)
     {
-        // Fix vanilla bug when report button displayed in the lobby
+
         __instance.ReportButton.ToggleVisible(!GameStates.IsLobby && isActive);
 
         if (!GameStates.IsModHost || GameStates.IsHideNSeek) return;
@@ -237,7 +234,6 @@ class SetHudActivePatch
         if (player.Is(CustomRoles.Mare) && !Utils.IsActive(SystemTypes.Electrical))
             __instance.KillButton.ToggleVisible(false);
 
-        // Check Toggle visible
         __instance.KillButton.ToggleVisible(player.CanUseKillButton());
         __instance.ImpostorVentButton.ToggleVisible(player.CanUseImpostorVentButton());
         __instance.SabotageButton.ToggleVisible(player.CanUseSabotage());
@@ -287,7 +283,7 @@ class TaskPanelBehaviourPatch
 
         if (GameStates.IsHideNSeek)
         {
-            //__instance.open = false;
+
             return;
         }
 
@@ -298,7 +294,6 @@ class TaskPanelBehaviourPatch
 
         if (!player) return;
 
-        // Display Description
         if (!player.GetCustomRole().IsVanilla())
         {
             var RoleWithInfo = $"{player.GetDisplayRoleAndSubName(player, false, false)}:\r\n";
@@ -339,7 +334,6 @@ class TaskPanelBehaviourPatch
             __instance.taskText.text = AllText;
         }
 
-        // RepairSender display
         if (RepairSender.enabled && AmongUsClient.Instance.NetworkMode != NetworkModes.OnlineGame)
             __instance.taskText.text = RepairSender.GetText();
     }
@@ -357,13 +351,13 @@ class RepairSender
     {
         if (!TypingAmount)
         {
-            //SystemType is being entered
+
             SystemType *= 10;
             SystemType += num;
         }
         else
         {
-            //Amount being entered
+
             amount *= 10;
             amount += num;
         }
@@ -372,12 +366,12 @@ class RepairSender
     {
         if (!TypingAmount)
         {
-            //SystemType is being entered
+
             TypingAmount = true;
         }
         else
         {
-            //Amount being entered
+
             Send();
         }
     }
@@ -397,7 +391,7 @@ class RepairSender
         return SystemType.ToString() + "(" + ((SystemTypes)SystemType).ToString() + ")\r\n" + amount;
     }
 }
-// Credit: EHR
+
 [HarmonyPatch(typeof(ActionButton), nameof(ActionButton.SetFillUp))]
 internal static class ActionButtonSetFillUpPatch
 {

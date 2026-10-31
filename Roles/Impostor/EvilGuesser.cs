@@ -5,12 +5,11 @@ namespace TONE.Roles.Impostor;
 
 internal class EvilGuesser : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.EvilGuesser;
     private const int Id = 1300;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem EGCanGuessTime;
     private static OptionItem EGCanGuessImp;
@@ -65,21 +64,18 @@ internal class EvilGuesser : RoleBase
             return true;
         }
 
-        // Check limit
         if (GuessManager.GuesserGuessed[guesser.PlayerId] >= EGCanGuessTime.GetInt())
         {
             guesser.ShowInfoMessage(isUI, GetString("GuessMax"));
             return true;
         }
 
-        // Evil Guesser Can't Guess Addons
         if (role.IsAdditionRole() && !EGCanGuessAdt.GetBool())
         {
             guesser.ShowInfoMessage(isUI, GetString("GuessAdtRole"));
             return true;
         }
 
-        // Evil Guesser Can't Guess Impostors
         if ((role.IsImpostor() || role.IsMadmate()) && !EGCanGuessImp.GetBool())
         {
             guesser.ShowInfoMessage(isUI, GetString("GuessImpRole"));

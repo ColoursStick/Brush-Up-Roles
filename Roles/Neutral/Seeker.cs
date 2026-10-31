@@ -11,14 +11,13 @@ namespace TONE.Roles.Neutral;
 
 internal class Seeker : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Seeker;
     private const int Id = 14600;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Seeker);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralEvil;
-    //==================================================================\\
 
     private static OptionItem PointsToWin;
     private static OptionItem TagCooldownOpt;
@@ -54,7 +53,7 @@ internal class Seeker : RoleBase
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Tag");
     private void SendRPC(byte targetId = 0xff)
     {
-        var writer = MessageWriter.Get(SendOption.Reliable); // SetSeekerTarget
+        var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(targetId);
         RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
     }
@@ -67,7 +66,7 @@ internal class Seeker : RoleBase
     public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
         if (Target == target.PlayerId)
-        {//if the target is correct
+        {
             killer.RpcIncreaseAbilityUseLimitBy(1);
             ResetTarget();
         }
@@ -98,7 +97,7 @@ internal class Seeker : RoleBase
 
             if (Target == 254)
             {
-                // No target for Seeker to find, normally this wont happen, Seeker already loses the game.
+
                 player.SetDeathReason(PlayerState.DeathReason.Suicide);
                 player.RpcExileV3();
                 player.SetRealKiller(player);
@@ -159,7 +158,6 @@ internal class Seeker : RoleBase
 
         _Player.Notify(string.Format(GetString("SeekerNotify"), target.GetRealName()));
         target.Notify(GetString("SeekerTargetNotify"));
-
 
         SendRPC(targetId);
         NotifyRoles(SpecifySeer: _Player, ForceLoop: true);

@@ -12,13 +12,12 @@ namespace TONE.Roles.Coven;
 
 internal class Dreamweaver : CovenManager
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Dreamweaver;
     private const int Id = 31100;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenTrickery;
-    //==================================================================\\
 
     private static OptionItem AbilityCooldown;
     private static OptionItem NeutralsCanBeDreamwoven;
@@ -30,7 +29,6 @@ internal class Dreamweaver : CovenManager
     }
     private static readonly Dictionary<byte, HashSet<byte>> DreamwovenList = [];
     private static readonly Dictionary<byte, HashSet<byte>> InsomniaList = [];
-
 
     public override void SetupCustomOption()
     {
@@ -81,7 +79,6 @@ internal class Dreamweaver : CovenManager
     public override void SetAbilityButtonText(HudManager hud, byte playerId) =>
         hud.KillButton.OverrideText(GetString("Dreamweaver.KillButtonText"));
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Dreamweave");
-    // please someone make the sprite look better im begging you - Marg
 
     public override string GetMark(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false)
     {

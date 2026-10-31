@@ -5,14 +5,13 @@ namespace TONE.Roles.Crewmate;
 
 internal class Bodyguard : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Bodyguard;
     private const int Id = 10300;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Bodyguard);
 
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
-    //==================================================================\\
 
     private static OptionItem ProtectRadiusOpt;
 
@@ -29,7 +28,7 @@ internal class Bodyguard : RoleBase
         if (!bodyguard.IsAlive() || killer.PlayerId == target.PlayerId || bodyguard.PlayerId == target.PlayerId) return false;
 
         var killerRole = killer.GetCustomRole();
-        // Not should kill
+
         if (killerRole is CustomRoles.Taskinator
             or CustomRoles.Crusader
             or CustomRoles.Veteran

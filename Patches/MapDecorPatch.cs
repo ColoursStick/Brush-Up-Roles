@@ -1,6 +1,5 @@
 namespace TONE;
 
-// 17.4 here
 [HarmonyPatch(typeof(MapDecor), nameof(MapDecor.Awake))]
 class MapDecorPatch
 {

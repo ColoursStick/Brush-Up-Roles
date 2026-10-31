@@ -9,12 +9,11 @@ namespace TONE.Roles.Crewmate;
 
 internal class Telecommunication : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Telecommunication;
     private const int Id = 12500;
     public override CustomRoles ThisRoleBase => CanVent.GetBool() ? CustomRoles.Engineer : CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
-    //==================================================================\\
 
     private static OptionItem CanCheckCamera;
     private static OptionItem CanVent;

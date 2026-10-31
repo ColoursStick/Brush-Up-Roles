@@ -6,12 +6,11 @@ namespace TONE.Roles.Neutral;
 
 internal class Tunny : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Tunny;
     private const int Id = 32800;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => CanSnatchesWin() ? Custom_RoleType.NeutralEvil : Custom_RoleType.NeutralBenign;
-    //==================================================================\\
 
     private static OptionItem CanWaitTime;
     private static OptionItem CanWaitTimeAfterMeeting;

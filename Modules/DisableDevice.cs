@@ -4,7 +4,6 @@ using static TONE.Utils;
 
 namespace TONE;
 
-//ÕÅé×ÇâÕàâ : https://github.com/ykundesu/SuperNewRoles/blob/master/SuperNewRoles/Mode/SuperHostRoles/BlockTool.cs
 class DisableDevice
 {
     public static bool DoDisable => Options.DisableDevices.GetBool();
@@ -130,7 +129,7 @@ class DisableDevice
                     DesyncComms.Remove(pc.PlayerId);
                     pc.RpcDesyncUpdateSystem(SystemTypes.Comms, 16);
 
-                    if (mapId is 1 or 5) // Mira HQ or The Fungle
+                    if (mapId is 1 or 5)
                         pc.RpcDesyncUpdateSystem(SystemTypes.Comms, 17);
                 }
             }

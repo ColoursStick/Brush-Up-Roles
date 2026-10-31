@@ -10,14 +10,13 @@ namespace TONE.Roles.Crewmate;
 
 internal class Knight : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Knight;
     private const int Id = 10800;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Knight);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
-    //==================================================================\\
 
     public static OptionItem KillCooldown;
     public static OptionItem CanKnowTargetRole;
@@ -75,12 +74,11 @@ internal class Knight : RoleBase
 
 internal class Requiter : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Requiter;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
-    //==================================================================\\
 
     public override void Add(byte playerId)
     {
@@ -108,14 +106,12 @@ internal class Requiter : RoleBase
 
     public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
-        // options disabled,requiter doesn't ignore protections
+
         if (!Knight.RequiterIgnoresShields.GetBool()) return true;
 
-        // requiter should never ignore Solsticer and Mini protections
         if (target.Is(CustomRoles.Solsticer)) return true;
         if (target.Is(CustomRoles.Mini) && Mini.Age < 18) return true;
 
-        // TNAs
         if (target.GetCustomRole().IsTNA()) return true;
 
         killer.RpcMurderPlayer(target);

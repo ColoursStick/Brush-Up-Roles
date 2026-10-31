@@ -9,13 +9,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Imitator : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Imitator;
     private const int Id = 13000;
     public override bool IsExperimental => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
-    //==================================================================\\
 
     private static readonly Dictionary<byte, CustomRoles> ImitateRole = [];
 
@@ -69,7 +68,7 @@ internal class Imitator : RoleBase
         if (!GameStates.IsMeeting || !pc || GameStates.IsExilling) return false;
         if (!pc.Is(CustomRoles.Imitator)) return false;
 
-        int operate = 0; // 1:ID 2:猜测
+        int operate = 0;
         msg = msg.ToLower().TrimStart().TrimEnd();
         if (GuessManager.CheckCommond(ref msg, "id|guesslist|gl编号|玩家编号|玩家id|id列表|玩家列表|列表|所有id|全部id||編號|玩家編號")) operate = 1;
         else if (GuessManager.CheckCommond(ref msg, "imi|imitate|效仿", false)) operate = 2;
@@ -138,7 +137,7 @@ internal class Imitator : RoleBase
         string result = string.Empty;
         for (int i = 0; i < mc.Count; i++)
         {
-            result += mc[i];//匹配结果是完整的数字，此处可以不做拼接的
+            result += mc[i];
         }
 
         if (int.TryParse(result, out int num) && num <= byte.MaxValue)
@@ -147,15 +146,12 @@ internal class Imitator : RoleBase
         }
         else
         {
-            //并不是玩家编号，判断是否颜色
-            //byte color = GetColorFromMsg(msg);
-            //好吧我不知道怎么取某位玩家的颜色，等会了的时候再来把这里补上
+
             id = byte.MinValue;
             error = GetString("ImitatorHelp");
             return false;
         }
 
-        //判断选择的玩家是否合理
         PlayerControl target = id.GetPlayer();
         if (!target || target.IsAlive())
         {

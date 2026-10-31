@@ -10,7 +10,7 @@ namespace TONE.Roles.Crewmate;
 
 internal class Snitch : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Snitch;
     private const int Id = 9500;
     private static readonly HashSet<byte> playerIdList = [];
@@ -18,7 +18,6 @@ internal class Snitch : RoleBase
 
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
-    //==================================================================\\
 
     private static readonly Color RoleColor = Utils.GetRoleColor(CustomRoles.Snitch);
 

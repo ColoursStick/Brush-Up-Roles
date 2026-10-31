@@ -11,15 +11,6 @@ public class SimpleButton
     private float _fontSize;
     private Vector2 _scale;
 
-    /// <summary>Creates a new button</summary>
-    /// <param name="parent">Parent object</param>
-    /// <param name="name">Object name</param>
-    /// <param name="normalColor">Background color in normal state</param>
-    /// <param name="hoverColor">Background color when mouse hovers</param>
-    /// <param name="action">Action triggered on click</param>
-    /// <param name="label">Button label</param>
-    /// <param name="localPosition">Button position</param>
-    /// <param name="isActive">Whether to be active initially (default true)</param>
     public SimpleButton(
         Transform parent,
         string name,
@@ -38,7 +29,6 @@ public class SimpleButton
         HoverSprite = Button.activeSprites.GetComponent<SpriteRenderer>();
         buttonCollider = Button.GetComponent<BoxCollider2D>();
 
-        // Center the label
         Transform container = Label.transform.parent;
         Object.Destroy(Label.GetComponent<AspectPosition>());
         container.SetLocalX(0f);

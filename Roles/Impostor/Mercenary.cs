@@ -6,12 +6,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Mercenary : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Mercenary;
     private const int Id = 2000;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem TimeLimit;
@@ -50,7 +49,7 @@ internal class Mercenary : RoleBase
 
     public override bool OnCheckShapeshift(PlayerControl shapeshifter, PlayerControl target, ref bool resetCooldown, ref bool shouldAnimate)
     {
-        // not should shapeshifted
+
         resetCooldown = false;
         return false;
     }

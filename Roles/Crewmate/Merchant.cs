@@ -6,12 +6,11 @@ namespace TONE.Roles.Crewmate;
 
 internal class Merchant : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Merchant;
     private const int Id = 8800;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
-    //==================================================================\\
 
     private static List<CustomRoles> addons = [];
     private static readonly Dictionary<byte, int> addonsSold = [];

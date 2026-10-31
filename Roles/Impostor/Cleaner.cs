@@ -5,12 +5,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Cleaner : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Cleaner;
     private const int Id = 3000;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
-    //==================================================================\\
 
     public override Sprite ReportButtonSprite => CustomButton.Get("Clean");
 

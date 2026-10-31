@@ -7,12 +7,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Fury : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Fury;
     private const int Id = 32000;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     public static OptionItem KillCooldown;
     public static OptionItem AngryCooldown;

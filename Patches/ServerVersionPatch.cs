@@ -11,7 +11,6 @@ class ServerUpdatePatch
         }
         if (GameStates.IsOnlineGame)
         {
-            // Changing server version for AU mods
 
             var revision = __result % 50;
             if (revision < 25) __result += 25;

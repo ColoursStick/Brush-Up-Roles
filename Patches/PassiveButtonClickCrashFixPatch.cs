@@ -2,7 +2,6 @@ using System;
 
 namespace TONE.Patches;
 
-// By https://github.com/TouseefX
 [HarmonyPatch(typeof(PassiveButton))]
 internal static class PassiveButtonClickCrashFixPatch
 {

@@ -6,14 +6,13 @@ namespace TONE.Roles.Coven;
 
 internal class WitchDoctor : CovenManager
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.WitchDoctor;
     private const int Id = 34500;
     public override bool IsDesyncRole => true;
     public override bool IsExperimental => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenPower;
-    //==================================================================\\
 
     private static OptionItem AbilityCooldown;
     private static OptionItem AbilityLimit;
@@ -50,14 +49,13 @@ internal class WitchDoctor : CovenManager
     {
         if (!killer || !target) return false;
 
-        // Prevent killing other coven members
         if (target.IsPlayerCovenTeam())
         {
             killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.WitchDoctor), Translator.GetString("CovenDontKillOtherCoven")));
-            return false; // Cancel the kill
+            return false;
         }
 
-        return true; // Allow the kill otherwise
+        return true;
     }
 
     public override void UnShapeShiftButton(PlayerControl pc)
@@ -83,7 +81,7 @@ internal class WitchDoctor : CovenManager
                 var role = CustomRoles.CrewmateTONE;
                 var roleList = CustomRolesHelper.AllRoles.Where(role => role.IsCoven() && role.IsEnable() && !role.RoleExist(countDead: true)).ToList();
                 role = roleList.RandomElement();
-                // if every enabled coven role is already in the game then use one of them anyways
+
                 if (role == CustomRoles.Crewmate || role == CustomRoles.CrewmateTONE)
                     role = CustomRolesHelper.AllRoles.Where(role => role.IsCoven() && role.IsEnable()).ToList().RandomElement();
 

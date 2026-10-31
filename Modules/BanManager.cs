@@ -15,8 +15,8 @@ public static class BanManager
     private static string ModeratorListPath = @$"{Main.Path}/BrushUpRoles-DATA/Moderators.txt";
     private static string VIPListPath = @$"{Main.Path}/BrushUpRoles-DATA/VIP-List.txt";
     private static string WhiteListListPath = @$"{Main.Path}/BrushUpRoles-DATA/WhiteList.txt";
-    //private static List<string> EACList = []; // Don't make it read-only
-    public static List<string> TempBanWhiteList = []; //To prevent writing to ban list
+
+    public static List<string> TempBanWhiteList = [];
     public static List<Dictionary<string, System.Text.Json.JsonElement>> EACDict = [];
     public static void Init()
     {
@@ -51,17 +51,6 @@ public static class BanManager
                 File.Create(WhiteListListPath).Close();
             }
 
-            // Read EAC List
-            //var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("TONE.Resources.Config.EACList.txt");
-            //stream.Position = 0;
-            //using StreamReader sr = new(stream, Encoding.UTF8);
-            //string line;
-            //while ((line = sr.ReadLine()) != null)
-            //{
-            //    if (line == "" || line.StartsWith("#")) continue;
-            //    EACList.Add(line);
-            //}
-
         }
         catch (Exception ex)
         {
@@ -85,11 +74,9 @@ public static class BanManager
     {
         using SHA256 sha256 = SHA256.Create();
 
-        // get sha-256 hash
         byte[] sha256Bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(puid));
         string sha256Hash = BitConverter.ToString(sha256Bytes).Replace("-", "").ToLower();
 
-        // pick front 5 and last 4
         return string.Concat(sha256Hash.AsSpan(0, 5), sha256Hash.AsSpan(sha256Hash.Length - 4));
     }
 
@@ -145,7 +132,6 @@ public static class BanManager
 
         string friendcode = player?.FriendCode;
 
-        // Check file BanList.txt
         if (Options.ApplyBanList.GetBool() && CheckBanList(friendcode, player?.GetHashedPuid()))
         {
             AmongUsClient.Instance.KickPlayer(player.Id, true);
@@ -153,7 +139,7 @@ public static class BanManager
             Logger.Info($"{player.PlayerName} found in BanList, so player is banned", "BAN");
             return;
         }
-        // Check EAC list from API
+
         if (CheckEACList(friendcode, player?.GetHashedPuid()))
         {
             AmongUsClient.Instance.KickPlayer(player.Id, true);
@@ -164,7 +150,7 @@ public static class BanManager
         if (TempBanWhiteList.Contains(player?.GetHashedPuid()))
         {
             AmongUsClient.Instance.KickPlayer(player.Id, true);
-            //This should not happen
+
             Logger.Info($"{player.PlayerName} was in temp ban list", "BAN");
             return;
         }
@@ -223,10 +209,7 @@ public static class BanManager
         }
 
         return false;
-        //bool OnlyCheckPuid = false;
-        //if (code == "" && hashedPuid == "") OnlyCheckPuid = true;
-        //else if (code == "") return false;
-        //return (EACList.Any(x => x.Contains(code) && !OnlyCheckPuid) || EACList.Any(x => x.Contains(hashedPuid) && hashedPuid != ""));
+
     }
     public static bool CheckAllowList(string friendcode)
     {

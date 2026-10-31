@@ -4,15 +4,9 @@ using System.Linq.Expressions;
 
 namespace TONE;
 
-// Credit: https://github.com/dabao40/TheOtherRolesGMIA/blob/main/TheOtherRoles/Utilities/EnumerationHelpers.cs
-
 public static class EnumerationHelpers
 {
-    /// <summary>
-    /// Improves the speed of code in a foreach loop
-    /// Used when List has a reference to Il2CppSystem.Collections.Generic
-    /// </summary>
-    /// <returns>IEnumerable of T</returns>
+
     public static IEnumerable<T> GetFastEnumerator<T>(this Il2CppSystem.Collections.Generic.List<T> list) where T : Il2CppSystem.Object => new Il2CppListEnumerable<T>(list);
 }
 

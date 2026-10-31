@@ -21,14 +21,13 @@ public static class Translator
     {
         try
         {
-            // Get the directory containing the JSON files (e.g., TONE.Resources.Lang)
+
             string jsonDirectory = "TONE.Resources.Lang";
-            // Get the assembly containing the resources
+
             var assembly = Assembly.GetExecutingAssembly();
             string[] jsonFileNames = GetJsonFileNames(assembly, jsonDirectory);
 
             translateMaps = [];
-
 
             if (jsonFileNames.Length == 0)
             {
@@ -37,7 +36,7 @@ public static class Translator
             }
             foreach (string jsonFileName in jsonFileNames)
             {
-                // Read the JSON file content
+
                 using Stream resourceStream = assembly.GetManifestResourceStream(jsonFileName);
 
                 if (resourceStream != null)
@@ -45,25 +44,23 @@ public static class Translator
                     using StreamReader reader = new(resourceStream);
 
                     string jsonContent = reader.ReadToEnd();
-                    // Deserialize the JSON into a dictionary
+
                     Dictionary<string, string> jsonDictionary = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent);
                     if (jsonDictionary.TryGetValue("LanguageID", out string languageIdObj) && int.TryParse(languageIdObj, out int languageId))
                     {
-                        // Remove the "LanguageID" entry
+
                         jsonDictionary.Remove("LanguageID");
 
-                        // Handle the rest of the data and merge it into the resulting translation map
                         MergeJsonIntoTranslationMap(translateMaps, languageId, jsonDictionary);
                     }
                     else
                     {
-                        //Logger.Warn(jsonDictionary["HostText"], "Translator");
+
                         Logger.Warn($"Invalid JSON format in {jsonFileName}: Missing or invalid 'LanguageID' field.", "Translator");
                     }
                 }
             }
 
-            // Convert the resulting translation map to JSON
             string mergedJson = JsonSerializer.Serialize(translateMaps, new JsonSerializerOptions
             {
                 WriteIndented = true
@@ -73,16 +70,13 @@ public static class Translator
         {
             Logger.Error($"Error: {ex}", "Translator");
         }
-        //カスタム翻訳ファイルの読み込み
 
         string languageFolderPath = Main.LANGUAGE_FOLDER_NAME;
 
         if (!Directory.Exists(@$"{Main.Path}/{languageFolderPath}")) Directory.CreateDirectory(@$"{Main.Path}/{languageFolderPath}");
 
-        // 翻訳テンプレートの作成
         CreateTemplateFile();
 
-        //Load vanilla role names into CrossLangRoleNames
         BuildInitialCrossLangRoleNames();
 
         foreach (var lang in EnumHelper.GetAllValues<SupportedLangs>())
@@ -102,12 +96,11 @@ public static class Translator
                         ActualRoleNames[lang].Add(role, GetString($"{role}", lang));
                     }
                 }
-                UpdateCustomTranslation($"{lang}.dat"/*, lang*/);
+                UpdateCustomTranslation($"{lang}.dat");
                 LoadCustomTranslation($"{lang}.dat", lang);
             }
         }
 
-        // Load all custom translation role names into CrossLangRoleNames
         AttachCustomCrossLangRoleNames();
     }
     static void MergeJsonIntoTranslationMap(Dictionary<string, Dictionary<int, string>> translationMaps, int languageId, Dictionary<string, string> jsonDictionary)
@@ -118,68 +111,22 @@ public static class Translator
             if (kvp.Value is string translation)
             {
 
-                // If the textString is not already in the translation map, add it
                 if (!translationMaps.ContainsKey(textString))
                 {
                     translationMaps[textString] = [];
                 }
 
-                // Add or update the translation for the current id and textString
                 translationMaps[textString][languageId] = translation.Replace("\\n", "\n").Replace("\\r", "\r");
             }
         }
     }
 
-    // Function to get a list of JSON file names in a directory
     static string[] GetJsonFileNames(System.Reflection.Assembly assembly, string directoryName)
     {
         string[] resourceNames = assembly.GetManifestResourceNames();
         return resourceNames.Where(resourceName => resourceName.StartsWith(directoryName) && resourceName.EndsWith(".json")).ToArray();
     }
 
-    //public static void LoadLangs()
-    //{
-    //    var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-    //    var stream = assembly.GetManifestResourceStream("TONE.Resources.String.csv");
-    //    translateMaps = new Dictionary<string, Dictionary<int, string>>();
-
-    //    var options = new CsvOptions()
-    //    {
-    //        HeaderMode = HeaderMode.HeaderPresent,
-    //        AllowNewLineInEnclosedFieldValues = false,
-    //    };
-    //    foreach (var line in CsvReader.ReadFromStream(stream, options))
-    //    {
-    //        if (line.Values[0][0] == '#') continue;
-    //        try
-    //        {
-    //            Dictionary<int, string> dic = new();
-    //            for (int i = 1; i < line.ColumnCount; i++)
-    //            {
-    //                int id = int.Parse(line.Headers[i]);
-    //                dic[id] = line.Values[i].Replace("\\n", "\n").Replace("\\r", "\r");
-    //            }
-    //            if (!translateMaps.TryAdd(line.Values[0], dic))
-    //                Logger.Warn($"待翻译的 CSV 文件中存在重复项：第{line.Index}行 => \"{line.Values[0]}\"", "Translator");
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            Logger.Warn($"翻译文件错误：第{line.Index}行 => \"{line.Values[0]}\"", "Translator");
-    //            Logger.Warn(ex.ToString(), "Translator");
-    //        }
-    //    }
-
-    //    // カスタム翻訳ファイルの読み込み
-    //    if (!Directory.Exists(LANGUAGE_FOLDER_NAME)) Directory.CreateDirectory(LANGUAGE_FOLDER_NAME);
-
-    //    // 翻訳テンプレートの作成
-    //    CreateTemplateFile();
-    //    foreach (var lang in Enum.GetValues(typeof(SupportedLangs)))
-    //    {
-    //        if (File.Exists(@$"./{LANGUAGE_FOLDER_NAME}/{lang}.dat"))
-    //            LoadCustomTranslation($"{lang}.dat", (SupportedLangs)lang);
-    //    }
-    //}
     public static void GetActualRoleName(this CustomRoles role, out string RealName)
     {
         var currentlang = TranslationController.Instance.currentLanguage.languageID;
@@ -232,8 +179,6 @@ public static class Translator
     }
     public static bool TryGetStrings(string strItem, out string[] s)
     {
-        // Basically if you wanna let the user infinitely expand a function to their liking
-        // I need to test if this shit works lol, I plan a usecase for it in 2.1.0 (see: https://discord.com/channels/1094344790910455908/1251264307052675134)
 
         var langId = TranslationController.InstanceExists ? TranslationController.Instance.currentLanguage.languageID : SupportedLangs.English;
         if (Main.ForceOwnLanguage.Value) langId = GetUserTrueLang();
@@ -278,7 +223,7 @@ public static class Translator
         var res = showInvalid ? $"<INVALID:{str}>" : str;
         try
         {
-            if (translateMaps.TryGetValue(str, out var dic)) //strに該当する&無効なlangIdかresが空
+            if (translateMaps.TryGetValue(str, out var dic))
             {
                 if (dic.TryGetValue((int)langId, out var rec) && !string.IsNullOrEmpty(rec))
                     return rec;
@@ -286,7 +231,7 @@ public static class Translator
                 if (langId != SupportedLangs.English)
                     return GetString(str, SupportedLangs.English);
             }
-            if (!translateMaps.ContainsKey(str)) //translateMapsにない場合、StringNamesにあれば取得する
+            if (!translateMaps.ContainsKey(str))
             {
                 var stringNames = EnumHelper.GetAllValues<StringNames>().Where(x => x.ToString() == str).ToArray();
                 if (stringNames != null && stringNames.Length != 0)
@@ -327,7 +272,7 @@ public static class Translator
             return SupportedLangs.English;
         }
     }
-    static void UpdateCustomTranslation(string filename/*, SupportedLangs lang*/)
+    static void UpdateCustomTranslation(string filename)
     {
         string path = @$"{Main.Path}/{Main.LANGUAGE_FOLDER_NAME}/{filename}";
         if (File.Exists(path))
@@ -341,13 +286,12 @@ public static class Translator
                     string line;
                     while ((line = reader.ReadLine()) != null)
                     {
-                        // Split the line by ':' to get the first part
+
                         string[] parts = line.Split(':');
 
-                        // Check if there is at least one part before ':'
                         if (parts.Length >= 1)
                         {
-                            // Trim any leading or trailing spaces and add it to the list
+
                             string textString = parts[0].Trim();
                             textStrings.Add(textString);
                         }
@@ -425,7 +369,7 @@ public static class Translator
 
     private static void BuildInitialCrossLangRoleNames()
     {
-        // Runs before Load Custom Translations to get all vanilla texts
+
         foreach (var role in CustomRolesHelper.AllRoles)
         {
             if (!CrossLangRoleNames.ContainsKey(role))
@@ -450,8 +394,7 @@ public static class Translator
 
     private static void AttachCustomCrossLangRoleNames()
     {
-        // Add custom role names to the cross-lang role names
-        // Sort and Remove Invaild
+
         foreach (var item in CrossLangRoleNames)
         {
             foreach (var lang in EnumHelper.GetAllValues<SupportedLangs>())

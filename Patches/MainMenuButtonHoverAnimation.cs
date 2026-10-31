@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace TONE;
 
-// 来源：https://github.com/TownOfNext/TownOfNext/blob/main/src/Patches/MainMenuButtonHoverAnimation.cs
 [HarmonyPatch]
 public class MainMenuButtonHoverAnimation
 {

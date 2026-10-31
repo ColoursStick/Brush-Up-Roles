@@ -10,7 +10,6 @@ using UnityEngine.Networking;
 
 namespace TONE;
 
-// 参考：https://github.com/Yumenopai/TownOfHost_Y
 [HarmonyPatch]
 public class ModNews
 {
@@ -61,9 +60,6 @@ public class ModNews
         }
         downloaded = true;
 
-        // ⚠️ Brush Up Roles：公告原本优先从上游 GitHub 拉取（qin-qwq/TownofNext-Edited），
-        //    结果新闻板块里显示的全是 TONE 的公告，本地改的公告根本看不到。
-        //    这里直接走本地内嵌公告，不再请求上游。
         ModNewsURL = "";
         Logger.Warn("公告改为本地内嵌（不再请求上游）", "ModNews");
         LoadModNewsFromResources();
@@ -85,7 +81,7 @@ public class ModNews
             SupportedLangs.Russian => "ru_RU.json",
             SupportedLangs.SChinese => "zh_CN.json",
             SupportedLangs.TChinese => "zh_TW.json",
-            _ => "en_US.json", //English and any other unsupported language
+            _ => "en_US.json",
         };
         var request = UnityWebRequest.Get(ModNewsURL);
         yield return request.SendWebRequest();
@@ -110,7 +106,7 @@ public class ModNews
                 var shortTitle = newsElement.GetProperty("Short").GetString();
                 var body = GetBody(newsElement.GetProperty("Body"));
                 var dateString = newsElement.GetProperty("Date").GetString();
-                // Create ModNews object
+
                 ModNews _ = new(number, title, subTitle, shortTitle, body, dateString);
             }
         }
@@ -118,7 +114,7 @@ public class ModNews
         {
             Logger.Exception(ex, "ModNews");
             Logger.Error("Failed to load mod info from github, load from local instead", "ModNews");
-            // Use local Mod news instead
+
             LoadModNewsFromResources();
         }
     }
@@ -140,7 +136,7 @@ public class ModNews
             SupportedLangs.Russian => "ru_RU.json",
             SupportedLangs.SChinese => "zh_CN.json",
             SupportedLangs.TChinese => "zh_TW.json",
-            _ => "en_US.json", //English and any other unsupported language
+            _ => "en_US.json",
         };
 
         var assembly = System.Reflection.Assembly.GetExecutingAssembly();
@@ -157,7 +153,7 @@ public class ModNews
             var shortTitle = newsElement.GetProperty("Short").GetString();
             var body = GetBody(newsElement.GetProperty("Body"));
             var dateString = newsElement.GetProperty("Date").GetString();
-            // Create ModNews object
+
             ModNews _ = new(number, title, subTitle, shortTitle, body, dateString);
         }
     }
@@ -184,8 +180,6 @@ public class ModNews
             return;
         }
 
-        // Brush Up Roles：保留原版（Innersloth）公告，只把本地 modNews 里的
-        // 上游 TONE 历史公告过滤掉（它们已在 modNews 文件中删除，这里再按编号兜底）。
         List<Announcement> finalAllNews = AllModNews.ConvertAll(n => n.ToAnnouncement());
         finalAllNews.AddRange(aRange.Where(news => AllModNews.All(x => x.Number != news.Number)));
         finalAllNews.Sort((a1, a2) => DateTime.Compare(DateTime.Parse(a2.Date), DateTime.Parse(a1.Date)));

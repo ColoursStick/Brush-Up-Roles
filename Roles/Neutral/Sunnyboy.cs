@@ -4,7 +4,7 @@ namespace TONE.Roles.Neutral;
 
 internal class Sunnyboy : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Sunnyboy;
     private const int Id = 14400;
     private static readonly HashSet<byte> PlayerIds = [];
@@ -12,7 +12,6 @@ internal class Sunnyboy : RoleBase
 
     public override CustomRoles ThisRoleBase => CustomRoles.Scientist;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
-    //==================================================================\\
 
     public override void Init()
     {

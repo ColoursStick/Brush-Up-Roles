@@ -7,7 +7,7 @@ namespace TONE.Roles.Neutral;
 
 internal class Jester : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Jester;
     private const int Id = 14400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Jester);
@@ -16,7 +16,6 @@ internal class Jester : RoleBase
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralEvil;
 
     public override bool BlockMoveInVent(PlayerControl pc) => CantMoveInVents.GetBool();
-    //==================================================================\\
 
     private static OptionItem CanUseMeetingButton;
     private static OptionItem HasImpostorVision;
@@ -79,7 +78,6 @@ internal class Jester : RoleBase
                     CustomWinnerHolder.WinnerIds.Add(exiled.PlayerId);
                 }
 
-                // Check exile target Executioner
                 foreach (var executionerId in Executioner.playerIdList)
                 {
                     var executioner = executionerId.GetPlayer();

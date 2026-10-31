@@ -9,12 +9,11 @@ namespace TONE.Roles.Crewmate;
 
 internal class Balancer : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Balancer;
     private const int Id = 32700;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
-    //==================================================================\\
 
     public static OptionItem MeetingTime;
     public static OptionItem ExileWithoutAnyoneVoting;

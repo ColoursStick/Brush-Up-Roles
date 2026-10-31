@@ -35,7 +35,7 @@ public static class CustomRoleManager
         }
         return roleClass ?? new DefaultSetup();
     }
-    public static List<RoleBase> AllEnabledRoles => Main.PlayerStates.Values.Select(x => x.RoleClass).ToList(); //Since there are classes which use object attributes and playerstate is not removed.
+    public static List<RoleBase> AllEnabledRoles => Main.PlayerStates.Values.Select(x => x.RoleClass).ToList();
     public static bool HasEnabled(this CustomRoles role) => role.GetStaticRoleClass().IsEnable;
 
     public static bool OtherCollectionsSet = false;
@@ -44,11 +44,7 @@ public static class CustomRoleManager
         List<RoleBase> roles = [];
         foreach (var role in RoleClass.Values)
         {
-            // ⚠️ 不再在此过滤黑名单。
-            //    被下架职业的 OptionItem 若从未创建就是 null，而全工程有 600+ 处
-            //    从全局路径读取这些选项（职业分配、每帧更新、名单颜色等），
-            //    会抛 NullReferenceException（表现为开始游戏黑屏 / 每帧刷错）。
-            //    改为「照常创建选项，但把菜单项隐藏」——见 HideBlackListedOptions。
+
             if (role.IsExperimental) continue;
 
             if (role.ThisRoleType == type)
@@ -86,20 +82,12 @@ public static class CustomRoleManager
         return roles;
     }
 
-    /// <summary>
-    /// 把「被下架职业」的设置菜单项隐藏起来。
-    ///
-    /// 下架职业的选项照常创建（避免 OptionItem 为 null 引发 NRE），
-    /// 但通过 SetHidden(true) 让它们在界面上不可见。
-    /// IsHiddenOn 会沿 Parent 级联，所以隐藏刷新率选项即隐藏其全部子选项。
-    /// </summary>
     public static void HideBlackListedOptions(IEnumerable<RoleBase> roles)
     {
         foreach (var r in roles)
         {
             var role = r.Role;
 
-            // 巫师阵营：本模组不提供
             var hide = IsOptBlackListed(r.GetType()) || role.IsCoven();
             if (!hide) continue;
 
@@ -113,24 +101,13 @@ public static class CustomRoleManager
         }
     }
 
-    /// <summary>
-    /// 该职业类型是否「不进设置菜单」。
-    ///
-    /// 本模组只提供 <see cref="CustomRolesHelper.KeepRoles"/> 里列出的职业，
-    /// 所以规则是：这个类型对应的职业只要有一个在保留名单里就不拉黑，
-    /// 否则一律下架（于是它的刷新率取不到值 → 返回 0 → 永不被分配）。
-    ///
-    /// 原项目这里的语义是屏蔽「共用同一个类的重复职业」
-    /// （靠 DuplicatedRoles.ContainsValue），本模组扩展成白名单机制。
-    /// </summary>
     public static bool IsOptBlackListed(this Type role)
     {
-        // 这个类型对应哪些职业？
+
         var owners = new List<CustomRoles>();
         foreach (var kv in RoleClass)
             if (kv.Value != null && kv.Value.GetType() == role) owners.Add(kv.Key);
 
-        // 找不到归属（不该发生）→ 退回原语义
         if (owners.Count == 0) return CustomRolesHelper.DuplicatedRoles.ContainsValue(role);
 
         foreach (var r in owners)
@@ -143,7 +120,7 @@ public static class CustomRoleManager
 
     public static RoleBase CreateRoleClass(this CustomRoles role)
     {
-        return (RoleBase)Activator.CreateInstance(role.GetStaticRoleClass().GetType()); // Converts this.RoleBase back to its type and creates an unique one.
+        return (RoleBase)Activator.CreateInstance(role.GetStaticRoleClass().GetType());
     }
 
     public static bool HasDesyncRole(this PlayerControl player)
@@ -153,8 +130,6 @@ public static class CustomRoleManager
         || player.Is(CustomRoles.Killer)
         || (player.GetCustomRole().IsImpostor() && NarcManager.IsNarcAssigned()));
 
-    /// If the role protects others players
-    /// </summary>
     public static bool OnCheckMurderAsTargetOnOthers(PlayerControl killer, PlayerControl target)
     {
         foreach (var roleClass in AllEnabledRoles.ToArray())
@@ -168,9 +143,6 @@ public static class CustomRoleManager
         return true;
     }
 
-    /// <summary>
-    /// Builds Modified GameOptions
-    /// </summary>
     public static void BuildCustomGameOptions(this PlayerControl player, ref IGameOptions opt)
     {
         if (player.IsAnySubRole(x => x is CustomRoles.EvilSpirit))
@@ -195,7 +167,6 @@ public static class CustomRoleManager
         if (CustomRoles.Pitfall.RoleExist()) Pitfall.SetPitfallTrapVision(opt, player);
         if (CustomRoles.Medusa.RoleExist()) Medusa.SetStoned(player, opt);
         if (CustomRoles.Sacrifist.RoleExist()) Sacrifist.SetVision(player, opt);
-
 
         var playerSubRoles = player.GetCustomSubRoles();
 
@@ -231,8 +202,7 @@ public static class CustomRoleManager
                 }
             }
 
-        // Add-ons
-        if (Glow.IsEnable) Glow.ApplyGameOptions(opt, player); //keep this at last
+        if (Glow.IsEnable) Glow.ApplyGameOptions(opt, player);
         if (Bewilder.IsEnable) Bewilder.ApplyGameOptions(opt, player);
         if (Ghoul.IsEnable) Ghoul.ApplyGameOptions(player);
 
@@ -258,9 +228,6 @@ public static class CustomRoleManager
         }
     }
 
-    /// <summary>
-    /// Check Murder as Killer in Target
-    /// </summary>
     public static bool OnCheckMurder(ref PlayerControl killer, ref PlayerControl target, ref bool __state)
     {
         if (killer == target) return true;
@@ -279,7 +246,6 @@ public static class CustomRoleManager
         var killerRoleClass = killer.GetRoleClass();
         var killerSubRoles = killer.GetCustomSubRoles();
 
-        // If Target is possessed by Dollmaster swap controllers
         target = DollMaster.SwapPlayerInfo(target);
 
         Logger.Info("Start", "PlagueBearer.CheckAndInfect");
@@ -300,7 +266,6 @@ public static class CustomRoleManager
 
         Logger.Info("Start", "ForcedCheckMurderAsKiller");
 
-        // Forced check
         if (killerRoleClass.ForcedCheckMurderAsKiller(killer, target) == false)
         {
             __state = true;
@@ -310,7 +275,6 @@ public static class CustomRoleManager
 
         Logger.Info("Start", "OnCheckMurder.RpcCheckAndMurder");
 
-        // Check in Target
         if (killer.RpcCheckAndMurder(target, true) == false)
         {
             __state = true;
@@ -359,12 +323,11 @@ public static class CustomRoleManager
 
         Logger.Info("Start", "OnCheckMurderAsKiller");
 
-        // Check murder as Killer
         if (killerRoleClass.OnCheckMurderAsKiller(killer, target) == false)
         {
             __state = true;
             if (cancelbutkill && target.IsAlive()
-                && !DoubleTrigger.FirstTriggerTimer.TryGetValue(killer.PlayerId, out _)) // some roles have an internal rpcmurderplayer, but still had to cancel
+                && !DoubleTrigger.FirstTriggerTimer.TryGetValue(killer.PlayerId, out _))
             {
                 target.RpcMurderPlayer(target);
                 target.SetRealKiller(killer);
@@ -375,13 +338,11 @@ public static class CustomRoleManager
             return false;
         }
 
-        // Swap controllers if Sheriff shoots Dollmasters main body
         if (DollMaster.HasEnabled && killer.Is(CustomRoles.Sheriff) && target == DollMaster.DollMasterTarget)
         {
             target = DollMaster.SwapPlayerInfo(target);
         }
 
-        // Check if Killer is a true killing role and Target is possessed by Dollmaster
         if (DollMaster.HasEnabled && DollMaster.IsControllingPlayer)
             if (!(DollMaster.DollMasterTarget == null || DollMaster.controllingTarget == null))
                 if (target == DollMaster.DollMasterTarget || target == DollMaster.controllingTarget)
@@ -403,18 +364,12 @@ public static class CustomRoleManager
 
         return true;
     }
-    /// <summary>
-    /// Tasks after Killer murders Target
-    /// </summary>
+
     public static void OnMurderPlayer(PlayerControl killer, PlayerControl target, bool inMeeting, bool fromRole)
     {
-        // ##################################-INFO-########################################
-        // When using this code, keep in mind that Killer and Target can be equal (Suicide)
-        // And the player can also die during the Meeting
-        // ################################################################################
 
-        PlayerControl trueDMKiller = killer; // Save real Killer
-        killer = DollMaster.SwapPlayerInfo(killer); // If Killer is possessed by the Dollmaster swap each other's controllers
+        PlayerControl trueDMKiller = killer;
+        killer = DollMaster.SwapPlayerInfo(killer);
 
         var killerRoleClass = killer.GetRoleClass();
         var targetRoleClass = target.GetRoleClass();
@@ -422,14 +377,12 @@ public static class CustomRoleManager
         var killerSubRoles = killer.GetCustomSubRoles();
         var targetSubRoles = target.GetCustomSubRoles();
 
-        // Check Suicide
         var isSuicide = killer.PlayerId == target.PlayerId;
 
         if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.OnMurderPlayerAsTarget(killer, target, inMeeting, isSuicide);
-        // Target was murdered by Killer
+
         targetRoleClass.OnMurderPlayerAsTarget(killer, target, inMeeting, isSuicide);
 
-        // Check Target Add-ons
         if (targetSubRoles.Any())
             foreach (var subRole in targetSubRoles.ToArray())
             {
@@ -440,7 +393,7 @@ public static class CustomRoleManager
                         break;
 
                     case CustomRoles.Bait when !inMeeting && !fromRole:
-                        Bait.BaitAfterDeathTasks(trueDMKiller, target); // Use trueDMKiller to any roles that needs the Dollmaster to be the killer!
+                        Bait.BaitAfterDeathTasks(trueDMKiller, target);
                         break;
 
                     case CustomRoles.Randomizer when !inMeeting && !fromRole && !isSuicide && !killer.Is(CustomRoles.KillingMachine):
@@ -474,10 +427,8 @@ public static class CustomRoleManager
                 }
             }
 
-        // Killer murder Target
         killerRoleClass.OnMurderPlayerAsKiller(killer, target, inMeeting, isSuicide);
 
-        // Check Killer Add-ons
         if (killerSubRoles.Any())
             foreach (var subRole in killerSubRoles.ToArray())
             {
@@ -497,30 +448,23 @@ public static class CustomRoleManager
                 }
             }
 
-        // Check dead body for others roles
         CheckDeadBody(killer, target, inMeeting);
 
-        // Check Lovers Suicide, including edge cases for suicide and disconnection
         if (!(killer.PlayerId == target.PlayerId && target.IsDisconnected()))
         {
             Lovers.LoversSuicide(target.PlayerId, inMeeting);
         }
     }
 
-    /// <summary>
-    /// Check if this task is marked by a role and do something
-    /// </summary>
     public static void OthersCompleteThisTask(PlayerControl player, PlayerTask task, bool playerIsOverridden, PlayerControl realPlayer)
         => AllEnabledRoles.Do(RoleClass => RoleClass.OnOthersTaskComplete(player, task, playerIsOverridden, realPlayer));
 
     public static HashSet<Action<PlayerControl, PlayerControl, bool>> CheckDeadBodyOthers = [];
-    /// <summary>
-    /// If the role need check a present dead body
-    /// </summary>
+
     public static void CheckDeadBody(PlayerControl killer, PlayerControl deadBody, bool inMeeting)
     {
         if (!CheckDeadBodyOthers.Any()) return;
-        //Execute other viewpoint processing if any
+
         foreach (var checkDeadBodyOthers in CheckDeadBodyOthers.ToArray())
         {
             checkDeadBodyOthers(killer, deadBody, inMeeting);
@@ -528,35 +472,26 @@ public static class CustomRoleManager
     }
 
     public static HashSet<Action<PlayerControl, bool, long>> OnFixedUpdateOthers = [];
-    /// <summary>
-    /// Function always called in a task turn
-    /// For interfering with other roles
-    /// Registered with OnFixedUpdateOthers+= at initialization
-    /// </summary>
+
     public static void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
     {
         player.GetRoleClass()?.OnFixedUpdate(player, lowLoad, nowTime, timerLowLoad);
 
         if (!OnFixedUpdateOthers.Any()) return;
-        //Execute other viewpoint processing if any
+
         foreach (var onFixedUpdate in OnFixedUpdateOthers.ToArray())
         {
             onFixedUpdate(player, lowLoad, nowTime);
         }
     }
 
-    /// <summary>
-    /// When others players on enter Vent
-    /// </summary>
     public static bool OthersCoEnterVent(PlayerPhysics physics, int ventId)
     {
         return AllEnabledRoles.Any(RoleClass => RoleClass.OnCoEnterVentOthers(physics, ventId));
     }
 
     private static HashSet<Func<PlayerControl, PlayerControl, bool, string>> MarkOthers = [];
-    /// <summary>
-    /// If Seer == seen then GetMarkOthers called from FixedUpadte or MeetingHud or NotifyRoles
-    /// </summary>
+
     public static string GetMarkOthers(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
     {
         var sb = new StringBuilder(100);
@@ -568,9 +503,7 @@ public static class CustomRoleManager
     }
 
     private static HashSet<Func<PlayerControl, PlayerControl, bool, bool, string>> LowerOthers = [];
-    /// <summary>
-    /// If Seer == seen then GetMarkOthers called from FixedUpadte or NotifyRoles
-    /// </summary>
+
     public static string GetLowerTextOthers(PlayerControl seer, PlayerControl seen, bool isForMeeting = false, bool isForHud = false)
     {
         var sb = new StringBuilder(100);
@@ -583,9 +516,7 @@ public static class CustomRoleManager
     }
 
     private static HashSet<Func<PlayerControl, PlayerControl, bool, string>> SuffixOthers = [];
-    /// <summary>
-    /// If Seer == seen then GetMarkOthers called from FixedUpadte or NotifyRoles
-    /// </summary>
+
     public static string GetSuffixOthers(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
     {
 
@@ -617,7 +548,6 @@ public static class CustomRoleManager
         OtherCollectionsSet = true;
     }
 
-    // ADDONS //
     public static void OnFixedAddonUpdate(this PlayerControl pc, bool lowload) => pc.GetCustomSubRoles().Do(x =>
     {
         if (AddonClasses.TryGetValue(x, out var IAddon) && IAddon != null)

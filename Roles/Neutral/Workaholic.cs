@@ -3,17 +3,16 @@ using static TONE.MeetingHudStartPatch;
 using static TONE.Options;
 using static TONE.Translator;
 
-//Thanks TOH_Y
 namespace TONE.Roles.Neutral;
 
 internal class Workaholic : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Workaholic;
     private const int Id = 15700;
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralChaos;
-    //==================================================================\\
+
     public override bool HasTasks(NetworkedPlayerInfo player, CustomRoles role, bool ForRecompute) => !ForRecompute;
 
     public static OptionItem WorkaholicCannotWinAtDeath;
@@ -26,7 +25,7 @@ internal class Workaholic : RoleBase
 
     public override void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Workaholic); //TOH_Y
+        SetupRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Workaholic);
         WorkaholicCannotWinAtDeath = BooleanOptionItem.Create(15702, "WorkaholicCannotWinAtDeath", false, TabGroup.NeutralRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Workaholic]);
         WorkaholicVentCooldown = FloatOptionItem.Create(15703, GeneralOption.EngineerBase_VentCooldown, new(0f, 180f, 2.5f), 0f, TabGroup.NeutralRoles, false)
@@ -64,7 +63,7 @@ internal class Workaholic : RoleBase
 
         if (!CustomWinnerHolder.CheckForConvertedWinner(player.PlayerId))
         {
-            CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Workaholic); //Workaholic win
+            CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Workaholic);
             CustomWinnerHolder.WinnerIds.Add(player.PlayerId);
         }
 

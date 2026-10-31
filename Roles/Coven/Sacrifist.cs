@@ -11,13 +11,12 @@ namespace TONE.Roles.Coven;
 
 internal class Sacrifist : CovenManager
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Sacrifist;
     private const int Id = 30600;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenUtility;
-    //==================================================================\\
 
     private static OptionItem DebuffCooldown;
     private static OptionItem DeathsAfterVote;
@@ -45,9 +44,6 @@ internal class Sacrifist : CovenManager
     private static readonly Dictionary<byte, float> originalSpeed = [];
     private static readonly Dictionary<byte, NetworkedPlayerInfo.PlayerOutfit> OriginalPlayerSkins = [];
     private static readonly Dictionary<byte, List<byte>> VisionChange = [];
-
-
-
 
     public override void SetupCustomOption()
     {
@@ -99,7 +95,7 @@ internal class Sacrifist : CovenManager
         AURoleOptions.ShapeshifterCooldown = 1f;
         base.ApplyGameOptions(opt, playerId);
     }
-    // Sacrifist shouldn't be able to kill at all but if there's solo Sacrifist the game is unwinnable so they can kill when solo
+
     public override bool CanUseKillButton(PlayerControl pc) => Main.EnumerateAlivePlayerControls().Where(pc => pc.Is(Custom_Team.Coven)).Count() == 1;
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
@@ -141,7 +137,7 @@ internal class Sacrifist : CovenManager
             {
                 default:
                     break;
-                // Change Speed
+
                 case 0:
                     originalSpeed.Remove(randPlayer);
                     originalSpeed.Add(randPlayer, Main.AllPlayerSpeed[randPlayer]);
@@ -164,7 +160,7 @@ internal class Sacrifist : CovenManager
                         originalSpeed.Remove(sacrifist);
                     }, SpeedDuration.GetFloat(), "Sacrifist Revert Speed");
                     break;
-                // Change Vision
+
                 case 1:
                     VisionChange[sacrifist].Add(sacrifist);
                     VisionChange[sacrifist].Add(randPlayer);
@@ -177,7 +173,7 @@ internal class Sacrifist : CovenManager
                         pc.Notify(GetString("SacrifistVisionRevert"), 5f);
                     }, VisionDuration.GetFloat(), "Sacrifist Revert Vision");
                     break;
-                // Change Cooldown
+
                 case 2:
                     Main.AllPlayerKillCooldown[randPlayer] += Main.AllPlayerKillCooldown[randPlayer] * (IncreasedCooldown.GetFloat() / 100);
                     Main.AllPlayerKillCooldown[sacrifist] += Main.AllPlayerKillCooldown[sacrifist] * (IncreasedCooldown.GetFloat() / 100);
@@ -185,14 +181,14 @@ internal class Sacrifist : CovenManager
                     Logger.Info($"{pc.GetRealName()} Changed Cooldown for {randPlayerPC.GetRealName()} and self", "Sacrifist");
                     pc.Notify(GetString("SacrifistCooldownDebuff"), 5f);
                     break;
-                // Cant Fix Sabotage (not coding allat, just give them Fool)
+
                 case 3:
                     pc.RpcSetCustomRole(CustomRoles.Fool);
                     randPlayerPC.RpcSetCustomRole(CustomRoles.Fool);
                     Logger.Info($"{pc.GetRealName()} Gave Fool to {randPlayerPC.GetRealName()} and self", "Sacrifist");
                     pc.Notify(GetString("SacrifistFoolDebuff"), 5f);
                     break;
-                // Make one of them call a meeting
+
                 case 4:
                     pc.Notify(GetString("SacrifistMeetingDebuff"), 15f);
                     _ = new LateTask(() =>
@@ -210,21 +206,21 @@ internal class Sacrifist : CovenManager
                         }
                     }, 2f, "Sacrifist Call Meeting");
                     break;
-                // Can't Report
+
                 case 5:
                     ReportDeadBodyPatch.CanReport[randPlayer] = false;
                     ReportDeadBodyPatch.CanReport[sacrifist] = false;
                     Logger.Info($"{pc.GetRealName()} Made {randPlayerPC.GetRealName()} and self unable to report", "Sacrifist");
                     pc.Notify(GetString("SacrifistReportDebuff"), 5f);
                     break;
-                // Reset Tasks
+
                 case 6:
                     randPlayerPC.RpcResetTasks();
                     pc.RpcResetTasks();
                     pc.Notify(GetString("SacrifistTasksDebuff"), 5f);
                     Logger.Info($"{pc.GetRealName()} Made {randPlayerPC.GetRealName()} and self reset tasks", "Sacrifist");
                     break;
-                // Swap Skins
+
                 case 7:
                     var temp = new NetworkedPlayerInfo.PlayerOutfit()
                     .Set(pc.GetRealName(), pc.CurrentOutfit.ColorId, pc.CurrentOutfit.HatId, pc.CurrentOutfit.SkinId, pc.CurrentOutfit.VisorId, pc.CurrentOutfit.PetId, pc.CurrentOutfit.NamePlateId);
@@ -238,7 +234,7 @@ internal class Sacrifist : CovenManager
                     pc.Notify(GetString("SacrifistSwapSkinsDebuff"), 5f);
                     Logger.Info($"{pc.GetRealName()} swapped outfit with {randPlayerPC.GetRealName()}", "Sacrifist");
                     break;
-                // Swap Sacrifist and Target
+
                 case 8:
                     _ = new LateTask(() =>
                     {
@@ -288,7 +284,6 @@ internal class Sacrifist : CovenManager
         }
         randPlayer = byte.MaxValue;
         Logger.Info($"Resetting Debuffs for Affected player", "Sacrifist");
-
 
         ReportDeadBodyPatch.CanReport[sacrifist] = true;
         _Player.ResetKillCooldown();

@@ -11,13 +11,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Jailer : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Jailer;
     private const int Id = 10600;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
-    //==================================================================\\
 
     private static OptionItem JailCooldown;
     private static OptionItem MaxExecution;
@@ -209,7 +208,7 @@ internal class Jailer : RoleBase
 
     public static bool JailerChannel(PlayerControl pc, string msg, bool check = true)
     {
-        //if (!AmongUsClient.Instance.AmHost) return false;
+
         if (!GameStates.IsMeeting || !pc) return false;
         if (!pc.Is(CustomRoles.Jailer) && !IsTarget(pc.PlayerId)) return false;
         if (!EnableJailerChannel.GetBool()) return false;

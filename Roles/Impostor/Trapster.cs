@@ -2,12 +2,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Trapster : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Trapster;
     private const int Id = 2600;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem TrapsterKillCooldown;
     private static OptionItem TrapConsecutiveBodies;
@@ -49,7 +48,6 @@ internal class Trapster : RoleBase
     public override bool OnCheckReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo deadBody, PlayerControl killer)
     {
 
-        // if trapster dead
         if (deadBody.Object.Is(CustomRoles.Trapster) && TrapTrapsterBody.GetBool() && !reporter.IsTransformedNeutralApocalypse())
         {
             var killerId = deadBody.PlayerId;
@@ -68,7 +66,6 @@ internal class Trapster : RoleBase
             return false;
         }
 
-        // if reporter try reported trap body
         if (BoobyTrapBody.Contains(deadBody.PlayerId) && reporter.IsAlive()
             && !reporter.IsTransformedNeutralApocalypse() && (reporter.Is(CustomRoles.Veteran) || _Player.RpcCheckAndMurder(reporter, true)))
         {

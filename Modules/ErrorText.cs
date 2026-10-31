@@ -82,7 +82,7 @@ public class ErrorText : MonoBehaviour
 
         if (!AllErrors.Any(e => e.Code == code))
         {
-            //まだ出ていないエラー
+
             AllErrors.Add(error);
         }
         UpdateText();
@@ -130,13 +130,13 @@ public class ErrorText : MonoBehaviour
         {
             this.Code = code;
             this.ErrorType1 = (int)code / 10000;
-            this.ErrorType2 = (int)code / 10 - ErrorType1 * 1000; // xxxyyy - xxx000
+            this.ErrorType2 = (int)code / 10 - ErrorType1 * 1000;
             this.ErrorLevel = (int)code - (int)code / 10 * 10;
             this.Timer = 0f;
         }
         public override string ToString()
         {
-            // ERR-xxx-yyy-z
+
             return $"ERR-{ErrorType1:000}-{ErrorType2:000}-{ErrorLevel:0}";
         }
         public void IncreaseTimer() => Timer += Time.deltaTime;
@@ -149,27 +149,17 @@ public class ErrorText : MonoBehaviour
 [Obfuscation(Exclude = true)]
 public enum ErrorCode
 {
-    //xxxyyyz: ERR-xxx-yyy-z
-    //  xxx: エラー大まかなの種類 (HUD関連, 追放処理関連など)
-    //  yyy: エラーの詳細な種類 (BoutyHunterの処理, Mercenaryの処理など)
-    //  z:   深刻度
-    //    0: 処置不要 (非表示)
-    //    1: 正常に動作しなければ廃村 (一定時間で非表示)
-    //    2: 廃村を推奨 (廃村で非表示)
-    //    3: ユーザー側では対処不能 (消さない)
-    // ==========
-    // 001 Main
-    Main_DictionaryError = 0010003, // 001-000-3 Main Dictionary Error
-    // 002 Support related
-    UnsupportedVersion = 002_000_1,  // 002-000-1 AmongUs version is outdated
-    // ==========
-    // 000 Test
-    NoError = 0000000, // 000-000-0 No Error
-    TestError0 = 0009000, // 000-900-0 Test Error 0
-    TestError1 = 0009101, // 000-910-1 Test Error 1
-    TestError2 = 0009202, // 000-920-2 Test Error 2
-    TestError3 = 0009303, // 000-930-3 Test Error 3
-    HnsUnload = 000_804_1, // 000-804-1 Unloaded By HnS
-    CheatDetected = 000_666_2, // 000-666-2 疑似存在作弊玩家
-    SBDetected = 000_666_1, // 000-666-1 傻逼外挂司马东西
+
+    Main_DictionaryError = 0010003,
+
+    UnsupportedVersion = 002_000_1,
+
+    NoError = 0000000,
+    TestError0 = 0009000,
+    TestError1 = 0009101,
+    TestError2 = 0009202,
+    TestError3 = 0009303,
+    HnsUnload = 000_804_1,
+    CheatDetected = 000_666_2,
+    SBDetected = 000_666_1,
 }

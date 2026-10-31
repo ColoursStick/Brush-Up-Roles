@@ -34,11 +34,8 @@ public class CustomRpcSender
             else Logger.Warn("CurrentStateはisUnsafeがtrueの時のみ上書きできます", "CustomRpcSender");
         }
     }
-    private State currentState/* = State.BeforeInit*/;
+    private State currentState;
 
-    // 0~: targetClientId (GameDataTo)
-    // -1: All players (GameData)
-    // -2: Not set
     private int currentRpcTarget;
 
     public bool checkLength;
@@ -112,13 +109,13 @@ public class CustomRpcSender
 
         if (targetClientId < 0)
         {
-            // RPC for everyone
+
             stream.StartMessage(5);
             stream.Write(AmongUsClient.Instance.GameId);
         }
         else
         {
-            // RPC (Desync) to a specific client
+
             stream.StartMessage(6);
             stream.Write(AmongUsClient.Instance.GameId);
             stream.WritePacked(targetClientId);
@@ -183,7 +180,7 @@ public class CustomRpcSender
         {
             if (wasPackedContext && !closingPackedRoot)
             {
-                // Close outer packed root too
+
                 stream.EndMessage();
             }
 
@@ -265,9 +262,9 @@ public class CustomRpcSender
         [CallerFilePath] string callerPath = "",
         [CallerLineNumber] int callerLine = 0)
     {
-        // ReSharper disable ExplicitCallerInfoArgument
+
         return AutoStartRpc(targetNetId, (byte)rpcCall, targetClientId, callerPath, callerLine);
-        // ReSharper restore ExplicitCallerInfoArgument
+
     }
     public CustomRpcSender AutoStartRpc(
         uint targetNetId,
@@ -300,10 +297,10 @@ public class CustomRpcSender
 
         if (currentRpcTarget != targetClientId)
         {
-            // StartMessage processing
+
             if (currentState == State.InRootMessage)
                 EndMessage(startNew: !packed && messages < AmongUsClient.Instance.GetMaxMessagePackingLimit());
-            else if (messages > 0) // state is Ready or InRootPackedMessage
+            else if (messages > 0)
             {
                 if (currentState == State.InRootPackedMessage)
                 {
@@ -312,9 +309,9 @@ public class CustomRpcSender
                     doneStreams.Add(stream);
                     stream = MessageWriter.Get(sendOption);
                     messages = 0;
-                    StartPackedMessage(); // assume the next message should be in a PackedGameDataTo message as well
+                    StartPackedMessage();
                 }
-                else // state is Ready
+                else
                 {
                     doneStreams.Add(stream);
                     stream = MessageWriter.Get(sendOption);
@@ -396,7 +393,6 @@ public class CustomRpcSender
 
     public int Length => stream.Length;
 
-    // Write
     #region PublicWriteMethods
     public CustomRpcSender Write(float val) => Write(w => w.Write(val));
     public CustomRpcSender Write(string val) => Write(w => w.Write(val));
@@ -437,12 +433,12 @@ public class CustomRpcSender
     [Obfuscation(Exclude = true)]
     public enum State
     {
-        BeforeInit = 0, // Cannot do anything before initialization
-        Ready, // Ready to send - StartMessage and SendMessage can be executed
-        InRootPackedMessage, // State where only GameDataTo submessages can be started
-        InRootMessage, // State between StartMessage and EndMessage - StartRpc and EndMessage can be executed
-        InRpc, // State between StartRpc and EndRpc - Write and EndRpc can be executed
-        Finished // Nothing can be done after sending
+        BeforeInit = 0,
+        Ready,
+        InRootPackedMessage,
+        InRootMessage,
+        InRpc,
+        Finished
     }
 }
 public static class CustomRpcSenderExtensions
@@ -451,7 +447,7 @@ public static class CustomRpcSenderExtensions
     {
         sender.AutoStartRpc(player.NetId, (byte)RpcCalls.SetRole, targetClientId)
             .Write((ushort)role)
-            .Write(true) // canOverride
+            .Write(true)
             .EndRpc();
     }
 
@@ -521,9 +517,6 @@ public static class CustomRpcSenderExtensions
     }
 }
 
-// Rather not send the packet than get kicked immediately after sending it
-// Packet sizes: The maximum MessageReader messasge size allowed (header included) is 1200 bytes.
-// can be found here: https://github.com/innersloth-LLC/AmongUsModdingInformation
 [HarmonyPatch(typeof(InnerNetClient), nameof(InnerNetClient.SendOrDisconnect))]
 static class PreventLargePacketKickPatch
 {

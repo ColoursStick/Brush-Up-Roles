@@ -47,7 +47,7 @@ class OnGameJoinedPatch
         FixedUpdateInNormalGamePatch.RoleTextCache.Clear();
         Utils.GetRegionName(ServerManager.Instance.CurrentRegion ?? null);
 
-        if (AmongUsClient.Instance.AmHost) // Execute the following only on the Host
+        if (AmongUsClient.Instance.AmHost)
         {
             EndGameManagerPatch.IsRestarting = false;
             if (!RehostManager.IsAutoRehostDone)
@@ -93,10 +93,9 @@ class OnGameJoinedPatch
                     if (AURoleOptions.GuardianAngelCooldown == 0f)
                         AURoleOptions.GuardianAngelCooldown = Main.LastGuardianAngelCooldown.Value;
 
-                    // If custom Gamemode is HideNSeekTONE in normal game, set Standard
                     if (GameModeBase.GetGameMode() == CustomGameMode.HidenSeekTONE)
                     {
-                        // Select Standard
+
                         Options.GameMode.SetValue(0);
                     }
                     break;
@@ -105,11 +104,10 @@ class OnGameJoinedPatch
                 case GameModes.HideNSeek:
                     Logger.Info(" Is Hide & Seek", "Game Mode");
 
-                    // If custom Gamemode is Standard/FFA/Speedrun/TagMode/BonfireNight/C&R in H&S game, set HideNSeekTONE
                     if (GameModeBase.GetGameMode() != CustomGameMode.HidenSeekTONE)
                     {
                         var hns = CustomGameModeManager.gameModes.Length - 1;
-                        // Select HideNSeekTONE
+
                         Options.GameMode.SetValue(hns);
                     }
                     break;
@@ -136,8 +134,7 @@ class OnGameJoinedPatch
             try
             {
                 if (!GameStates.IsOnlineGame) return;
-                //if (!GameStates.IsModHost)
-                //RPC.RpcRequestRetryVersionCheck();
+
                 if (BanManager.CheckEACList(EOSManager.Instance.FriendCode, BanManager.GetHashedPuid(EOSManager.Instance.ProductUserId)) && GameStates.IsOnlineGame)
                 {
                     AmongUsClient.Instance.ExitGame(DisconnectReasons.Banned);
@@ -202,7 +199,7 @@ public static class OnPlayerJoinedPatch
             }
         }
         return false;
-        // When a client disconnects, it is removed from allClients in method amongusclient.removeplayer
+
     }
     public static bool HasInvalidFriendCode(string friendcode)
     {
@@ -211,7 +208,7 @@ public static class OnPlayerJoinedPatch
             return true;
         }
 
-        if (friendcode.Length < 7) // #1234 is 5 chars, and its impossible for a friend code to only have 3
+        if (friendcode.Length < 7)
         {
             return true;
         }
@@ -229,7 +226,7 @@ public static class OnPlayerJoinedPatch
 
         return false;
     }
-    public static void Postfix(/*AmongUsClient __instance,*/ [HarmonyArgument(0)] ClientData client)
+    public static void Postfix( [HarmonyArgument(0)] ClientData client)
     {
         Logger.Info($"{client.PlayerName}(ClientID:{client.Id}/FriendCode:{client.FriendCode}/HashPuid:{client.GetHashedPuid()}/Platform:{client.PlatformData.Platform}) Joining room", "Session: OnPlayerJoined");
 
@@ -255,7 +252,6 @@ public static class OnPlayerJoinedPatch
             }
             catch { }
         }, 4.5f, "Green Bean Kick LateTask", false);
-
 
         if (AmongUsClient.Instance.AmHost && HasInvalidFriendCode(client.FriendCode) && Options.KickPlayerFriendCodeInvalid.GetBool() && !GameStates.IsLocalGame)
         {
@@ -316,7 +312,6 @@ public static class OnPlayerJoinedPatch
         {
             if (Main.SayStartTimes.ContainsKey(client.Id)) Main.SayStartTimes.Remove(client.Id);
             if (Main.SayBanwordsTimes.ContainsKey(client.Id)) Main.SayBanwordsTimes.Remove(client.Id);
-            //if (Main.newLobby && Options.ShareLobby.GetBool()) Cloud.ShareLobby();
 
             if (client.GetHashedPuid() != "" && Options.TempBanPlayersWhoKeepQuitting.GetBool()
                 && !BanManager.CheckAllowList(client.FriendCode) && !GameStates.IsLocalGame)
@@ -365,13 +360,13 @@ class OnPlayerLeftPatch
 
         if (GameStates.IsNormalGame && GameStates.IsInGame)
         {
-            //if (data.Character != null) CustomNetObject.DespawnOnQuit(data.Character.PlayerId);
+
             MurderPlayerPatch.AfterPlayerDeathTasks(data?.Character, data?.Character, GameStates.IsMeeting);
         }
 
         if (AmongUsClient.Instance.AmHost && data.Character != null)
         {
-            // Remove messages sending to left player
+
             for (int i = 0; i < Main.MessagesToSend.Count; i++)
             {
                 var (msg, sendTo, title, sendOption) = Main.MessagesToSend[i];
@@ -382,7 +377,6 @@ class OnPlayerLeftPatch
                 }
             }
 
-            // This LateTask is to make sure that the player control is completely despawned for everyone so nobody gonna disconnect itself
             var netid = data.Character.NetId;
             _ = new LateTask(() =>
             {
@@ -426,11 +420,10 @@ class OnPlayerLeftPatch
                 state.Disconnected = true;
                 state.SetDead();
 
-                // If the player left while he had a Notice message, clear it
                 if (NameNotifyManager.Notifying(data.Character))
                 {
                     NameNotifyManager.Notice.Remove(data.Character.PlayerId);
-                    //Utils.DoNotifyRoles(SpecifyTarget: data.Character, ForceLoop: true);
+
                 }
 
                 if (AmongUsClient.Instance.AmHost)
@@ -470,7 +463,6 @@ class OnPlayerLeftPatch
                 DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg);
                 player.SetName(name);
 
-                // On become Host is called before OnPlayerLeft, so this is safe to use
                 if (AmongUsClient.Instance.AmHost)
                 {
                     var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
@@ -490,7 +482,7 @@ class OnPlayerLeftPatch
                     writer.SendMessage();
                 }
                 Main.HostClientId = AmongUsClient.Instance.HostId;
-                // We won't notify vanilla players for Host's quit because Niko doesn't know how to prevent message spamming
+
                 _ = new LateTask(() =>
                 {
                     if (!GameStates.IsOnlineGame) return;
@@ -533,12 +525,10 @@ class OnPlayerLeftPatch
 
             Logger.Info($"{data?.PlayerName} - (ClientID:{data?.Id} / FriendCode:{data?.FriendCode} / HashPuid:{data?.GetHashedPuid()} / Platform:{data?.PlatformData.Platform}) Disconnect (Reason:{reason}´╝îPing:{AmongUsClient.Instance.Ping})", "Session OnPlayerLeftPatch");
 
-            // End the game when a player exits game during assigning roles (AntiBlackOut Protect)
             if (Main.AssignRolesIsStarted)
             {
                 CriticalErrorManager.SetCriticalError("The player left the game during assigning roles", true);
             }
-
 
             if (data != null)
             {
@@ -561,7 +551,7 @@ class OnPlayerLeftPatch
                         if (Main.PlayerQuitTimes[data?.GetHashedPuid()] >= Options.QuitTimesTillTempBan.GetInt())
                         {
                             BanManager.TempBanWhiteList.Add(data?.GetHashedPuid());
-                            // Should ban on player's next join game
+
                         }
                     }
                 }
@@ -571,7 +561,6 @@ class OnPlayerLeftPatch
                     Swapper.CheckSwapperTarget(data.Character.PlayerId);
                     Balancer.CheckBalancerTarget(data.Character.PlayerId);
 
-                    // Prevent double check end voting
                     if (MeetingHud.Instance.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted)
                     {
                         MeetingHud.Instance.CheckForEndVoting();
@@ -595,7 +584,7 @@ class OnPlayerLeftPatch
         catch (Exception error)
         {
             Logger.Error(error.ToString(), "OnPlayerLeftPatch.Postfix");
-            //Logger.SendInGame("Error: " + error.ToString());
+
         }
 
         StartingProcessing = false;
@@ -612,8 +601,8 @@ class InnerNetClientSpawnPatch
 
         Logger.Info($"Spawn player: ID {ownerId}: {client.PlayerName}", "InnerNetClientSpawn");
 
-        if (client == null || client.Character == null // client is null
-            || client.ColorId < 0 || Palette.PlayerColors.Length <= client.ColorId) // invalid client color
+        if (client == null || client.Character == null
+            || client.ColorId < 0 || Palette.PlayerColors.Length <= client.ColorId)
         {
             Logger.Warn("client is null or client have invalid color", "TrySyncAndSendMessage");
         }
@@ -648,13 +637,12 @@ class InnerNetClientSpawnPatch
                 {
                     if (GameStates.IsLobby && client.Character != null && LobbyBehaviour.Instance != null && GameStates.IsVanillaServer)
                     {
-                        // Only for vanilla
+
                         if (!client.Character.IsModded())
                         {
-                            /*var message = new RpcSyncLobbyTimerVanilla(LobbyBehaviour.Instance.NetId, (int)GameStartManagerPatch.timer, false);
-                            RpcUtils.LateSpecificSendMessage(message, client.Id);*/
+
                         }
-                        // Non-host modded client
+
                         else if (client.Character.IsNonHostModdedClient())
                         {
                             var message = new RpcSyncLobbyTimerModded(PlayerControl.LocalPlayer.NetId, (int)GameStartManagerPatch.timer);
@@ -712,8 +700,7 @@ class InnerNetClientSpawnPatch
                         }
                     }, 3.2f, "DisplayLastResult");
                 }
-                //if (PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsUp && Options.EnableUpMode.GetBool())
-                //{
+
                 _ = new LateTask(() =>
                 {
                     if (!AmongUsClient.Instance.IsGameStarted && client.Character?.IsHost() == true)
@@ -722,7 +709,7 @@ class InnerNetClientSpawnPatch
                         AchievementManager.ShowCompletedThisGame();
                     }
                 }, 3.3f, "DisplayAchievementResult");
-                //}
+
             }
         }
     }

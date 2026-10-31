@@ -36,7 +36,7 @@ namespace TONE.Modules
                 if (RCountdownTextText.isActiveAndEnabled)
                 {
                     RCountdownTextText.text = string.Format(GetString("CancelStartCountDown"));
-                    //Press Shift + C to cancel the countdown
+
                 }
                 Logger.Info("Auto Rehost Cancelled!", "Rehost Manager");
                 return;
@@ -68,6 +68,5 @@ namespace TONE.Modules
             }, 1f, "Begin Auto Rehost Countdown");
         }
     }
-
 
 }

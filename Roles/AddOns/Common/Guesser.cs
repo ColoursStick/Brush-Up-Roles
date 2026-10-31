@@ -42,4 +42,3 @@ public class Guesser : IAddon
     public void Remove(byte playerId)
     { }
 }
-

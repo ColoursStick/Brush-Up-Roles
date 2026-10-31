@@ -9,13 +9,12 @@ namespace TONE.Roles.Crewmate;
 
 internal partial class Pyrophoric : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Pyrophoric;
     private const int Id = 31900;
     public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
-    //==================================================================\\
 
     public static OptionItem PyrophoricSkillCooldown;
     private static OptionItem PyrophoricVision;

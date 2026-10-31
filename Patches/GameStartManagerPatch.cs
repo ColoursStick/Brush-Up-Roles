@@ -34,7 +34,7 @@ public class GameStartManagerPatch
         {
             GameStartManagerUpdatePatch.AlredyBegin = false;
             __instance.GameRoomNameCode.text = GameCode.IntToGameName(AmongUsClient.Instance.GameId);
-            // Reset lobby countdown timer
+
             timer = 600f;
             joinedTime = Utils.GetTimeStamp();
 
@@ -65,7 +65,7 @@ public class GameStartManagerPatch
             timerText.outlineColor = Color.black;
             timerText.outlineWidth = 0.40f;
             timerText.hideFlags = HideFlags.None;
-            //timerText.transform.localPosition += new Vector3(-0.5f, -2.6f, 0f);
+
             timerText.transform.localPosition += new Vector3(-0.55f, -0.25f, 0f);
             timerText.transform.localScale = new(0.7f, 0.7f, 1f);
             timerText.gameObject.SetActive(AmongUsClient.Instance.NetworkMode == NetworkModes.OnlineGame && GameStates.IsVanillaServer);
@@ -75,7 +75,7 @@ public class GameStartManagerPatch
             var cancelLabel = cancelButton.buttonText;
             cancelLabel.DestroyTranslator();
             cancelLabel.text = GetString("Cancel");
-            //cancelButton.transform.localScale = new(0.5f, 0.5f, 1f);
+
             var cancelButtonInactiveRenderer = cancelButton.inactiveSprites.GetComponent<SpriteRenderer>();
             cancelButtonInactiveRenderer.color = new(0.8f, 0f, 0f, 1f);
             var cancelButtonActiveRenderer = cancelButton.activeSprites.GetComponent<SpriteRenderer>();
@@ -86,7 +86,7 @@ public class GameStartManagerPatch
                 cancelButtonInactiveShine.gameObject.SetActive(false);
             }
             cancelButton.activeTextColor = cancelButton.inactiveTextColor = Color.white;
-            //cancelButton.transform.localPosition = new(2f, 0.13f, 0f);
+
             GameStartTextlocalPosition = __instance.GameStartText.transform.localPosition;
             cancelButton.OnClick = new();
             cancelButton.OnClick.AddListener((UnityEngine.Events.UnityAction)(() =>
@@ -140,7 +140,7 @@ public class GameStartManagerPatch
             minPlayer = Options.PlayerAutoStart.GetInt();
             minWait = 600f - minWait * 60f;
             maxWait *= 60f;
-            // Lobby code
+
             if (DataManager.Settings.Gameplay.StreamerMode)
             {
                 __instance.GameRoomNameCode.color = new(255, 255, 255, 0);
@@ -153,7 +153,7 @@ public class GameStartManagerPatch
             }
 
             update = GameData.Instance?.PlayerCount != __instance.LastPlayerCount;
-            if (!AmongUsClient.Instance.AmHost || !GameData.Instance || AmongUsClient.Instance.NetworkMode == NetworkModes.LocalGame) return; // Not host or no instance or LocalGame
+            if (!AmongUsClient.Instance.AmHost || !GameData.Instance || AmongUsClient.Instance.NetworkMode == NetworkModes.LocalGame) return;
 
             if (Main.AutoStart.Value)
             {
@@ -254,7 +254,6 @@ public class GameStartManagerPatch
 
             __instance.RulesPresetText.text = GetString($"Preset_{OptionItem.CurrentPreset + 1}");
 
-            // Lobby timer
             if (!GameData.Instance || AmongUsClient.Instance.NetworkMode == NetworkModes.LocalGame || !GameStates.IsVanillaServer) return;
 
             if (update) currentText = __instance.PlayerCounter.text;
@@ -347,7 +346,7 @@ public class GameStartManagerBeginGamePatch
                 Main.HideNSeekOptions.MapId = mapId;
             }
 
-            if (mapId == 3) // Dleks map
+            if (mapId == 3)
                 GameOptionsMapPickerPatch.SetDleks = true;
             else
                 GameOptionsMapPickerPatch.SetDleks = false;
@@ -360,12 +359,6 @@ public class GameStartManagerBeginGamePatch
             else if (GameStates.IsHideNSeek)
                 Main.HideNSeekOptions.MapId = 3;
         }
-
-        //if (GameStates.IsNormalGame && Options.IsActiveDleks)
-        //{
-        //    Logger.SendInGame(GetString("Warning.BrokenVentsInDleksSendInGame"));
-        //    Utils.SendMessage(GetString("Warning.BrokenVentsInDleksMessage"), title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.NiceMini), GetString("WarningTitle")));
-        //}
 
         IGameOptions opt = GameStates.IsNormalGame
             ? Main.NormalOptions.CastFast<IGameOptions>()
@@ -385,30 +378,17 @@ public class GameStartManagerBeginGamePatch
             Main.LastGuardianAngelCooldown.Value = Options.DefaultAngelCooldown.GetFloat();
             AURoleOptions.GuardianAngelCooldown = 0f;
 
-            // ⚠️ JudgeTONE（法官）不在 KeepRoles 白名单里，它的选项从未创建，
-            //    直接读会抛 NullReferenceException。
-            //    这个异常在 BeginGame 的 Prefix 里，会让补丁提前退出，
-            //    进而导致 BeginGame 被反复调用（表现为「点击开始没反应」）。
-            //    这里做空值保护，选项不存在时用默认值 50。
             AURoleOptions.JudgeTaskRequirementPercentage = JudgeTONE.JudgeTaskRequirementPercentage?.GetInt() ?? 50;
         }
 
         GameManager.Instance.LogicOptions.SetDirty();
         OptionItem.SyncAllOptions();
-        //RPC.RpcVersionCheck();
+
     }
     private static byte SelectRandomMap()
     {
         var rand = IRandom.Instance;
         List<byte> randomMaps = [];
-        /*
-            The Skeld    = 0
-            MIRA HQ      = 1
-            Polus        = 2
-            Dleks        = 3
-            The Airship  = 4
-            The Fungle   = 5
-        */
 
         if (Options.UseMoreRandomMapSelection.GetBool())
         {

@@ -670,20 +670,8 @@ public class FireThief : RoleBase
         WoodNum[pc.PlayerId] = reader.ReadInt32();
     }
 
-    /*public override string GetMark(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
-    {
-        if (seer.PlayerId == seen.PlayerId)
-        {
-            var color = new Color32(244, 164, 96, byte.MaxValue);
-            return ColorString(color, $"({WoodNum[seer.PlayerId]}/{MaxNum[seer.PlayerId]})");
-        }
-
-        return "";
-    }*/
-
     public override string GetMarkOthers(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
     {
-        //if (seer.PlayerId == seen.PlayerId) return "";
 
         var color = new Color32(244, 164, 96, byte.MaxValue);
         return ColorString(color, $"({WoodNum[seen.PlayerId]}/{MaxNum[seen.PlayerId]})");

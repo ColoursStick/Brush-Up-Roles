@@ -29,7 +29,7 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
             if (allSender is PlayerGameOptionsSender sender && sender.player.PlayerId == playerId)
             {
                 sender.SetDirty();
-                break; // Only one sender can have the same player id
+                break;
             }
         }
     }
@@ -45,7 +45,7 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
                 ForceWaitFrame = true;
                 sender.SendGameOptions();
                 sender.IsDirty = false;
-                break; // Only one sender can have the same player id
+                break;
             }
         }
     }
@@ -245,7 +245,7 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
 
     protected override void SendOptionsArray(Il2CppStructArray<byte> optionArray, byte logicOptionsIndex)
     {
-        if (PackedWriter == null) // Single write
+        if (PackedWriter == null)
         {
             Logger.Info("Enqueue complete for single write", "SendOptionsArray");
             DataFlagRateLimiter.Enqueue(() =>
@@ -381,11 +381,8 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
             if (role.IsGhostRole())
                 AURoleOptions.GuardianAngelCooldown = Options.DefaultAngelCooldown.GetFloat();
 
-            AURoleOptions.ViperDissolveTime = ViperTONE.ViperDissolveTime.GetInt(); // can't be desynced
+            AURoleOptions.ViperDissolveTime = ViperTONE.ViperDissolveTime.GetInt();
 
-            /*
-            * Builds Modified GameOptions
-            */
             player.BuildCustomGameOptions(ref opt);
 
             AURoleOptions.EngineerCooldown = Mathf.Max(0.01f, AURoleOptions.EngineerCooldown);

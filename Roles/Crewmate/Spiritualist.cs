@@ -5,12 +5,11 @@ namespace TONE.Roles.Crewmate;
 
 internal class Spiritualist : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Spiritualist;
     private const int Id = 9600;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
-    //==================================================================\\
 
     private static OptionItem ShowGhostArrowEverySeconds;
     private static OptionItem ShowGhostArrowForSeconds;
@@ -86,21 +85,7 @@ internal class Spiritualist : RoleBase
         TargetArrow.Add(player.PlayerId, target.PlayerId);
 
         Utils.SendMessage(GetString("SpiritualistNoticeMessage"), target.PlayerId, GetString("Spiritualist").ToUpper());
-        /*var writer = CustomRpcSender.Create("SpiritualistSendMessage", SendOption.None);
-        writer.StartMessage(target.GetClientId());
-        writer.StartRpc(target.NetId, (byte)RpcCalls.SetName)
-            .Write(target.Data.NetId)
-            .Write(GetString("Spiritualist").ToUpper())
-            .EndRpc();
-        writer.StartRpc(target.NetId, (byte)RpcCalls.SendChat)
-            .Write(GetString("SpiritualistNoticeMessage"))
-            .EndRpc();
-        writer.StartRpc(target.NetId, (byte)RpcCalls.SetName)
-            .Write(target.Data.NetId)
-            .Write(target.Data.PlayerName)
-            .EndRpc();
-        writer.EndMessage();
-        writer.SendMessage();*/
+
     }
 
     public override string GetSuffix(PlayerControl seer, PlayerControl target = null, bool isForMeeting = false)

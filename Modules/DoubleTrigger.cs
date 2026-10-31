@@ -26,16 +26,13 @@ static class DoubleTrigger
         return PlayerIdList.Contains(killer.PlayerId);
     }
 
-    /// <summary>
-    /// <returns>returns false on first action, returns true on second action</returns>
-    /// </summary>
     public static bool CheckDoubleTrigger(this PlayerControl killer, PlayerControl target, Action firstAction)
     {
         if (FirstTriggerTimer.ContainsKey(killer.PlayerId))
         {
             if (FirstTriggerTarget[killer.PlayerId] != target.PlayerId)
             {
-                // Single action on the first opponent if the second one is off target
+
                 return false;
             }
             Logger.Info($"{killer.name} DoDoubleAction", "DoubleTrigger");
@@ -44,7 +41,7 @@ static class DoubleTrigger
             FirstTriggerAction.Remove(killer.PlayerId);
             return true;
         }
-        // Ignore kill interval when single action
+
         CheckMurderPatch.TimeSinceLastKill.Remove(killer.PlayerId);
         FirstTriggerTimer.Add(killer.PlayerId, 1f);
         FirstTriggerTarget.Add(killer.PlayerId, target.PlayerId);

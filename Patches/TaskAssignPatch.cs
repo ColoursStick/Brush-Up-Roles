@@ -74,7 +74,7 @@ class DisableTasks
                 case TaskTypes.EmptyGarbage when Options.DisableEmptyGarbage.GetBool():
                 case TaskTypes.FuelEngines when Options.DisableFuelEngines.GetBool():
                 case TaskTypes.DivertPower when Options.DisableDivertPower.GetBool():
-                case TaskTypes.FixWeatherNode when Options.DisableActivateWeatherNodes.GetBool(): // Activate Weather Nodes
+                case TaskTypes.FixWeatherNode when Options.DisableActivateWeatherNodes.GetBool():
                 case TaskTypes.RoastMarshmallow when Options.DisableRoastMarshmallow.GetBool():
                 case TaskTypes.CollectSamples when Options.DisableCollectSamples.GetBool():
                 case TaskTypes.ReplaceParts when Options.DisableReplaceParts.GetBool():
@@ -90,8 +90,8 @@ class DisableTasks
                 case TaskTypes.CrankGenerator when Options.DisableCrankGenerator.GetBool():
                 case TaskTypes.MonitorMushroom when Options.DisableMonitorMushroom.GetBool():
                 case TaskTypes.PlayVideogame when Options.DisablePlayVideoGame.GetBool():
-                case TaskTypes.TuneRadio when Options.DisableFindSignal.GetBool(): // Find Signal
-                case TaskTypes.TestFrisbee when Options.DisableThrowFisbee.GetBool(): // Throw Fisbee
+                case TaskTypes.TuneRadio when Options.DisableFindSignal.GetBool():
+                case TaskTypes.TestFrisbee when Options.DisableThrowFisbee.GetBool():
                 case TaskTypes.LiftWeights when Options.DisableLiftWeights.GetBool():
                 case TaskTypes.CollectShells when Options.DisableCollectShells.GetBool():
                     disabledTasks.Add(task);
@@ -109,13 +109,6 @@ class DisableTasks
 [HarmonyPatch(typeof(NetworkedPlayerInfo), nameof(NetworkedPlayerInfo.RpcSetTasks))]
 class RpcSetTasksPatch
 {
-    // Patch to overwrite the task just before the process of allocating the task and sending the RPC is performed
-    // Does not interfere with the vanilla task allocation process itself
-
-    /* TO DO:
-     * Try to make players get different tasks from each other
-     * InnerSloth uses task pool to achieve this.
-     */
 
     public static List<byte> decidedCommonTasks = [];
     public static bool Prefix(NetworkedPlayerInfo __instance)
@@ -123,7 +116,6 @@ class RpcSetTasksPatch
         if (!AmongUsClient.Instance.AmHost) return false;
         if (GameStates.IsHideNSeek) return true;
 
-        // null measure
         if (Main.RealOptionsData == null)
         {
             Logger.Warn("Warning: RealOptionsData is null", "RpcSetTasksPatch");
@@ -135,24 +127,20 @@ class RpcSetTasksPatch
         if (RoleNullable == null) return true;
         CustomRoles role = RoleNullable.Value;
 
-        // Default number of tasks
         bool hasCommonTasks = true;
         int NumLongTasks = Main.NormalOptions.NumLongTasks;
         int NumShortTasks = Main.NormalOptions.NumShortTasks;
 
         if (Options.OverrideTasksData.AllData.TryGetValue(role, out var data) && data.doOverride.GetBool())
         {
-            // whether to assign a common task (normal task) or not.
-            // If assigned, it will not be reassigned and the same common task will be assigned as the other crew members.
+
             hasCommonTasks = data.assignCommonTasks.GetBool();
 
-            NumLongTasks = data.numLongTasks.GetInt(); // Number of long tasks to assign
-            NumShortTasks = data.numShortTasks.GetInt(); // Number of short tasks to allocate
+            NumLongTasks = data.numLongTasks.GetInt();
+            NumShortTasks = data.numShortTasks.GetInt();
 
-            // Long and short tasks are always reallocated.
         }
 
-        // Betrayal of whistleblower mission coverage
         if (pc.Is(CustomRoles.Snitch) && pc.Is(CustomRoles.Madmate))
         {
             hasCommonTasks = false;
@@ -174,7 +162,6 @@ class RpcSetTasksPatch
             NumShortTasks = Main.NormalOptions.NumCommonTasks == 0 ? 2 : 1;
         }
 
-        // GM - no have tasks, Lazy Gay and Lazy have 1 task, FFA all are killers so need to assign any tasks
         if (pc.Is(CustomRoles.GM) || pc.Is(CustomRoles.LazyGuy) || pc.Is(CustomRoles.Lazy) || GameModeBase.GetGameMode() == CustomGameMode.FFA)
         {
             hasCommonTasks = false;
@@ -198,9 +185,7 @@ class RpcSetTasksPatch
 
         if (pc.Is(CustomRoles.Crewpostor))
         {
-            // when Crewpostor has Last Impostor,their kills wont be limited
-            // and they will only need 1 task for each kill
-            // so let the total number of alive players decide how many tasks Crewpostor will get
+
             int CPTaskNum = LastImpostor.currentId == pc.PlayerId ? Main.AllAlivePlayerControls.Count : Crewpostor.KillAfterTask.GetInt() * Crewpostor.KillsPerRound.GetInt();
 
             hasCommonTasks = false;
@@ -208,11 +193,6 @@ class RpcSetTasksPatch
             NumShortTasks = CPTaskNum;
         }
 
-        // Above is override task num
-        /* --------------------------------------------------------------*/
-        //Below is assign tasks
-
-        // We completely igonre the tasks decided by ShipStatus and assign our own.
         List<NormalPlayerTask> commonTasks = ShipStatus.Instance.CommonTasks.Shuffle().ToList();
         List<NormalPlayerTask> shortTasks = ShipStatus.Instance.ShortTasks.Shuffle().ToList();
         List<NormalPlayerTask> longTasks = ShipStatus.Instance.LongTasks.Shuffle().ToList();
@@ -226,7 +206,6 @@ class RpcSetTasksPatch
             }
         }
 
-        // Remove all disabled tasks
         DisableTasks.DoRemove(ref commonTasks);
         DisableTasks.DoRemove(ref shortTasks);
         DisableTasks.DoRemove(ref longTasks);
@@ -247,7 +226,6 @@ class RpcSetTasksPatch
 
         int commonTasksNum = System.Math.Min(commonTasks.Count, defaultcommoncount);
 
-        // Setting task num to 0 will make role description disappear from task panel for vanilla players and mod crews
         if (!hasCommonTasks && NumShortTasks + NumLongTasks < 1)
         {
             NumShortTasks = 1;
@@ -375,8 +353,6 @@ class HandleRpcPatch
 {
     public static bool Prefix(NetworkedPlayerInfo __instance, [HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader)
     {
-        //MessageReader sr = MessageReader.Get(reader);
-        // var rpc = (RpcCalls)callId;
 
         if (AmongUsClient.Instance.AmHost)
         {

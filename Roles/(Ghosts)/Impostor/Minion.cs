@@ -3,18 +3,16 @@ using TONE.Modules;
 using static TONE.Options;
 using static TONE.Utils;
 
-
 namespace TONE.Roles._Ghosts_.Impostor;
 
 internal class Minion : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Minion;
     private const int Id = 27900;
 
     public override CustomRoles ThisRoleBase => CustomRoles.GuardianAngel;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorGhosts;
-    //==================================================================\\
 
     public static OptionItem AbilityCooldown;
     public static OptionItem AbilityTime;
@@ -27,7 +25,7 @@ internal class Minion : RoleBase
         AbilityTime = FloatOptionItem.Create(Id + 11, GeneralOption.AbilityDuration, new(1f, 10f, 1f), 5f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Minion])
             .SetValueFormat(OptionFormat.Seconds);
     }
-    // EAC bans players when GA uses sabotage
+
     public override bool CanUseSabotage(PlayerControl pc) => false;
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
@@ -63,4 +61,3 @@ internal class Minion : RoleBase
         return false;
     }
 }
-

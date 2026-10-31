@@ -9,13 +9,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Witness : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Witness;
     private const int Id = 10100;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
-    //==================================================================\\
 
     private static OptionItem WitnessCD;
     private static OptionItem WitnessTime;

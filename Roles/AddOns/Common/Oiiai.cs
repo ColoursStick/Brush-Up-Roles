@@ -16,7 +16,6 @@ public class Oiiai : IAddon
     public static bool IsEnable = false;
     public AddonTypes Type => AddonTypes.Mixed;
 
-
     private static OptionItem CanPassOn;
     private static OptionItem ShouldChangeRoleOnNeutral;
     private static OptionItem ChangeNeutralRole;
@@ -26,7 +25,7 @@ public class Oiiai : IAddon
     public static readonly CustomRoles[] NRoleChangeRoles =
     [
         CustomRoles.Amnesiac,
-        //CustomRoles.Imitator,
+
     ];
 
     public void SetupCustomOption()
@@ -110,7 +109,7 @@ public class Oiiai : IAddon
         }
         else if (CovenManager.HasNecronomicon(killer))
         {
-            // Necronomicon holder immune to Oiiai
+
             Logger.Info($"Oiiai {killer.GetNameWithRole().RemoveHtmlTags()} with Coven with Necronomicon.", "Oiiai");
         }
         else if (killerRole.IsMadmate())
@@ -134,7 +133,7 @@ public class Oiiai : IAddon
         else if (!killerRole.IsNeutral())
         {
             var readyrole = GetErasedRole(killer.GetCustomRole().GetRoleTypes(), killer.GetCustomRole());
-            //Use eraser here LOL
+
             killer.GetRoleClass()?.OnRemove(killer.PlayerId);
             killer.RpcChangeRoleBasis(readyrole);
             killer.RpcSetCustomRole(readyrole);
@@ -176,7 +175,6 @@ public class Oiiai : IAddon
         return true;
     }
 
-    // Erased RoleType - Impostor, Shapeshifter, Crewmate, Engineer, Scientist (Not Neutrals)
     public static CustomRoles GetErasedRole(RoleTypes roleType, CustomRoles role)
     {
         return role.IsVanilla()

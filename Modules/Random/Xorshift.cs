@@ -4,7 +4,7 @@ namespace TONE;
 
 public class Xorshift(uint seed) : IRandom
 {
-    // Reference element
+
     public const string REFERENCE = "https://ja.wikipedia.org/wiki/Xorshift";
 
     private uint num = seed;

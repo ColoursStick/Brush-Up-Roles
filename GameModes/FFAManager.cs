@@ -24,7 +24,6 @@ internal class FFAManager : GameModeBase
     public static Dictionary<byte, long> FFALastKill = [];
     public static int RoundTime;
 
-    //Options
     public static OptionItem FFA_GameTime;
     public static OptionItem FFA_ShowChatInGame;
     public static OptionItem FFA_KCD;
@@ -236,7 +235,7 @@ internal class FFAManager : GameModeBase
 
             if (!GameStates.AirshipIsActive) EffectType = (byte)random.Next(0, 10);
             else EffectType = (byte)random.Next(4, 10);
-            if (EffectType <= 7) // Buff
+            if (EffectType <= 7)
             {
                 byte EffectID = (byte)random.Next(0, 3);
                 if (GameStates.AirshipIsActive) EffectID = 2;
@@ -274,7 +273,7 @@ internal class FFAManager : GameModeBase
                         break;
                 }
             }
-            else if (EffectType == 8) // De-Buff
+            else if (EffectType == 8)
             {
                 byte EffectID = (byte)random.Next(0, 3);
                 if (GameStates.AirshipIsActive) EffectID = 1;
@@ -313,7 +312,7 @@ internal class FFAManager : GameModeBase
                         break;
                 }
             }
-            else // Mixed
+            else
             {
                 _ = new LateTask(killer.RpcRandomVentTeleport, 0.5f, "FFA-Event-TP");
                 killer.Notify(GetString("FFA-Event-GetTP"));

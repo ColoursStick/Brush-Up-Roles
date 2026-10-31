@@ -22,7 +22,7 @@ public class PlayerState(byte playerId)
     public bool IsDead { get; set; } = false;
     public bool Disconnected { get; set; } = false;
     public CustomRoles RoleofKiller = CustomRoles.NotAssigned;
-#pragma warning disable IDE1006 // Naming Styles
+#pragma warning disable IDE1006
     public DeathReason deathReason { get; set; } = DeathReason.etc;
 #pragma warning restore IDE1006
     public TaskState taskState = new();
@@ -62,7 +62,6 @@ public class PlayerState(byte playerId)
             IsNecromancer = true;
         }
 
-        // check for role addon
         if (pc.Is(CustomRoles.Madmate))
         {
             countTypes = Madmate.MadmateCountMode.GetInt() switch
@@ -128,10 +127,7 @@ public class PlayerState(byte playerId)
 
         if (GameStates.IsInGame && preMainRole != CustomRoles.NotAssigned)
         {
-            // Role got assigned mid game.
-            // Since role basis may change, we need to re assign tasks?
 
-            //Some role may be bugged for this, need further testing.
             if (!(preMainRole == CustomRoles.Summoned || pc.GetCustomRole() == CustomRoles.Summoned))
             {
                 Logger.Info($"{pc.GetNameWithRole()} previously was {GetRoleName(preMainRole)}, reassign tasks!", "PlayerState.SetMainRole");
@@ -153,13 +149,6 @@ public class PlayerState(byte playerId)
         if (role == CustomRoles.Cleansed)
         {
             if (pc != null) countTypes = pc.GetCustomRole().GetCountTypes();
-
-            // Remove lovers on Cleansed
-            /*if (pc.Is(CustomRoles.Lovers))
-            {
-                var lover = Main.PlayerStates.Values.FirstOrDefault(x => x.PlayerId != pc.PlayerId && x.SubRoles.Contains(CustomRoles.Lovers));
-                lover?.RemoveSubRole(CustomRoles.Lovers);
-            }*/
 
             foreach (var subRole in SubRoles.ToArray())
             {
@@ -238,8 +227,6 @@ public class PlayerState(byte playerId)
                 };
                 break;
 
-            // This exist as it would be possible for them to exist on the same player via Bandit
-            // But since Bandit can't vent without Nimble, allowing them to have Circumvent is pointless
             case CustomRoles.Nimble:
                 SubRoles.Remove(CustomRoles.Circumvent);
                 break;
@@ -340,7 +327,6 @@ public class PlayerState(byte playerId)
         Fall,
         Exorcised,
 
-        // TONE
         Gambled,
         Eaten,
         Sacrifice,
@@ -379,7 +365,6 @@ public class PlayerState(byte playerId)
         AFK,
         Philosophy,
 
-        //Please add all new roles with deathreason & new deathreason in Utils.DeathReasonIsEnable();
         etc = -1,
     }
 
@@ -456,15 +441,12 @@ public class TaskState
     {
         Logger.Info($"{player.GetNameWithRole().RemoveHtmlTags()}: UpdateTask", "TaskState.Update");
 
-        // If not initialized, initialize it
         if (AllTasksCount == -1) Init(player);
 
         if (!hasTasks) return;
 
-        // if it's clear, it doesn't count
         if (CompletedTasksCount >= AllTasksCount) return;
 
-        //Solsticer task state is updated by host rpc
         if (player.Is(CustomRoles.Solsticer) && !AmongUsClient.Instance.AmHost) return;
 
         CompletedTasksCount++;
@@ -475,7 +457,6 @@ public class TaskState
             if (Math.Abs(add - float.MaxValue) > 0.5f && add > 0) player.RpcIncreaseAbilityUseLimitBy(add);
         }
 
-        // Display only up to the adjusted task amount
         CompletedTasksCount = Math.Min(AllTasksCount, CompletedTasksCount);
         Logger.Info($"{player.GetNameWithRole().RemoveHtmlTags()}: TaskCounts = {CompletedTasksCount}/{AllTasksCount}", "TaskState.Update");
 
@@ -486,7 +467,7 @@ public class PlayerVersion(Version ver, string tag_str, string forkId)
     public readonly Version version = ver;
     public readonly string tag = tag_str;
     public readonly string forkId = forkId;
-#pragma warning disable CA1041 // Provide ObsoleteAttribute message
+#pragma warning disable CA1041
     [Obsolete] public PlayerVersion(string ver, string tag_str) : this(Version.Parse(ver), tag_str, string.Empty) { }
     [Obsolete] public PlayerVersion(Version ver, string tag_str) : this(ver, tag_str, string.Empty) { }
 #pragma warning restore CA1041
@@ -501,7 +482,7 @@ public static class GameStates
 {
     public static bool InGame = false;
     public static bool AlreadyDied = false;
-    /**********Check Game Status***********/
+
     public static bool IsModHost => Main.playerVersion.ContainsKey(AmongUsClient.Instance.HostId);
     public static bool IsNormalGame => GameOptionsManager.Instance.CurrentGameOptions.GameMode is GameModes.Normal or GameModes.NormalFools;
     public static bool IsHideNSeek => GameOptionsManager.Instance.CurrentGameOptions.GameMode is GameModes.HideNSeek or GameModes.SeekFools;
@@ -524,7 +505,6 @@ public static class GameStates
             if (IsLocalGame && !IsNotJoined) return true;
             const string Domain = "among.us";
 
-            // From Reactor.gg
             return ServerManager.Instance.CurrentRegion?.CastFast<StaticHttpRegionInfo>() is { } regionInfo &&
                    regionInfo.PingServer.EndsWith(Domain, StringComparison.Ordinal) &&
                    regionInfo.Servers.All(serverInfo => serverInfo.Ip.EndsWith(Domain, StringComparison.Ordinal));
@@ -538,7 +518,7 @@ public static class GameStates
     public static bool IsProceeding => IsMeeting && MeetingHud.Instance.state is MeetingHud.MeetingStates.Proceeding;
     public static bool IsExilling => ExileController.Instance != null && !(AirshipIsActive && Minigame.Instance != null && Minigame.Instance.isActiveAndEnabled);
     public static bool IsCountDown => GameStartManager.InstanceExists && GameStartManager.Instance.startState == GameStartManager.StartingStates.Countdown;
-    /**********TOP ZOOM.cs***********/
+
     public static bool IsShip => ShipStatus.Instance != null;
     public static bool IsCanMove => PlayerControl.LocalPlayer?.CanMove is true;
     public static bool IsDead => PlayerControl.LocalPlayer?.Data?.IsDead is true;

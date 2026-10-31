@@ -10,13 +10,12 @@ namespace TONE.Roles.Crewmate;
 
 internal class Investigator : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Investigator;
     private const int Id = 24900;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
-    //==================================================================\\
 
     private static OptionItem InvestigateCooldown;
     private static OptionItem InvestigateMax;

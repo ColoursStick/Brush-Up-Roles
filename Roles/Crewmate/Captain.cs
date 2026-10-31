@@ -2,17 +2,15 @@ using static TONE.Options;
 using static TONE.Translator;
 using static TONE.Utils;
 
-
 namespace TONE.Roles.Crewmate;
 
 internal class Captain : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Captain;
     private const int Id = 26300;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
-    //==================================================================\\
 
     private static OptionItem OptionCrewCanFindCaptain;
     private static OptionItem OptionMadmateCanFindCaptain;

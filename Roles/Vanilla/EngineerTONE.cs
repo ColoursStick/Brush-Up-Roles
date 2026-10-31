@@ -5,12 +5,11 @@ namespace TONE.Roles.Vanilla;
 
 internal class EngineerTONE : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.EngineerTONE;
     private const int Id = 6100;
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateVanilla;
-    //==================================================================\\
 
     private static OptionItem VentUseCooldown;
     private static OptionItem InVentMaxTime;

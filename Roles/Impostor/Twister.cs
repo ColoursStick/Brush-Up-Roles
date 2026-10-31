@@ -9,13 +9,12 @@ namespace TONE.Roles.Impostor;
 
 internal class Twister : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Twister;
     private const int Id = 5700;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Twister);
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
-    //==================================================================\\
 
     private static OptionItem ShapeshiftCooldown;
     private static OptionItem ShapeshiftDuration;
@@ -44,7 +43,7 @@ internal class Twister : RoleBase
     }
     public override void OnShapeshift(PlayerControl shapeshifter, PlayerControl targetSS, bool IsAnimate, bool shapeshifting)
     {
-        // When is force revert shapeshift
+
         if (shapeshifter.PlayerId == targetSS.PlayerId && !IsAnimate) return;
 
         changePositionPlayers.Clear();

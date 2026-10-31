@@ -13,14 +13,14 @@ namespace TONE.Roles.Neutral;
 
 internal class Lich : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Lich;
     private const int Id = 32900;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Lich);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralApocalypse;
-    //==================================================================\\
+
     private static OptionItem LichPointsOpt;
     private static OptionItem GetPassiveCharges;
     public static OptionItem LichCanVent;
@@ -29,13 +29,6 @@ internal class Lich : RoleBase
     private static byte TargetId;
     private static PlayerControl LichPlayer;
 
-    // Roles Decieved (that are implemented so far): Necroview, Sleuth, CopyCat, Forensic, Enigma, FortuneTeller, Inspector, Investigator, Oracle, Psychic, Snitch, Consigliere, Visionary, Doomsayer
-    // Probably Decieved (needs testing): Mimic, Potion Master, Overseer, etc.
-
-    // Not Decieved: Apoc, Lovers, Admirer, Executioner, Lawyer, Follower, Infectious, Jackal, Virus, Romantic, SchrodingersCat
-
-    // Not Decided Yet: God, Revolutionist
-
     public override void SetupCustomOption()
     {
         SetupSingleRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Lich, 1, zeroOne: false);
@@ -43,9 +36,7 @@ internal class Lich : RoleBase
             .SetValueFormat(OptionFormat.Times);
         GetPassiveCharges = BooleanOptionItem.Create(Id + 11, "GetPassiveCharges", true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Lich]);
         LichCanVent = BooleanOptionItem.Create(Id + 12, "LichCanVent", true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Lich]);
-        // Bind to SoulCollector setting
-        // _ = IntegerOptionItem.Create(15313, "DeathMeetingTimeIncrease", new(0, 120, 1), 0, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.SoulCollector])
-        //     .SetValueFormat(OptionFormat.Seconds); 
+
         LichHasImpostorVision = BooleanOptionItem.Create(Id + 14, "LichHasImpostorVision", true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Lich]);
     }
 
@@ -169,14 +160,12 @@ internal class Lich : RoleBase
         if (seer.IsNeutralApocalypse()) return false;
         if (target.GetCustomRole().IsRevealingRole(target) || target.IsAnySubRole(role => role.IsRevealingRole(target))) return false;
 
-        // Imposter Team
         if (seer.CheckImpCanSeeAllies(CheckAsSeer: true) && target.CheckImpCanSeeAllies(CheckAsTarget: true)) return false;
         if (seer.Is(CustomRoles.Madmate) && target.CheckImpCanSeeAllies(CheckAsTarget: true) && Madmate.MadmateKnowWhosImp.GetBool()) return false;
         if (seer.CheckImpCanSeeAllies(CheckAsSeer: true) && target.Is(CustomRoles.Madmate) && Madmate.ImpKnowWhosMadmate.GetBool()) return false;
         if (seer.CheckImpCanSeeAllies(CheckAsSeer: true) && target.GetCustomRole().IsGhostRole() && target.GetCustomRole().IsImpostor()) return false;
         if (seer.Is(CustomRoles.Madmate) && target.Is(CustomRoles.Madmate) && Madmate.MadmateKnowWhosMadmate.GetBool()) return false;
 
-        // Coven Team
         if (seer.Is(Custom_Team.Coven) && target.Is(Custom_Team.Coven)) return false;
         if (seer.Is(CustomRoles.Enchanted) && target.Is(Custom_Team.Coven) && Ritualist.EnchantedKnowsCoven.GetBool()) return false;
         if (seerHasState && seerState.IsNecromancer && target.Is(Custom_Team.Coven)) return false;
@@ -186,23 +175,17 @@ internal class Lich : RoleBase
         if (targetHasState && targetState.IsNecromancer && seer.Is(CustomRoles.Enchanted)) return false;
         if (seer.Is(CustomRoles.Enchanted) && target.Is(CustomRoles.Enchanted) && Ritualist.EnchantedKnowsEnchanted.GetBool()) return false;
 
-        // Cultist
         if (Cultist.NameRoleColor(seer, target)) return false;
 
-        // Admirer
         if (seer.Is(CustomRoles.Admirer) && !(seerHasState && seerState.IsNecromancer) && target.Is(CustomRoles.Admired)) return false;
         if (seer.Is(CustomRoles.Admired) && target.Is(CustomRoles.Admirer) && !(seerHasState && seerState.IsNecromancer)) return false;
 
-        // Infectious
         if (Infectious.InfectedKnowColorOthersInfected(seer, target)) return false;
 
-        // Jackal recruit
         if (Jackal.JackalKnowRole(seer, target)) return false;
 
-        //Virus
         if (Virus.KnowRoleColor(seer, target) != "") return false;
 
-        // Narc & Sheriff/ChiefOfPolice
         if (NarcManager.KnowRoleOfTarget(seer, target)) return false;
 
         if (Main.GodMode.Value && seer.IsHost()) return false;
@@ -212,7 +195,6 @@ internal class Lich : RoleBase
         if (Workaholic.OthersKnowWorka(target)) return false;
         if (target.Is(CustomRoles.Gravestone) && targetHasState && targetState.IsDead) return false;
 
-        // if (player.GetBetrayalAddon(forRecruiter: true) != CustomRoles.NotAssigned && player.GetBetrayalAddon(true) == target.GetBetrayalAddon(true)) return false;
         if (seer.IsLoverWith(target)) return false;
 
         if (seer.Is(CustomRoles.Executioner) && (seer.GetRoleClass() as Executioner).IsTarget(target.PlayerId)) return false;

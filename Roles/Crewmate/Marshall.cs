@@ -7,12 +7,11 @@ namespace TONE.Roles.Crewmate;
 
 internal class Marshall : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Marshall;
     private const int Id = 11900;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
-    //==================================================================\\
 
     private static readonly Color RoleColor = Utils.GetRoleColor(CustomRoles.Marshall);
 

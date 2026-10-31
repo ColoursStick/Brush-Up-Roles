@@ -7,13 +7,12 @@ namespace TONE.Roles.Crewmate;
 
 internal partial class Mayor : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Mayor;
     private const int Id = 12000;
     public override CustomRoles ThisRoleBase => MayorHasPortableButton.GetBool() ? CustomRoles.Engineer : CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
-    //==================================================================\\
 
     private static OptionItem MayorAdditionalVote;
     private static OptionItem MayorHasPortableButton;
@@ -70,11 +69,6 @@ internal partial class Mayor : RoleBase
         }
     }
 
-    //public override void OnReportDeadBody(PlayerControl reporter, PlayerControl target)
-    //{
-    //    if (target == null)
-    //        MayorUsedButtonCount[reporter.PlayerId] += 1;
-    //}
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
         AURoleOptions.EngineerCooldown =

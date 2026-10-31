@@ -9,7 +9,7 @@ namespace TONE.Roles.Neutral;
 
 internal class Shocker : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Shocker;
     private const int Id = 31000;
     public static byte? playerId;
@@ -18,7 +18,6 @@ internal class Shocker : RoleBase
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
-    //==================================================================\\
 
     private static OptionItem ShockerAbilityCooldown;
     private static OptionItem ShockerAbilityDuration;

@@ -24,7 +24,7 @@ namespace TONE.Modules.Rpc
         }
         public override void SerializeCustomValues(MessageWriter writer)
         {
-            // start message data flag
+
             var optionsMessage = new SendOptionsArray(options);
             optionsMessage.SerializeCustomValues(writer);
             writer.EndMessage();
@@ -34,7 +34,7 @@ namespace TONE.Modules.Rpc
             writer.Write((byte)RpcCalls.MurderPlayer);
             writer.WritePacked(targetNetId);
             writer.Write((int)MurderResultFlags.FailedProtected);
-            // endmessage
+
         }
 
         private readonly uint netId;

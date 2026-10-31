@@ -10,14 +10,13 @@ namespace TONE.Roles.Crewmate;
 
 internal class Psychic : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Psychic;
     private const int Id = 9400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Psychic);
 
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
-    //==================================================================\\
 
     private static OptionItem CanSeeNum;
     private static OptionItem Fresh;
@@ -28,7 +27,6 @@ internal class Psychic : RoleBase
     private static OptionItem NAshowEvil;
     private static OptionItem NKshowEvil;
     private static OptionItem CovshowEvil;
-
 
     private readonly HashSet<byte> RedPlayer = [];
 
@@ -86,7 +84,7 @@ internal class Psychic : RoleBase
         {
             if (Fresh.GetBool())
             {
-                RedPlayer.Clear(); // Force generate new red names so its freshed?
+                RedPlayer.Clear();
             }
 
             GetRedName();

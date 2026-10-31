@@ -8,7 +8,6 @@ public class DoubleShot : IAddon
     public static readonly HashSet<byte> IsActive = [];
     public AddonTypes Type => AddonTypes.Guesser;
 
-
     public static OptionItem ImpCanBeDoubleShot;
     public static OptionItem CrewCanBeDoubleShot;
     public static OptionItem NeutralCanBeDoubleShot;

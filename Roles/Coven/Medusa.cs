@@ -9,20 +9,17 @@ namespace TONE.Roles.Coven;
 
 internal class Medusa : CovenManager
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Medusa;
     private const int Id = 17000;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenUtility;
-    //==================================================================\\
 
     private static OptionItem StoneCooldown;
     private static OptionItem StoneDuration;
     private static OptionItem StoneVision;
-    //private static OptionItem KillCooldownAfterStoneGazing;
-    //private static OptionItem CanVent;
-    //private static OptionItem HasImpostorVision;
+
     enum OptionName
     {
         MedusaStoneCooldown,
@@ -33,8 +30,6 @@ internal class Medusa : CovenManager
     private static readonly Dictionary<byte, float> originalSpeed = [];
     private static bool isStoning;
 
-
-
     public override void SetupCustomOption()
     {
         SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
@@ -44,12 +39,7 @@ internal class Medusa : CovenManager
             .SetValueFormat(OptionFormat.Seconds);
         StoneVision = FloatOptionItem.Create(Role, Id + 16, OptionName.MedusaStoneVision, new(0f, 5f, 0.25f), 0.5f, false)
             .SetValueFormat(OptionFormat.Multiplier);
-        /*
-        KillCooldownAfterStoneGazing = FloatOptionItem.Create(Id + 15, "KillCooldownAfterStoneGazing", new(0f, 180f, 2.5f), 40f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Medusa])
-            .SetValueFormat(OptionFormat.Seconds);
-        CanVent = BooleanOptionItem.Create(Id + 11, GeneralOption.CanVent, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Medusa]);
-        HasImpostorVision = BooleanOptionItem.Create(Id + 13, GeneralOption.ImpostorVision, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Medusa]);
-        */
+
     }
     public override void Init()
     {
@@ -83,21 +73,6 @@ internal class Medusa : CovenManager
     }
     public override bool CanUseKillButton(PlayerControl pc) => true;
 
-    /*
-    public override bool OnCheckReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target, PlayerControl killer)
-    {
-        if (reporter.Is(CustomRoles.Medusa))
-        {
-            Main.UnreportableBodies.Add(target.PlayerId);
-            reporter.Notify(GetString("MedusaStoneBody"));
-
-            reporter.SetKillCooldownV3(KillCooldownAfterStoneGazing.GetFloat(), forceAnime: true);
-            Logger.Info($"{reporter.GetRealName()} stoned {target.PlayerName} body", "Medusa");
-            return false;
-        }
-        return true;
-    }
-    */
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
         if (killer == null || target == null) return false;
@@ -138,7 +113,7 @@ internal class Medusa : CovenManager
             {
                 dusa.Notify(GetString("MedusaStoningEnd"));
                 isStoning = false;
-                // sometimes it doesn't contain the player for some stupid reason
+
                 if (originalSpeed.ContainsKey(player)) Main.AllPlayerSpeed[player] = originalSpeed[player];
                 else Main.AllPlayerSpeed[player] = AURoleOptions.PlayerSpeedMod;
                 GetPlayerById(player).SyncSettings();

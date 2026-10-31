@@ -12,12 +12,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Ninja : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Ninja;
     private const int Id = 2100;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem MarkCooldown;
     private static OptionItem AssassinateCooldownOpt;
@@ -122,10 +121,9 @@ internal class Ninja : RoleBase
     {
         var selfShapeshift = shapeshifter.PlayerId == target.PlayerId;
 
-        // Not call code if is self revert shapeshift after meeting or when mushroom mixup was activated
         if (selfShapeshift)
         {
-            // When shapeshift duration is over
+
             if (shouldAnimate && Shapeshifting(shapeshifter.PlayerId))
             {
                 shouldAnimate = false;
@@ -133,14 +131,12 @@ internal class Ninja : RoleBase
             return true;
         }
 
-        // Ninja not marked player
         if (!MarkedPlayer.ContainsKey(shapeshifter.PlayerId))
         {
             resetCooldown = false;
             return false;
         }
 
-        // Check and kill marked player
         if (MarkedPlayer.TryGetValue(shapeshifter.PlayerId, out var targetId))
         {
             var marketTarget = Utils.GetPlayerById(targetId);

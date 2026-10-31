@@ -4,12 +4,11 @@ namespace TONE.Roles.Impostor;
 
 internal class Saboteur : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Saboteur;
     private const int Id = 2300;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
-    //==================================================================\\
 
     private static OptionItem SaboteurCD;
     public static OptionItem SaboteurMinCD;

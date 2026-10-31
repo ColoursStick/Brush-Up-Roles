@@ -31,10 +31,9 @@ internal class EAC
     }
     public static bool PlayerControlReceiveRpc(PlayerControl pc, byte callId, MessageReader reader)
     {
-        // nvm, it works so im not doing more changes
 
         if (!AmongUsClient.Instance.AmHost) return false;
-        //if (RoleBasisChanger.IsChangeInProgress) return false;
+
         if (pc == null || reader == null) return false;
         try
         {
@@ -42,7 +41,7 @@ internal class EAC
             var rpc = (RpcCalls)callId;
             switch (rpc)
             {
-                // Check name is now done in PlayerControl.CheckName
+
                 case RpcCalls.CheckName:
                     if (!GameStates.IsLobby)
                     {
@@ -53,23 +52,7 @@ internal class EAC
                         return true;
                     }
                     break;
-                /*
-                case RpcCalls.SetName:
-                    //Only sent by host
-                    WarnHost();
-                    Report(pc, "Directly SetName");
-                    HandleCheat(pc, "Directly SetName");
-                    Logger.Fatal($"Directly SetName【{pc.GetClientId()}:{pc.GetRealName()}】已驳回", "EAC");
-                    return true;
-                case RpcCalls.SetRole:
-                    //Only sent by host
-                    WarnHost();
-                    Report(pc, "Directly SetRole");
-                    HandleCheat(pc, "Directly SetRole");
-                    Logger.Fatal($"Directly SetRole for【{pc.GetClientId()}:{pc.GetRealName()}】已驳回", "EAC");
-                    break;
-                */
-                // Disabled due to host sending these rpcs to itself using custom sender
+
                 case RpcCalls.SendChat:
                     var text = sr.ReadString();
                     if ((
@@ -87,7 +70,7 @@ internal class EAC
                     }
                     break;
                 case RpcCalls.StartMeeting:
-                    //Only sent by host
+
                     WarnHost();
                     Report(pc, "Bad StartMeeting");
                     HandleCheat(pc, "Bad StartMeeting");
@@ -133,9 +116,9 @@ internal class EAC
                         return true;
                     }
                     break;
-                // Some mods may add custom colors. Skip check color check
+
                 case RpcCalls.SetColor:
-                    // Only sent by Host
+
                     Report(pc, "Directly SetColor");
                     HandleCheat(pc, "Directly SetColor");
                     Logger.Fatal($"Directly SetColor【{pc.GetClientId()}:{pc.GetRealName()}】已驳回", "EAC");
@@ -151,7 +134,7 @@ internal class EAC
                     }
                     break;
                 case RpcCalls.MurderPlayer:
-                    //Calls will only be sent by host(under protocol) / server(vanilla)
+
                     var murdered = sr.ReadNetObject<PlayerControl>();
                     if (GameStates.IsLobby)
                     {
@@ -179,7 +162,7 @@ internal class EAC
                     break;
                 case RpcCalls.Shapeshift:
                     {
-                        // Only be sent by host
+
                         Report(pc, "Directly Shapeshift");
                         MessageWriter swriter = AmongUsClient.Instance.StartRpcImmediately(pc.NetId, (byte)RpcCalls.Shapeshift, SendOption.Reliable, -1);
                         swriter.WriteNetObject(pc);
@@ -189,12 +172,12 @@ internal class EAC
                         Logger.Fatal($"玩家【{pc.GetClientId()}:{pc.GetRealName()}】直接变形，已驳回", "EAC");
                         return true;
                     }
-                // Skip Check Phantom Rpcs bcz I dont know what the mod will do with phantom
+
                 case RpcCalls.StartVanish:
                 case RpcCalls.StartAppear:
                     {
                         var sreason = "Directly Phantom Rpcs " + rpc.ToString();
-                        // Only be sent by host
+
                         Report(pc, sreason);
                         var swriter = AmongUsClient.Instance.StartRpcImmediately(pc.NetId, (byte)RpcCalls.StartAppear, SendOption.Reliable, -1);
                         swriter.Write(false);
@@ -204,7 +187,7 @@ internal class EAC
                         return true;
                     }
                 case RpcCalls.SendChatNote:
-                    // Only sent by Host
+
                     Report(pc, "Directly Send ChatNote");
                     HandleCheat(pc, "Directly Send ChatNote");
                     Logger.Fatal($"玩家【{pc.GetClientId()}:{pc.GetRealName()}】直接Send ChatNote，已驳回", "EAC");
@@ -212,7 +195,7 @@ internal class EAC
             }
             switch (callId)
             {
-                case 101: // Aum Chat
+                case 101:
                     try
                     {
                         var firstString = sr.ReadString();
@@ -231,10 +214,10 @@ internal class EAC
                     }
                     catch
                     {
-                        // Do nothing
+
                     }
                     break;
-                case unchecked((byte)42069): // 85 AUM
+                case unchecked((byte)42069):
                     try
                     {
                         var aumid = sr.ReadByte();
@@ -249,10 +232,10 @@ internal class EAC
                     }
                     catch
                     {
-                        // Do nothing
+
                     }
                     break;
-                case 119: // KN Chat
+                case 119:
                     try
                     {
                         var firstString = sr.ReadString();
@@ -271,10 +254,10 @@ internal class EAC
                     }
                     catch
                     {
-                        // Do nothing
+
                     }
                     break;
-                case 250: // KN
+                case 250:
                     if (sr.BytesRemaining == 0)
                     {
                         Report(pc, "KN RPC");
@@ -283,7 +266,7 @@ internal class EAC
                         return true;
                     }
                     break;
-                case unchecked((byte)420): // 164 Sicko
+                case unchecked((byte)420):
                     if (sr.BytesRemaining == 0)
                     {
                         Report(pc, "Sicko RPC");
@@ -329,20 +312,7 @@ internal class EAC
                         Logger.Fatal($"玩家【{pc.GetClientId()}:{pc.GetRealName()}】游戏内改等级，已驳回", "EAC");
                         return true;
                     }
-                    //if (sr.ReadPackedUInt32() > 0)
-                    //{
-                    //    uint ClientDataLevel = pc.GetClient() == null ? pc.GetClient().PlayerLevel : 0;
-                    //    uint PlayerControlLevel = sr.ReadPackedUInt32();
-                    //    if (ClientDataLevel != 0 && Math.Abs(PlayerControlLevel - ClientDataLevel) > 4)
-                    //    {
-                    //        WarnHost();
-                    //        Report(pc, "Sus Level Change");
-                    //        AmongUsClient.Instance.KickPlayer(pc.GetClientId(), false);
-                    //        Logger.Fatal($"玩家【{pc.GetClientId()}:{pc.GetRealName()}】游戏内改等级，已驳回", "EAC");
-                    //        return true;
-                    //    }
-                    //}
-                    //Buggy
+
                     break;
                 case 39:
                 case 40:
@@ -362,7 +332,7 @@ internal class EAC
         catch (Exception e)
         {
             Logger.Exception(e, "EAC");
-            //throw e;
+
         }
         WarnHost(-1);
         return false;
@@ -388,7 +358,7 @@ internal class EAC
         {
             return false;
         }
-        //Update system rpc can not get received by playercontrol.handlerpc
+
         var Mapid = Utils.GetActiveMapId();
         Logger.Info("Check sabotage RPC" + ", PlayerName: " + player.GetNameWithRole() + ", SabotageType: " + systemType.ToString() + ", amount: " + amount.ToString(), "EAC");
         if (!AmongUsClient.Instance.AmHost) return false;
@@ -399,7 +369,7 @@ internal class EAC
             return true;
         }
 
-        if (systemType == SystemTypes.Sabotage) //Normal sabotage using buttons
+        if (systemType == SystemTypes.Sabotage)
         {
             if (!player.HasImpKillButton(true))
             {
@@ -409,7 +379,7 @@ internal class EAC
                 Logger.Fatal($"玩家【{player.GetClientId()}:{player.GetRealName()}】Bad Sabotage A，已驳回", "EAC");
                 return true;
             }
-        } //Cheater directly send 128 systemtype rpc
+        }
         else if (systemType == SystemTypes.LifeSupp)
         {
             if (Mapid != 0 && Mapid != 1 && Mapid != 3) goto YesCheat;
@@ -430,7 +400,7 @@ internal class EAC
         else if (systemType == SystemTypes.Electrical)
         {
             if (Mapid == 5) goto YesCheat;
-            if (amount >= 5) //0 - 4 normal lights. other sabotage, Should never be sent by client
+            if (amount >= 5)
             {
                 goto YesCheat;
             }
@@ -444,7 +414,7 @@ internal class EAC
         {
             if (Mapid == 2 || Mapid == 4) goto YesCheat;
             else if (!(amount == 64 || amount == 65 || amount == 32 || amount == 33)) goto YesCheat;
-            //Airship use heli sabotage /Other use 64,65 | 32,33
+
         }
         else if (systemType == SystemTypes.HeliSabotage)
         {
@@ -454,7 +424,7 @@ internal class EAC
         else if (systemType == SystemTypes.MushroomMixupSabotage)
         {
             goto YesCheat;
-            //Normal clients will never directly send MushroomMixupSabotage
+
         }
 
         if ((GameStates.IsMeeting && MeetingHud.Instance.state != MeetingHud.MeetingStates.Animating) || GameStates.IsExilling)
@@ -467,7 +437,6 @@ internal class EAC
             Logger.Fatal($"玩家【{player.GetClientId()}:{player.GetRealName()}】Bad Sabotage D，已驳回", "EAC");
             return true;
         }
-        //There may be cases where a player is fixing reactor and a meeting start, triggering EAC check in meeting
 
         return false;
 
@@ -488,7 +457,7 @@ internal class EAC
         {
             ReportTimes.Add(player.PlayerId, 0);
         }
-        //target == null , button event
+
         if (target == null || !Main.OverDeadPlayerList.Contains(target.PlayerId))
         {
             ReportTimes[player.PlayerId]++;
@@ -505,8 +474,7 @@ internal class EAC
 
         if (ReportTimes[player.PlayerId] >= 14)
         {
-            //I believe nobody can report 14 different bodies in a single round if host players normally
-            //This check is still not enough to stop spam meeting hacks or crazy hosts that spam kill command
+
             WarnHost();
             Report(player, "Spam report bodies");
             HandleCheat(player, "Spam report bodies");
@@ -515,15 +483,13 @@ internal class EAC
         }
         if (GameStates.IsMeeting)
         {
-            //Cancel rpc report body if a meeting is already held
+
             Logger.Info($"玩家【{player.GetClientId()}:{player.GetRealName()}】在会议期间开会，已驳回", "EAC");
             return true;
         }
 
         return false;
-        // Niko intended to do report living player check,
-        // but concerning roles like bait, hacker somehow never use report dead body,
-        // Niko gave up
+
     }
 
     public static bool PlayerPhysicsRpcCheck(PlayerPhysics __instance, byte callId, MessageReader reader)
@@ -569,7 +535,7 @@ internal class EAC
                     }
                     else
                     {
-                        // Not sure whether host will send null vent to a player huh
+
                         Logger.Warn($"【{player.GetClientId()}:{player.GetRealName()}】 attempted to enter a unexisting vent. {ventid}", "EAC_physics");
                         if (rpcType is RpcCalls.ExitVent)
                         {
@@ -584,35 +550,7 @@ internal class EAC
                 break;
 
             case RpcCalls.BootFromVent:
-                //int ventid2 = subReader.ReadPackedInt32();
-                //if (!hasVent(ventid2))
-                //{
-                //    if (AmongUsClient.Instance.AmHost)
-                //    {
-                //        WarnHost();
-                //        Report(player, "Got booted from a null vent (can be spoofed by others)");
-                //        AmongUsClient.Instance.KickPlayer(player.GetClientId(), false);
-                //        Logger.Fatal($"【{player.GetClientId()}:{player.GetRealName()}】 attempted to boot from a unexisting vent. {ventid2}", "EAC_physics");
-                //    }
-                //    else
-                //    {
-                //        // Not sure whether host will send null vent to a player huh
-                //        // Nah, host may send 99 boot from vent, which is stupid
-                //        Logger.Warn($"【{player.GetClientId()}:{player.GetRealName()}】 attempted to boot from a unexisting vent. {ventid2}", "EAC_physics");
-                //        if (ventid2 == 99 && player.inVent)
-                //        {
-                //            __instance.BootFromVent(ventid2);
-                //            return true;
-                //        }
-                //        player.Visible = true;
-                //        player.inVent = false;
-                //        player.moveable = true;
-                //        player.NetTransform.SetPaused(false);
-                //    }
-                //    return true;
-                //}
 
-                // BootFromVent can only be sent by host
                 WarnHost();
                 Report(player, "Got boot from vent from clients, can be spoofed");
                 HandleCheat(player, "Got boot from vent from clients, can be spoofed");
@@ -646,8 +584,6 @@ internal class EAC
                     return true;
                 }
 
-                // if (player.CurrentOutfit.PetId == "")
-                // Petting air is fine i guess lol
                 break;
         }
         return false;
@@ -662,7 +598,7 @@ internal class EAC
         }
 
         string msg = $"{pc.GetClientId()}|{pc.FriendCode}|{pc.Data.PlayerName}|{pc.GetClient().GetHashedPuid()}|{reason}";
-        //Cloud.SendData(msg);
+
         Logger.Fatal($"EAC报告：{msg}", "EAC Cloud");
         if (Options.CheatResponses.GetInt() != 5)
             Logger.SendInGame(string.Format(GetString("Message.NoticeByEAC"), $"{pc?.Data?.PlayerName} | {pc.GetClient().GetHashedPuid()}", reason));
@@ -706,8 +642,7 @@ internal class EAC
                 break;
             case 5:
                 Logger.Info("No Handle Cheat", "MalumMenu_On_Top");
-                //Hope u like this scp =(
-                //Even handle the cheats brings lag
+
                 break;
         }
     }

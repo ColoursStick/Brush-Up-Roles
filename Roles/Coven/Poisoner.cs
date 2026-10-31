@@ -12,19 +12,18 @@ internal class Poisoner : CovenManager
         public byte PoisonerId = poisonerId;
         public float KillTimer = killTimer;
     }
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Poisoner;
     private const int Id = 17500;
 
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenTrickery;
-    //==================================================================\\
 
     private static OptionItem OptionKillDelay;
-    //private static OptionItem CanVent;
+
     public static OptionItem KillCooldown;
-    //private static OptionItem HasImpostorVision;
+
     enum OptionName
     {
         PoisonCooldown,
@@ -32,7 +31,6 @@ internal class Poisoner : CovenManager
     }
     private static readonly Dictionary<byte, PoisonedInfo> PoisonedPlayers = [];
     private static readonly Dictionary<byte, List<byte>> RoleblockedPlayers = [];
-
 
     private static float KillDelay;
 
@@ -43,8 +41,7 @@ internal class Poisoner : CovenManager
             .SetValueFormat(OptionFormat.Seconds);
         OptionKillDelay = FloatOptionItem.Create(Role, Id + 11, OptionName.PoisonerKillDelay, new(1f, 60f, 1f), 10f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        //CanVent = BooleanOptionItem.Create(Id + 12, GeneralOption.CanVent, true, TabGroup.CovenRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Poisoner]);
-        //HasImpostorVision = BooleanOptionItem.Create(Id + 13, GeneralOption.ImpostorVision, true, TabGroup.CovenRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Poisoner]);
+
     }
 
     public override void Init()
@@ -62,7 +59,6 @@ internal class Poisoner : CovenManager
     }
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
     public override bool CanUseKillButton(PlayerControl pc) => true;
-
 
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
@@ -163,7 +159,7 @@ internal class Poisoner : CovenManager
         }
         return false;
     }
-    public override bool CheckMurderOnOthersTarget(PlayerControl pc, PlayerControl _)  // Target of Pursuer attempt to murder someone
+    public override bool CheckMurderOnOthersTarget(PlayerControl pc, PlayerControl _)
     {
         if (pc == null) return false;
         if (IsRoleblocked(pc.PlayerId))

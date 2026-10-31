@@ -1,7 +1,6 @@
 using AmongUs.GameOptions;
 using System;
 
-
 namespace TONE;
 
 public abstract class OptionBackupValue

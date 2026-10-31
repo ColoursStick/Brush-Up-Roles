@@ -17,9 +17,7 @@ public class dbConnect
 
     public static IEnumerator Init()
     {
-        // ⚠️ Brush Up Roles：这里原本会向 qin-qwq/TONE-Record 拉取「用户角色表」和「EAC 名单」，
-        //    启动时会因此卡 10 秒左右（日志里那两条 Fetching ... 就是它）。
-        //    本模组不依赖上游服务，直接跳过整个登录流程。
+
         Logger.Info("dbConnect 已在本模组中停用（不再请求上游服务）", "dbConnect.init");
         yield break;
 
@@ -95,28 +93,20 @@ public class dbConnect
         string apiToken = "";
         Assembly assembly = Assembly.GetExecutingAssembly();
 
-        // Specify the full name of the embedded resource
         string resourceName = "TONE.token.env";
-        /*
-         make a token.env file in the root folder and add `API_TOKEN=your_api_token_here`
-        for example :- API_TOKEN=1234567890
-         */
 
-        // Read the embedded resource
         using (Stream stream = assembly.GetManifestResourceStream(resourceName))
         {
             if (stream != null)
             {
                 using StreamReader reader = new(stream);
-                // Read the content of the .env file
+
                 string content = reader.ReadToEnd();
 
-                // Process the content as needed
                 apiToken = content.Replace("API_TOKEN=", string.Empty).Trim();
             }
         }
 
-        // Check if the token contains spaces or is empty
         if (string.IsNullOrWhiteSpace(apiToken) || apiToken.Contains(' '))
         {
             Logger.Info("No api token provided in token.env", "db.Connect");
@@ -139,7 +129,7 @@ public class dbConnect
 
     private static IEnumerator GetRoleTable()
     {
-        var tempUserType = new Dictionary<string, string>(); // Create a temporary dictionary
+        var tempUserType = new Dictionary<string, string>();
         string apiToken = GetToken();
         if (apiToken == "")
         {
@@ -183,7 +173,7 @@ public class dbConnect
                                 colorCmd: userData["colorCmd"].GetInt32() == 1,
                                 upName: userData["name"].ToString()));
                         }
-                        tempUserType[userData["friendcode"].ToString()] = userData["type"].ToString(); // Store the data in the temporary dictionary
+                        tempUserType[userData["friendcode"].ToString()] = userData["type"].ToString();
                         if (DevManager.IsDevUser(userData["friendcode"].ToString()) && !tempUserType.ContainsKey(userData["friendcode"].ToString()))
                         {
                             DevManager.DevUserList.Remove(DevManager.GetDevUser(userData["friendcode"].ToString()));
@@ -191,7 +181,7 @@ public class dbConnect
                     }
                     if (tempUserType.Count > 1)
                     {
-                        UserType = tempUserType; // Replace userType with the temporary dictionary
+                        UserType = tempUserType;
                         success = true;
                     }
                     else if (!InitOnce)
@@ -222,10 +212,9 @@ public class dbConnect
         }
     }
 
-
     private static string ToAutoTranslate(JsonElement tag)
     {
-        //Translates the mostly used tags.
+
         string text = tag.ToString();
         switch (text)
         {
@@ -269,21 +258,19 @@ public class dbConnect
             Logger.Info($"Fetching EAC List from {apiUrls[attempt % 2]}", "GetEACList");
             UnityWebRequest webRequest = UnityWebRequest.Get(endpoint);
 
-            // Send the request
             yield return webRequest.SendWebRequest();
 
-            // Check for errors
             if (webRequest.result == UnityWebRequest.Result.Success)
             {
                 try
                 {
                     var tempEACDict = JsonSerializer.Deserialize<List<Dictionary<string, JsonElement>>>(webRequest.downloadHandler.text);
-                    BanManager.EACDict = [.. BanManager.EACDict, .. tempEACDict]; // Merge the temporary list with BanManager.EACDict
+                    BanManager.EACDict = [.. BanManager.EACDict, .. tempEACDict];
                     success = true;
                 }
                 catch (JsonException jsonEx)
                 {
-                    // If deserialization fails
+
                     Logger.Error($"Error deserializing JSON: {jsonEx.Message}", "GetEACList.error");
                 }
                 finally

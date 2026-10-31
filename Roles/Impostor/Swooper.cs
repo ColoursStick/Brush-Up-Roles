@@ -11,13 +11,12 @@ namespace TONE.Roles.Impostor;
 
 internal class Swooper : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Swooper;
     private const int Id = 4700;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Swooper);
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
-    //==================================================================\\
 
     private static OptionItem SwooperCooldown;
     private static OptionItem SwooperDuration;
@@ -180,7 +179,7 @@ internal class Swooper : RoleBase
 
     public override string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
     {
-        // Only for modded
+
         if (seer == null || !isForHud || isForMeeting || !seer.IsAlive()) return string.Empty;
 
         var str = new StringBuilder();

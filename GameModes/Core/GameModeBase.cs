@@ -19,14 +19,9 @@ public abstract class GameModeBase
         return Options.CurrentGameMode;
     }
 
-    /// <summary>
-    /// Variable resets when the game starts
-    /// </summary>
     public virtual void Init()
     { }
-    /// <summary>
-    /// When Role is applied in the game, beginning or during the game
-    /// </summary>
+
     public virtual void Add()
     { }
 

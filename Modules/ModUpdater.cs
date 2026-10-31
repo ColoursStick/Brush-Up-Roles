@@ -17,10 +17,9 @@ namespace TONE;
 [HarmonyPatch]
 public class ModUpdater
 {
-    //private static readonly string URL_2018k = "http://api.tohre.dev";
-    // Brush Up Roles：不使用上游 TONE 的发布源（更新检查已在 Start_Postfix 里停用）
+
     private static readonly string URL_Github = "https://api.github.com/repos/ColoursStick/Brush-Up-Roles";
-    //public static readonly string downloadTest = "https://github.com/Pietrodjaowjao/TONEN-Contributions/releases/download/v123123123/TONE.dll";
+
     public static bool hasUpdate = false;
     private static bool firstNotify = true;
     public static bool forceUpdate = false;
@@ -38,14 +37,12 @@ public class ModUpdater
     private static CancellationTokenSource downloadCancellationTokenSource = new();
 
     [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.Start)), HarmonyPostfix, HarmonyPriority(Priority.VeryLow)]
-    public static void Start_Postfix(/*MainMenuManager __instance*/)
+    public static void Start_Postfix()
     {
-        // ⚠️ Brush Up Roles：本模组是独立模组，更新源仍是上游 TONE 的仓库，
-        //    联网检查会弹出「更新来啦！TONE ...」并引导下载 TONE，必须停用。
+
         return;
         ResetUpdateButton();
         if (isChecked) return;
-        //If we are not using it for now, just freaking disable it.
 
         Main.Instance.StartCoroutine(PrefixCoroutine());
     }
@@ -190,7 +187,7 @@ public class ModUpdater
         Stream stream = res.Content.ReadAsStream();
         try
         {
-            //ÞÄÀÕÅûÕåàÕ«╣
+
             using StreamReader reader = new(stream);
             result = reader.ReadToEnd();
         }
@@ -277,7 +274,6 @@ public class ModUpdater
         isChecked = true;
         isBroken = false;
 
-        // Manually dispose of the UnityWebRequest instance
         request.Dispose();
 
         isFail = false;
@@ -320,7 +316,7 @@ public class ModUpdater
                     preReleaseValue += hotfixNum;
                 }
             }
-            // RC?
+
         }
 
         return patch * 1000 + preReleaseValue;
@@ -410,7 +406,6 @@ public class ModUpdater
     {
         var savePath = "BepInEx/plugins/TONE.dll.temp";
 
-        // Delete the temporary file if it exists
         DeleteOldFiles();
 
         try

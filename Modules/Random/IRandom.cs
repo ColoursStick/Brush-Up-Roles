@@ -4,16 +4,14 @@ namespace TONE;
 
 public interface IRandom
 {
-    /// <summary>Generates a random number between 0 and maxValue</summary>
+
     public int Next(int maxValue);
-    /// <summary>Generates a random number between minValue and maxValue</summary>
+
     public int Next(int minValue, int maxValue);
 
-    // == static ==
-    // List of classes implementing IRandom
     public static Dictionary<int, Type> randomTypes = new()
     {
-        { 0, typeof(NetRandomWrapper) }, //Default
+        { 0, typeof(NetRandomWrapper) },
         { 1, typeof(HashRandomWrapper) },
         { 2, typeof(Xorshift) },
         { 3, typeof(MersenneTwister) },

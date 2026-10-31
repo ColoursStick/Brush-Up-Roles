@@ -16,12 +16,11 @@ namespace TONE;
 [HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.FixedUpdate))]
 class ShipFixedUpdatePatch
 {
-    public static void Postfix(/*ShipStatus __instance*/)
+    public static void Postfix()
     {
-        //Above here, all of us will execute
+
         if (!AmongUsClient.Instance.AmHost) return;
 
-        //Below here, only the host performs
         if (Main.IsFixedCooldown && Main.RefixCooldownDelay >= 0)
         {
             Main.RefixCooldownDelay -= Time.fixedDeltaTime;
@@ -92,19 +91,14 @@ class UpdateSystemPatch
 
         if (!AmongUsClient.Instance.AmHost) return true;
 
-        // ###### Can Be Sabotage Started? ######
         if ((GameModeBase.GetGameMode() == CustomGameMode.FFA) && systemType == SystemTypes.Sabotage) return false;
 
         if (Options.DisableSabotage.GetBool() && systemType == SystemTypes.Sabotage) return false;
-
-
-        // ###### Roles/Add-ons During Sabotages ######
 
         if (Fool.IsEnable && Fool.BlockFixSabotage(player, systemType))
         {
             return false;
         }
-
 
         if (player.Is(CustomRoles.Unlucky) && player.IsAlive()
             && (systemType is SystemTypes.Doors))
@@ -124,7 +118,6 @@ class UpdateSystemPatch
         return true;
     }
 
-    // Fast fix lights
     public static void Postfix(ShipStatus __instance,
         [HarmonyArgument(0)] SystemTypes systemType,
         [HarmonyArgument(1)] PlayerControl player,
@@ -163,7 +156,7 @@ class UpdateSystemPatch
 [HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.CloseDoorsOfType))]
 class ShipStatusCloseDoorsPatch
 {
-    public static bool Prefix(/*ShipStatus __instance,*/ SystemTypes room)
+    public static bool Prefix( SystemTypes room)
     {
         Logger.Info($"Trying to close the door in the room: {room}", "CloseDoorsOfType");
 
@@ -210,7 +203,7 @@ class StartPatch
 
         switch (Utils.GetActiveMapName())
         {
-            // Skeld in MapDecorPatch
+
             case MapNames.MiraHQ when Options.EnableHalloweenDecorations.GetBool():
                 __instance.transform.FindChild("HalloweenDecorMira")?.gameObject.SetActive(true);
                 break;
@@ -226,21 +219,7 @@ class StartPatch
             case MapNames.Fungle when Options.EnableHalloweenDecorations.GetBool():
                 __instance.transform.FindChild("HalloweenDecorFungle")?.gameObject.SetActive(true);
                 break;
-                /*case MapNames.Polus when Main.EnableCustomDecorations.Value:
-                    var Dropship = GameObject.Find("Dropship/panel_fuel");
-                    if (Dropship != null)
-                    {
-                        var Decorations = Object.Instantiate(Dropship, GameObject.Find("Dropship")?.transform);
-                        Decorations.name = "Dropship_Decorations";
-                        Decorations.transform.DestroyChildren();
-                        Object.Destroy(Decorations.GetComponent<Console>());
-                        Object.Destroy(Decorations.GetComponent<BoxCollider2D>());
-                        Object.Destroy(Decorations.GetComponent<PassiveButton>());
-                        Decorations.GetComponent<SpriteRenderer>().sprite = Utils.LoadSprite("TONE.Resources.Images.Dropship-Decorations.png", 100f);
-                        Decorations.transform.SetSiblingIndex(1);
-                        Decorations.transform.localPosition = new(0.0709f, 0.73f);
-                    }
-                    break;*/
+
         }
     }
 }
@@ -282,23 +261,17 @@ class ShipStatusBeginPatch
     }
 }
 
-/*
-    // Since SnapTo is unstable on the server side,
-    // after a meeting, sometimes not all players appear on the table,
-    // it's better to manually teleport them
-*/
 [HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.SpawnPlayer))]
 class ShipStatusSpawnPlayerPatch
 {
     public static bool Prefix(ShipStatus __instance, PlayerControl player, int numPlayers, bool initialSpawn)
     {
-        // Skip first spawn and modded clients
+
         if (!AmongUsClient.Instance.AmHost || initialSpawn || !player.IsAlive()) return true;
 
         Vector2 direction = Vector2.up.Rotate((player.PlayerId - 1) * (360f / numPlayers));
         Vector2 position = __instance.MeetingSpawnCenter + direction * __instance.SpawnRadius + new Vector2(0.0f, 0.3636f);
 
-        // Delay teleport because the map will stop updating player positions too late
         _ = new LateTask(() =>
         {
             player?.RpcTeleport(position, isRandomSpawn: true, sendInfoInLogs: false);
@@ -311,7 +284,7 @@ class PolusShipStatusSpawnPlayerPatch
 {
     public static bool Prefix(PolusShipStatus __instance, PlayerControl player, int numPlayers, bool initialSpawn)
     {
-        // Skip first spawn and modded clients
+
         if (!AmongUsClient.Instance.AmHost || initialSpawn || !player.IsAlive()) return true;
 
         int num1 = Mathf.FloorToInt(numPlayers / 2f);
@@ -321,7 +294,6 @@ class PolusShipStatusSpawnPlayerPatch
             ? __instance.MeetingSpawnCenter2 + Vector2.right * (num2 - num1) * 0.6f
             : __instance.MeetingSpawnCenter + Vector2.right * num2 * 0.6f;
 
-        // Delay teleport because the map will stop updating player positions too late
         _ = new LateTask(() =>
         {
             player?.RpcTeleport(position, isRandomSpawn: true, sendInfoInLogs: false);
@@ -333,8 +305,7 @@ class PolusShipStatusSpawnPlayerPatch
 [HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.Serialize))]
 class ShipStatusSerializePatch
 {
-    // Patch the global way of Serializing ShipStatus
-    // If we are patching any other systemTypes, just add below like Ventilation.
+
     public static List<int> ReactorFlashList = [];
 
     public static bool Prefix(ShipStatus __instance, [HarmonyArgument(0)] MessageWriter writer, [HarmonyArgument(1)] bool initialState, ref bool __result)
@@ -343,7 +314,6 @@ class ShipStatusSerializePatch
         if (!AmongUsClient.Instance.AmHost) return true;
         if (initialState) return true;
 
-        // Original methods
         short num = 0;
         while (num < SystemTypeHelpers.AllTypes.Length)
         {
@@ -351,8 +321,7 @@ class ShipStatusSerializePatch
 
             if (systemTypes is SystemTypes.Ventilation)
             {
-                // Skip Ventilation here
-                // Further new systems should skip original methods here and add new patches below.
+
                 num++;
                 continue;
             }
@@ -366,7 +335,7 @@ class ShipStatusSerializePatch
                 }
             }
 
-            if (__instance.Systems.TryGetValue(systemTypes, out ISystemType systemType) && systemType.IsDirty) // initialState used here in vanilla code. Removed it.
+            if (__instance.Systems.TryGetValue(systemTypes, out ISystemType systemType) && systemType.IsDirty)
             {
                 __result = true;
                 writer.StartMessage((byte)systemTypes);
@@ -376,10 +345,8 @@ class ShipStatusSerializePatch
             num++;
         }
 
-        // Ventilation part
         {
-            // Logger.Info("doing Ventilation Serialize", "ShipStatusSerializePatch");
-            // Serialize Ventilation with our own patches to clients specifically if needed
+
             bool customVentilation = false;
 
             if (GameStates.IsInGame)
@@ -397,14 +364,14 @@ class ShipStatusSerializePatch
             var ventilationSystem = __instance.Systems[SystemTypes.Ventilation].CastFast<VentilationSystem>();
             if (ventilationSystem != null && ventilationSystem.IsDirty)
             {
-                // Logger.Info("customVentilation: " + customVentilation, "ShipStatusSerializePatch");
+
                 if (customVentilation)
                 {
                     Utils.SetAllVentInteractions();
                 }
                 else
                 {
-                    // Logger.Info("vanilla update vents", "ShipStatusSerializePatch");
+
                     DataFlagRateLimiter.Enqueue(() =>
                     {
                         var subwriter = MessageWriter.Get(SendOption.Reliable);
@@ -431,7 +398,7 @@ class ShipStatusSerializePatch
         return false;
     }
 }
-// Credit: EHR
+
 internal static class ShipStatusFixedUpdatePatch
 {
     public static Dictionary<byte, int> ClosestVent = [];

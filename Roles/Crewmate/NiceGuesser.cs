@@ -6,12 +6,11 @@ namespace TONE.Roles.Crewmate;
 
 internal class NiceGuesser : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.NiceGuesser;
     private const int Id = 10900;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
-    //==================================================================\\
 
     private static OptionItem GGCanGuessTime;
     private static OptionItem GGCanGuessCrew;
@@ -63,21 +62,18 @@ internal class NiceGuesser : RoleBase
             return true;
         }
 
-        // Check limit
         if (GuessManager.GuesserGuessed[guesser.PlayerId] >= GGCanGuessTime.GetInt())
         {
             guesser.ShowInfoMessage(isUI, GetString("GuessMax"));
             return true;
         }
 
-        // Nice Guesser Can't Guess Addons
         if (role.IsAdditionRole() && !GGCanGuessAdt.GetBool())
         {
             guesser.ShowInfoMessage(isUI, GetString("GuessAdtRole"));
             return true;
         }
 
-        // Nice Guesser Can't Guess Crewmates
         if (role.IsCrewmate() && !GGCanGuessCrew.GetBool() && !guesser.Is(CustomRoles.Madmate))
         {
             guesser.ShowInfoMessage(isUI, GetString("GuessCrewRole"));

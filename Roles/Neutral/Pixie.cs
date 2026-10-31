@@ -12,14 +12,13 @@ namespace TONE.Roles.Neutral;
 
 internal class Pixie : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Pixie;
     private const int Id = 25900;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Pirate);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => CanSnatchesWin() ? Custom_RoleType.NeutralEvil : Custom_RoleType.NeutralBenign;
-    //==================================================================\\
 
     public static OptionItem PixiePointsToWin;
     private static OptionItem PixieMaxTargets;
@@ -82,7 +81,7 @@ internal class Pixie : RoleBase
     }
     public void SendRPC(byte pixieId, byte targetId = 255)
     {
-        var writer = MessageWriter.Get(SendOption.Reliable); //SetPixieTargets
+        var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(pixieId);
         writer.Write(targetId);
         RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
@@ -177,4 +176,3 @@ internal class Pixie : RoleBase
     }
     public static bool CanSnatchesWin() => SnatchesWin == null ? false : SnatchesWin.GetBool();
 }
-

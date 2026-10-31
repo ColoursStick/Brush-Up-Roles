@@ -7,7 +7,7 @@ using static TONE.Utils;
 
 namespace TONE;
 
-public abstract class CovenManager : RoleBase // NO, THIS IS NOT A ROLE
+public abstract class CovenManager : RoleBase
 {
     public static byte necroHolder = byte.MaxValue;
     [Obfuscation(Exclude = true)]

@@ -72,29 +72,20 @@ public static class HudSpritePatch
         if (playerRoleClass?.SabotageButtonSprite is Sprite Sabotagebutton)
             newSabotageButton = Sabotagebutton;
 
-        // CustomButton.Get("Paranoid"); for Paranoid
-
     EndOfSelectImg:
 
-        // Set custom icon for Kill button
         __instance.KillButton.graphic.sprite = newKillButton;
-        //  Set custom icon for impostor vent button
+
         __instance.ImpostorVentButton.graphic.sprite = newVentButton;
 
-        // Set custom icon for Ability button (Shapeshift, Vitals, Engineer Vent)
         __instance.AbilityButton.graphic.sprite = newAbilityButton;
 
-        // Set custom icon for Pet button
         __instance.PetButton.graphic.sprite = newPetButton;
 
-        // Set custom icon for Report button
         __instance.ReportButton.graphic.sprite = newReportButton;
 
-        // Set custom icon for Sabotage button
         __instance.SabotageButton.graphic.sprite = newSabotageButton;
 
-        // Normalized Uvs
-        // The sprites after custom icons has a strong overexposure
         __instance.KillButton.graphic.SetCooldownNormalizedUvs();
         __instance.ImpostorVentButton.graphic.SetCooldownNormalizedUvs();
         __instance.AbilityButton.graphic.SetCooldownNormalizedUvs();

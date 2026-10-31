@@ -5,7 +5,7 @@ namespace TONE.Roles.Crewmate;
 
 internal class Brave : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Brave;
     private const int Id = 32400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Brave);
@@ -13,7 +13,6 @@ internal class Brave : RoleBase
     public override bool IsBalance => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
-    //==================================================================\\
 
     private static OptionItem HeartPlayerThreshold;
     private static OptionItem ShieldPlayerThreshold;

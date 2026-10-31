@@ -70,16 +70,13 @@ public class Diseased : IAddon
     {
         if (KilledDiseased.ContainsKey(killer.PlayerId))
         {
-            // Key already exists, update the value
+
             KilledDiseased[killer.PlayerId] += 1;
         }
         else
         {
-            // Key doesn't exist, add the key-value pair
+
             KilledDiseased.Add(killer.PlayerId, 1);
         }
     }
 }
-
-
-

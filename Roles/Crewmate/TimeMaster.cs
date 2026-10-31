@@ -11,10 +11,9 @@ using static TONE.Utils;
 
 namespace TONE.Roles.Crewmate;
 
-// 部分代码参考：https://github.com/Gurge44/EndlessHostRoles
 internal class TimeMaster : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.TimeMaster;
     private const int Id = 9900;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.TimeMaster);
@@ -22,7 +21,6 @@ internal class TimeMaster : RoleBase
     public override bool IsExperimental => true;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
-    //==================================================================\\
 
     public static OptionItem TimeMasterSkillCooldown;
     public static OptionItem TimeMasterSkillDuration;

@@ -10,13 +10,12 @@ namespace TONE.Roles.Impostor;
 
 internal class Kamikaze : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Kamikaze;
     private const int Id = 26900;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Kamikaze);
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem OptMaxMarked;
@@ -38,7 +37,6 @@ internal class Kamikaze : RoleBase
     {
         playerId.SetAbilityUseLimit(OptMaxMarked.GetInt());
 
-        // Double Trigger
         var pc = Utils.GetPlayerById(playerId);
         pc.AddDoubleTrigger();
     }

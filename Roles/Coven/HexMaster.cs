@@ -7,22 +7,19 @@ using static TONE.Options;
 using static TONE.Translator;
 using static TONE.Utils;
 
-
 namespace TONE.Roles.Coven;
 
 internal class HexMaster : CovenManager
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.HexMaster;
     private const int Id = 16400;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenKilling;
-    //==================================================================\\
 
-    //private static OptionItem ModeSwitchAction;
     private static OptionItem HexesLookLikeSpells;
-    //private static OptionItem HasImpostorVision;
+
     private static OptionItem HexCooldown;
     private static OptionItem CovenCanGetMovingHex;
     private static OptionItem MovingHexPassCooldown;
@@ -45,27 +42,17 @@ internal class HexMaster : CovenManager
     private static readonly Color RoleColorHex = GetRoleColor(CustomRoles.HexMaster);
     private static readonly Color RoleColorSpell = GetRoleColor(CustomRoles.Impostor);
 
-    /*
-    private enum SwitchTriggerList
-    {
-        TriggerKill,
-        TriggerVent,
-        TriggerDouble,
-    };
-    private static SwitchTriggerList NowSwitchTrigger;
-    */
-
     public override void SetupCustomOption()
     {
         SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
-        //ModeSwitchAction = StringOptionItem.Create(Id + 10, GeneralOption.ModeSwitchAction, EnumHelper.GetAllNames<SwitchTriggerList>(), 2, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.HexMaster]);
+
         HexCooldown = FloatOptionItem.Create(Role, Id + 13, OptionName.HexMasterHexCooldown, new(0f, 180f, 2.5f), 30f, false)
             .SetValueFormat(OptionFormat.Seconds);
         MovingHexPassCooldown = FloatOptionItem.Create(Role, Id + 15, OptionName.HexMasterMovingHexCooldown, new(0f, 5f, 0.25f), 1f, false)
             .SetValueFormat(OptionFormat.Seconds);
         CovenCanGetMovingHex = BooleanOptionItem.Create(Role, Id + 14, OptionName.HexMasterCovenCanGetMovingHex, false, false);
         HexesLookLikeSpells = BooleanOptionItem.Create(Role, Id + 11, OptionName.HexesLookLikeSpells, false, false);
-        //HasImpostorVision = BooleanOptionItem.Create(Id + 12, GeneralOption.ImpostorVision,  true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.HexMaster]);
+
         CanKillTNA = BooleanOptionItem.Create(Role, Id + 16, OptionName.CanKillTNA, false, false);
     }
     public override void Init()
@@ -79,7 +66,6 @@ internal class HexMaster : CovenManager
     public override void Add(byte playerId)
     {
         HexedPlayer.Add(playerId, []);
-        // NowSwitchTrigger = (SwitchTriggerList)ModeSwitchAction.GetValue();
 
         var pc = GetPlayerById(playerId);
         pc.AddDoubleTrigger();
@@ -129,32 +115,6 @@ internal class HexMaster : CovenManager
     public override bool CanUseKillButton(PlayerControl pc) => true;
     public override void SetKillCooldown(byte id) => HexCooldown.GetFloat();
 
-    /*
-    private static bool IsHexMode(byte playerId)
-    {
-        return HexMode.ContainsKey(playerId) && HexMode[playerId];
-    }
-   
-    private static void SwitchHexMode(byte playerId, bool kill)
-    {
-        bool needSwitch = false;
-        switch (NowSwitchTrigger)
-        {
-            case SwitchTriggerList.TriggerKill:
-                needSwitch = kill;
-                break;
-            case SwitchTriggerList.TriggerVent:
-                needSwitch = !kill;
-                break;
-        }
-        if (needSwitch)
-        {
-            HexMode[playerId] = !HexMode[playerId];
-            SendRPC(false, playerId);
-            NotifyRoles(SpecifySeer: GetPlayerById(playerId));
-        }
-    }
-    */
     private static bool IsHexed(byte target)
     {
         foreach (var hexmaster in HexedPlayer.Keys)
@@ -169,7 +129,7 @@ internal class HexMaster : CovenManager
         {
             HexedPlayer[killer.PlayerId].Add(target.PlayerId);
             SendRPC(true, killer.PlayerId, target.PlayerId);
-            //キルクールの適正化
+
             killer.ResetKillCooldown();
             killer.SetKillCooldown();
         }
@@ -184,7 +144,6 @@ internal class HexMaster : CovenManager
         if (target.PlayerId == LastHexedPlayer) return;
         if (!CovenCanGetMovingHex.GetBool() && target.GetCustomRole().IsCovenTeam()) return;
 
-
         if (target.Is(CustomRoles.Pestilence))
         {
             target.RpcMurderPlayer(player);
@@ -195,7 +154,6 @@ internal class HexMaster : CovenManager
         CurrentHexedPlayer = target.PlayerId;
         CurrentHexedPlayerTime = now;
         MarkEveryoneDirtySettings();
-
 
         SendRPC(false, CurrentHexedPlayer, LastHexedPlayer);
         Logger.Msg($"{player.GetNameWithRole()} passed hex to {target.GetNameWithRole()}", "Hex Master Pass");
@@ -239,18 +197,6 @@ internal class HexMaster : CovenManager
     {
         if (target.IsTransformedNeutralApocalypse()) return false;
 
-        /*
-        if (NowSwitchTrigger == SwitchTriggerList.TriggerDouble)
-        {
-            return killer.CheckDoubleTrigger(target, () => { SetHexed(killer, target); });
-        }
-        if (!IsHexMode(killer.PlayerId))
-        {
-            SwitchHexMode(killer.PlayerId, true);
-            //キルモードなら通常処理に戻る
-            return true;
-        }
-        */
         if (!HasNecronomicon(killer))
         {
             if (!target.GetCustomRole().IsCovenTeam()) SetHexed(killer, target);
@@ -370,15 +316,7 @@ internal class HexMaster : CovenManager
             SendRPC(true, hexmaster);
         }
     }
-    /*
-    public override void OnEnterVent(PlayerControl pc, Vent vent)
-    {
-        if (NowSwitchTrigger is SwitchTriggerList.TriggerVent)
-        {
-            SwitchHexMode(pc.PlayerId, false);
-        }
-    }
-    */
+
     public override string GetMarkOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)
     {
         if (isForMeeting && IsHexed(target.PlayerId))
@@ -394,32 +332,6 @@ internal class HexMaster : CovenManager
         }
         return string.Empty;
     }
-    /*
-    public override string GetLowerText(PlayerControl hexmaster, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
-    {
-        if (!hexmaster.IsAlive() || isForMeeting || hexmaster != seen) return string.Empty;
-
-        var str = new StringBuilder();
-        if (isForHud)
-        {
-            str.Append($"{GetString("WitchCurrentMode")}: ");
-        }
-        else
-        {
-            str.Append($"{GetString("Mode")}: ");
-        }
-        if (NowSwitchTrigger == SwitchTriggerList.TriggerDouble)
-        {
-            str.Append(GetString("HexMasterModeDouble"));
-        }
-        else
-        {
-            str.Append(IsHexMode(hexmaster.PlayerId) ? GetString("HexMasterModeHex") : GetString("HexMasterModeKill"));
-        }
-
-        return str.ToString();
-    }
-    */
 
     public override void SetAbilityButtonText(HudManager hud, byte playerid) => hud.KillButton.OverrideText($"{GetString("HexButtonText")}");
 

@@ -6,11 +6,9 @@ using static TONE.Utils;
 
 namespace TONE.Roles.Impostor;
 
-// 参考 : https://github.com/ykundesu/SuperNewRoles/blob/master/SuperNewRoles/Mode/SuperHostRoles/BlockTool.cs
-// 贡献：https://github.com/Yumenopai/TownOfHost_Y/tree/AntiAdminer
 internal class AntiAdminer : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.AntiAdminer;
     private const int Id = 2800;
     private static readonly HashSet<byte> playerIdList = [];
@@ -18,7 +16,6 @@ internal class AntiAdminer : RoleBase
 
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
-    //==================================================================\\
 
     private static OptionItem CanCheckCamera;
 

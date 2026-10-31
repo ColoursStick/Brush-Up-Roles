@@ -11,13 +11,12 @@ namespace TONE.Roles.Impostor;
 
 internal class Wildling : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Wildling;
     private const int Id = 5200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Wildling);
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
-    //==================================================================\\
 
     private static OptionItem ProtectDuration;
     private static OptionItem ShapeshiftCD;

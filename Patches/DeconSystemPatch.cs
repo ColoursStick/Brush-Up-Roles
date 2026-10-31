@@ -9,7 +9,7 @@ public static class DeconSystemUpdateSystemPatch
 
         if (Options.ChangeDecontaminationTime.GetBool())
         {
-            // Temp decon time
+
             var deconTime = Utils.GetActiveMapName() switch
             {
                 MapNames.MiraHQ => Options.DecontaminationTimeOnMiraHQ.GetFloat(),
@@ -17,13 +17,12 @@ public static class DeconSystemUpdateSystemPatch
                 _ => 3f,
             };
 
-            // Set same value for "DeconTime" and "DoorOpenTime"
             __instance.DoorOpenTime = deconTime;
             __instance.DeconTime = deconTime;
         }
         else
         {
-            // Set to defalt
+
             __instance.DoorOpenTime = 3f;
             __instance.DeconTime = 3f;
         }

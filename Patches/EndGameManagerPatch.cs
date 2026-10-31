@@ -65,7 +65,6 @@ public class EndGameManagerPatch
     }
 }
 
-// Credit: EHR
 [HarmonyPatch(typeof(EndGameNavigation), nameof(EndGameNavigation.NextGame))]
 internal static class EndGameNavigationNextGamePatch
 {

@@ -8,14 +8,13 @@ namespace TONE.Roles.Crewmate;
 
 internal class Sheriff : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Sheriff;
     private const int Id = 11200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Sheriff);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem MisfireKillsTarget;
@@ -158,7 +157,7 @@ internal class Sheriff : RoleBase
 
         if (CanKill) return true;
         else if (player.Is(CustomRoles.Admired) && MisfireOnAdmired.GetBool()) return false;
-        else if (player.Is(CustomRoles.Narc)) return false; //copycat sheriff can still kill narc so this exists
+        else if (player.Is(CustomRoles.Narc)) return false;
         return cRole switch
         {
             CustomRoles.Trickster => false,

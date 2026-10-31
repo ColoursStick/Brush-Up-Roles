@@ -49,4 +49,3 @@ public class Radar : IAddon
         return Utils.ColorString(Utils.GetRoleColor(CustomRoles.Radar), TargetArrow.GetArrows(seer));
     }
 }
-

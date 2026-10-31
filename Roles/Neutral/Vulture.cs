@@ -12,7 +12,7 @@ namespace TONE.Roles.Neutral;
 
 internal class Vulture : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Vulture;
     private const int Id = 15600;
     private static readonly HashSet<byte> playerIdList = [];
@@ -20,7 +20,6 @@ internal class Vulture : RoleBase
     public override bool IsBalance => true;
     public override CustomRoles ThisRoleBase => CanVent.GetBool() ? CustomRoles.Engineer : CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralChaos;
-    //==================================================================\\
 
     private static OptionItem ArrowsPointingToDeadBody;
     private static OptionItem NumberOfReportsToWin;
@@ -77,7 +76,7 @@ internal class Vulture : RoleBase
                     player.Notify(GetString("VultureCooldownUp"));
                 }
                 return;
-            }, VultureReportCD.GetFloat() + 8f, "Vulture Cooldown Up In Start");  //for some reason that idk vulture cd completes 8s faster when the game starts, so I added 8f for now 
+            }, VultureReportCD.GetFloat() + 8f, "Vulture Cooldown Up In Start");
         }
     }
 

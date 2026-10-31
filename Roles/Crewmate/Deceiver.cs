@@ -7,14 +7,13 @@ namespace TONE.Roles.Crewmate;
 
 internal class Deceiver : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Deceiver;
     private const int Id = 10500;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Deceiver);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
-    //==================================================================\\
 
     private static OptionItem DeceiverSkillCooldown;
     private static OptionItem DeceiverSkillLimitTimes;

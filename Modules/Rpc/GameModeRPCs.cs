@@ -48,7 +48,7 @@ namespace TONE.Modules.Rpc
         {
             msg.Write(writer, false);
             writer.Recycle();
-            // There are chances that the writer can't be recycled. May cause memory leak.
+
         }
 
         private readonly MessageWriter writer;

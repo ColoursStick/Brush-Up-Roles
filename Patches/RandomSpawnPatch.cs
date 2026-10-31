@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace TONE;
 
-// Thanks: https://github.com/tukasa0001/TownOfHost/blob/main/Patches/RandomSpawnPatch.cs
 class RandomSpawn
 {
     [HarmonyPatch(typeof(CustomNetworkTransform), nameof(CustomNetworkTransform.SnapTo))]
@@ -35,10 +34,9 @@ class RandomSpawn
             {
                 var player = __instance.myPlayer;
 
-                // Players haven't spawned yet
                 if (!Main.PlayerStates[player.PlayerId].HasSpawned)
                 {
-                    // Read the coordinates of the SnapTo destination
+
                     Vector2 position;
                     {
                         var newReader = MessageReader.Get(reader);
@@ -47,7 +45,6 @@ class RandomSpawn
                     }
                     Logger.Info($"SnapTo: {player.GetRealName()}, ({position.x}, {position.y})", "RandomSpawn");
 
-                    // if the SnapTo destination is a spring location, proceed to the spring process
                     if (IsAirshipVanillaSpawnPosition(position))
                     {
                         AirshipSpawn(player);
@@ -64,15 +61,11 @@ class RandomSpawn
 
         private static bool IsAirshipVanillaSpawnPosition(Vector2 position)
         {
-            // Using the fact that the coordinates of the spring position are in increments of 0.1
-            //The comparison is made with an int type in which the coordinates are multiplied by 10
-            //As a countermeasure against errors of the float type and the expansion of errors due to the implementation of ReadVector2
+
             var decupleXFloat = position.x * 10f;
             var decupleYFloat = position.y * 10f;
             var decupleXInt = Mathf.RoundToInt(decupleXFloat);
 
-            // if the difference between the values multiplied by 10 is closer than 0.1,
-            //The original coordinates are not in increments of 0.1, so it is not a spring position.
             if (Mathf.Abs(decupleXInt - decupleXFloat) >= 0.09f)
             {
                 return false;
@@ -85,15 +78,15 @@ class RandomSpawn
             var decuplePosition = (decupleXInt, decupleYInt);
             return decupleVanillaSpawnPositions.Contains(decuplePosition);
         }
-        /// <summary>For comparison Ten times the vanilla spring position of the airship</summary>
+
         private static readonly HashSet<(int x, int y)> decupleVanillaSpawnPositions =
             [
-                (-7, 85),  // Walkway in front of the dormitory
-                (-7, -10),  // Engine
-                (-70, -115),  // Kitchen
-                (335, -15),  // Cargo
-                (200, 105),  // Archive
-                (155, 0),  // Main Hall
+                (-7, 85),
+                (-7, -10),
+                (-70, -115),
+                (335, -15),
+                (200, 105),
+                (155, 0),
             ];
     }
     [HarmonyPatch(typeof(SpawnInMinigame), nameof(SpawnInMinigame.SpawnAt))]
@@ -110,10 +103,10 @@ class RandomSpawn
             {
                 return false;
             }
-            // Cancel vanilla upwelling if random spawn is enabled
+
             if (IsRandomSpawn())
             {
-                // Vanilla process RpcSnapTo replaced with AirshipSpawn
+
                 __instance.gotButton = true;
                 PlayerControl.LocalPlayer.SetKinematic(true);
                 PlayerControl.LocalPlayer.NetTransform.SetPaused(true);
@@ -141,7 +134,7 @@ class RandomSpawn
             }
             if (GameStates.IsNormalGame)
             {
-                // Reset cooldown player
+
                 player.RpcResetAbilityCooldown();
             }
 
@@ -193,7 +186,7 @@ class RandomSpawn
     private static OptionItem SpawnInFirstRound;
     private static OptionItem AirshipAdditionalSpawn;
     private static OptionItem SpawnRandomVents;
-    // Skeld && dlekS
+
     public static OptionItem RandomSpawnSkeld;
     public static OptionItem RandomSpawnSkeldCafeteria;
     public static OptionItem RandomSpawnSkeldWeapons;
@@ -209,7 +202,7 @@ class RandomSpawn
     public static OptionItem RandomSpawnSkeldSecurity;
     public static OptionItem RandomSpawnSkeldReactor;
     public static OptionItem RandomSpawnSkeldMedBay;
-    // Mira HQ
+
     public static OptionItem RandomSpawnMira;
     public static OptionItem RandomSpawnMiraCafeteria;
     public static OptionItem RandomSpawnMiraBalcony;
@@ -225,7 +218,7 @@ class RandomSpawn
     public static OptionItem RandomSpawnMiraAdmin;
     public static OptionItem RandomSpawnMiraOffice;
     public static OptionItem RandomSpawnMiraGreenhouse;
-    //Polus
+
     public static OptionItem RandomSpawnPolus;
     public static OptionItem RandomSpawnPolusOfficeLeft;
     public static OptionItem RandomSpawnPolusOfficeRight;
@@ -242,7 +235,7 @@ class RandomSpawn
     public static OptionItem RandomSpawnPolusLaboratory;
     public static OptionItem RandomSpawnPolusToilet;
     public static OptionItem RandomSpawnPolusSpecimens;
-    //AirShip
+
     public static OptionItem RandomSpawnAirship;
     public static OptionItem RandomSpawnAirshipBrig;
     public static OptionItem RandomSpawnAirshipEngine;
@@ -263,7 +256,7 @@ class RandomSpawn
     public static OptionItem RandomSpawnAirshipMedical;
     public static OptionItem RandomSpawnAirshipToilet;
     public static OptionItem RandomSpawnAirshipShowers;
-    //Fungle
+
     public static OptionItem RandomSpawnFungle;
     public static OptionItem RandomSpawnFungleKitchen;
     public static OptionItem RandomSpawnFungleBeach;
@@ -299,7 +292,7 @@ class RandomSpawn
             .SetParent(RandomSpawnMode);
         SpawnRandomVents = BooleanOptionItem.Create(Id + 90, RandomSpawnOpt.RandomSpawn_SpawnRandomVents, false, TabGroup.ModSettings, false)
             .SetParent(RandomSpawnMode);
-        // Skeld && dlekS
+
         RandomSpawnSkeld = BooleanOptionItem.Create(Id, "RandomSpawnSkeld", false, TabGroup.ModSettings, false).SetParent(RandomSpawnMode);
         RandomSpawnSkeldCafeteria = BooleanOptionItem.Create(Id + 1, StringNames.Cafeteria, true, TabGroup.ModSettings, false).SetParent(RandomSpawnSkeld);
         RandomSpawnSkeldWeapons = BooleanOptionItem.Create(Id + 2, StringNames.Weapons, true, TabGroup.ModSettings, false).SetParent(RandomSpawnSkeld);
@@ -315,7 +308,7 @@ class RandomSpawn
         RandomSpawnSkeldSecurity = BooleanOptionItem.Create(Id + 12, StringNames.Security, false, TabGroup.ModSettings, false).SetParent(RandomSpawnSkeld);
         RandomSpawnSkeldReactor = BooleanOptionItem.Create(Id + 13, StringNames.Reactor, false, TabGroup.ModSettings, false).SetParent(RandomSpawnSkeld);
         RandomSpawnSkeldMedBay = BooleanOptionItem.Create(Id + 14, StringNames.MedBay, false, TabGroup.ModSettings, false).SetParent(RandomSpawnSkeld);
-        // Mira HQ
+
         RandomSpawnMira = BooleanOptionItem.Create(Id + 15, "RandomSpawnMira", false, TabGroup.ModSettings, false).SetParent(RandomSpawnMode);
         RandomSpawnMiraCafeteria = BooleanOptionItem.Create(Id + 16, StringNames.Cafeteria, true, TabGroup.ModSettings, false).SetParent(RandomSpawnMira);
         RandomSpawnMiraComms = BooleanOptionItem.Create(Id + 17, StringNames.Comms, true, TabGroup.ModSettings, false).SetParent(RandomSpawnMira);
@@ -331,7 +324,7 @@ class RandomSpawn
         RandomSpawnMiraLaboratory = BooleanOptionItem.Create(Id + 27, StringNames.Laboratory, false, TabGroup.ModSettings, false).SetParent(RandomSpawnMira);
         RandomSpawnMiraOffice = BooleanOptionItem.Create(Id + 28, StringNames.Office, false, TabGroup.ModSettings, false).SetParent(RandomSpawnMira);
         RandomSpawnMiraGreenhouse = BooleanOptionItem.Create(Id + 29, StringNames.Greenhouse, false, TabGroup.ModSettings, false).SetParent(RandomSpawnMira);
-        // Polus
+
         RandomSpawnPolus = BooleanOptionItem.Create(Id + 30, "RandomSpawnPolus", false, TabGroup.ModSettings, false).SetParent(RandomSpawnMode);
         RandomSpawnPolusOfficeLeft = BooleanOptionItem.Create(Id + 31, "OfficeLeft", true, TabGroup.ModSettings, false).SetParent(RandomSpawnPolus);
         RandomSpawnPolusBoilerRoom = BooleanOptionItem.Create(Id + 32, StringNames.BoilerRoom, true, TabGroup.ModSettings, false).SetParent(RandomSpawnPolus);
@@ -348,7 +341,7 @@ class RandomSpawn
         RandomSpawnPolusStorage = BooleanOptionItem.Create(Id + 43, StringNames.Storage, false, TabGroup.ModSettings, false).SetParent(RandomSpawnPolus);
         RandomSpawnPolusRocket = BooleanOptionItem.Create(Id + 44, "Rocket", false, TabGroup.ModSettings, false).SetParent(RandomSpawnPolus);
         RandomSpawnPolusToilet = BooleanOptionItem.Create(Id + 45, "Toilet", false, TabGroup.ModSettings, false).SetParent(RandomSpawnPolus);
-        // Airship
+
         RandomSpawnAirship = BooleanOptionItem.Create(Id + 46, "RandomSpawnAirship", false, TabGroup.ModSettings, false).SetParent(RandomSpawnMode);
         RandomSpawnAirshipBrig = BooleanOptionItem.Create(Id + 47, StringNames.Brig, true, TabGroup.ModSettings, false).SetParent(RandomSpawnAirship);
         RandomSpawnAirshipEngine = BooleanOptionItem.Create(Id + 48, StringNames.Engine, true, TabGroup.ModSettings, false).SetParent(RandomSpawnAirship);
@@ -369,7 +362,7 @@ class RandomSpawn
         RandomSpawnAirshipMedical = BooleanOptionItem.Create(Id + 63, StringNames.Medical, false, TabGroup.ModSettings, false).SetParent(RandomSpawnAirship);
         RandomSpawnAirshipToilet = BooleanOptionItem.Create(Id + 64, "Toilet", false, TabGroup.ModSettings, false).SetParent(RandomSpawnAirship);
         RandomSpawnAirshipShowers = BooleanOptionItem.Create(Id + 65, StringNames.Showers, false, TabGroup.ModSettings, false).SetParent(RandomSpawnAirship);
-        // Fungle
+
         RandomSpawnFungle = BooleanOptionItem.Create(Id + 66, "RandomSpawnFungle", false, TabGroup.ModSettings, false).SetParent(RandomSpawnMode);
         RandomSpawnFungleKitchen = BooleanOptionItem.Create(Id + 67, StringNames.Kitchen, true, TabGroup.ModSettings, false).SetParent(RandomSpawnFungle);
         RandomSpawnFungleBeach = BooleanOptionItem.Create(Id + 68, StringNames.Beach, true, TabGroup.ModSettings, false).SetParent(RandomSpawnFungle);
@@ -427,7 +420,7 @@ class RandomSpawn
 
                 if (SpawnRandomVents.GetBool())
                 {
-                    selectRandomSpawn = 2; // 1 or 2
+                    selectRandomSpawn = 2;
                 }
             }
             else selectRandomSpawn = 1;
@@ -457,7 +450,7 @@ class RandomSpawn
                         return Locations.ToArray()[0..4].OrderBy(_ => Guid.NewGuid()).Take(1).FirstOrDefault().Value;
                     case 2:
                         return Locations.ToArray()[0..2].OrderBy(_ => Guid.NewGuid()).Take(1).FirstOrDefault().Value;
-                    // Skip Airship
+
                     case 5:
                         return Locations.ToArray()[0..5].OrderBy(_ => Guid.NewGuid()).Take(1).FirstOrDefault().Value;
                     default:
@@ -581,21 +574,21 @@ class RandomSpawn
             [RandomSpawnFungleGreenhouse] = new(9.2f, -11.8f),
             [RandomSpawnFungleLookout] = new(6.4f, 3.1f),
             [RandomSpawnFungleMiningPit] = new(12.5f, 9.6f),
-            [RandomSpawnFungleHighlands] = new(15.5f, 3.9f),    //展望台右の高地
+            [RandomSpawnFungleHighlands] = new(15.5f, 3.9f),
             [RandomSpawnFungleUpperEngine] = new(21.9f, 3.2f),
             [RandomSpawnFungleKitchen] = new(-17.8f, -7.3f),
-            [RandomSpawnFungleBeach] = new(-21.3f, 3.0f),   //海岸
+            [RandomSpawnFungleBeach] = new(-21.3f, 3.0f),
             [RandomSpawnFungleCafeteria] = new(-16.9f, 5.5f),
             [RandomSpawnFungleRecRoom] = new(-17.7f, 0.0f),
-            [RandomSpawnFungleBonfire] = new(-9.7f, 2.7f),  //焚き火
+            [RandomSpawnFungleBonfire] = new(-9.7f, 2.7f),
             [RandomSpawnFungleDropship] = new(-7.6f, 10.4f),
             [RandomSpawnFungleStorage] = new(2.3f, 4.3f),
             [RandomSpawnFungleMeetingRoom] = new(-4.2f, -2.2f),
-            [RandomSpawnFungleSleepingQuarters] = new(1.7f, -1.4f),  //宿舎
+            [RandomSpawnFungleSleepingQuarters] = new(1.7f, -1.4f),
             [RandomSpawnFungleLaboratory] = new(-4.2f, -7.9f),
             [RandomSpawnFungleJungleTop] = new(4.2f, -5.3f),
             [RandomSpawnFungleJungleBottom] = new(15.9f, -14.8f),
-            [RandomSpawnFunglePrecipice] = new(19.8f, 7.3f),   //通信室下の崖
+            [RandomSpawnFunglePrecipice] = new(19.8f, 7.3f),
             [RandomSpawnFungleComms] = new(20.9f, 13.4f),
         };
     }

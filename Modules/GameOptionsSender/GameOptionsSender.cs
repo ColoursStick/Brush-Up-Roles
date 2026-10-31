@@ -16,7 +16,6 @@ public abstract class GameOptionsSender
         IGameOptions opt = BuildGameOptions();
         var currentGameMode = AprilFoolsMode.IsAprilFoolsModeToggledOn ? opt.AprilFoolsOnMode : opt.GameMode;
 
-        // option => byte[]
         MessageWriter writer = MessageWriter.Get();
         writer.Write(opt.Version);
         writer.StartMessage(0);
@@ -87,9 +86,6 @@ public abstract class GameOptionsSender
 
     protected static MessageWriter PackedWriter;
     protected static int PackedWriterMessages;
-
-    // Currently, a LogicOptions serialize is 155-156 bytes. 11 bytes are needed for the packet headers.
-    // Safe to pack until the length is over 1000, as it's impossible to exceed 1200 with 156 bytes per message.
 
     public static IEnumerator SendDirtyGameOptionsContinuously()
     {
@@ -167,7 +163,7 @@ public abstract class GameOptionsSender
 
     public static Coroutine ActiveCoroutine;
     private static readonly Stopwatch Stopwatch = new();
-    private const int FrameBudget = 3; // in milliseconds
+    private const int FrameBudget = 3;
     protected static bool ForceWaitFrame;
 
     #endregion

@@ -9,7 +9,7 @@ namespace TONE.Roles.Impostor;
 
 internal class Camouflager : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Camouflager;
     private const int Id = 2900;
     public static readonly HashSet<byte> Playerids = [];
@@ -17,13 +17,11 @@ internal class Camouflager : RoleBase
 
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
-    //==================================================================\\
 
     private static OptionItem CamouflageCooldownOpt;
     private static OptionItem CamouflageDurationOpt;
     private static OptionItem CanUseCommsSabotagOpt;
     private static OptionItem DisableReportWhenCamouflageIsActiveOpt;
-    //private static OptionItem ShowShapeshiftAnimationsOpt;
 
     public static bool AbilityActivated = false;
     private static float CamouflageCooldown;
@@ -42,8 +40,6 @@ internal class Camouflager : RoleBase
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Camouflager]);
         DisableReportWhenCamouflageIsActiveOpt = BooleanOptionItem.Create(Id + 8, "DisableReportWhenCamouflageIsActive", false, TabGroup.ImpostorRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Camouflager]);
-        //ShowShapeshiftAnimationsOpt = BooleanOptionItem.Create(Id + 9, GeneralOption.ShowShapeshiftAnimations, true, TabGroup.ImpostorRoles, false)
-        //.SetParent(Options.CustomRoleSpawnChances[CustomRoles.Camouflager]);
 
     }
     public override void Init()
@@ -86,25 +82,13 @@ internal class Camouflager : RoleBase
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Camo");
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
-        //if (AbilityActivated)
-        //hud.AbilityButton.OverrideText(GetString("CamouflagerShapeshiftTextAfterDisguise"));
-        //else
+
         hud.AbilityButton.OverrideText(GetString("CamouflagerShapeshiftTextBeforeDisguise"));
     }
-    /*public override bool OnCheckShapeshift(PlayerControl camouflager, PlayerControl target, ref bool resetCooldown, ref bool shouldAnimate)
-    {
-        if (ShowShapeshiftAnimationsOpt.GetBool()) return true;
 
-        shouldAnimate = false;
-        return true;
-    }*/
     public override void UnShapeShiftButton(PlayerControl shapeshifter)
     {
-        /*if (!shapeshifting)
-        {
-            ClearCamouflage();
-            return;
-        }*/
+
         if (AbilityActivated) return;
 
         AbilityActivated = true;
@@ -125,15 +109,6 @@ internal class Camouflager : RoleBase
             }
         }, CamouflageDurationOpt.GetFloat(), shoudLog: false);
 
-        /*var timer = ShowShapeshiftAnimationsOpt.GetBool() ? 1.2f : 0f;
-
-        _ = new LateTask(() =>
-        {
-            if (!Main.MeetingIsStarted && GameStates.IsInTask)
-            {
-                Camouflage.CheckCamouflage();
-            }
-        }, timer, "Camouflager Use Shapeshift");*/
     }
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {

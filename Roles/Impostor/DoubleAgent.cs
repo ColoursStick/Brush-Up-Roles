@@ -14,12 +14,12 @@ namespace TONE.Roles.Impostor;
 
 internal class DoubleAgent : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.DoubleAgent;
     private const int Id = 29000;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
-    //==================================================================\\
+
     private static readonly List<GameObject> createdButtonsList = [];
     private static readonly HashSet<byte> CurrentBombedPlayers = [];
     private static float CurrentBombedTime;
@@ -45,11 +45,11 @@ internal class DoubleAgent : RoleBase
     ];
     public static readonly CustomRoles[] CRoleChangeRoles =
     [
-        0, // NoChange
-        0, // Random
-        CustomRoles.ImpostorTONE, // Team Crewmate
-        CustomRoles.Traitor, // Team Neutral
-        CustomRoles.Trickster, // Team Impostor as Crewmate
+        0,
+        0,
+        CustomRoles.ImpostorTONE,
+        CustomRoles.Traitor,
+        CustomRoles.Trickster,
     ];
 
     public override void SetupCustomOption()
@@ -89,8 +89,6 @@ internal class DoubleAgent : RoleBase
         SendRPC();
     }
 
-    // On vent diffuse Bastion & Agitator Bomb if DoubleAgentCanDiffuseBombs is enabled.
-    // Dev Note: Add role check for OnCoEnterVentOthers and make BombedVents public in Bastion.cs.
     public override void OnEnterVent(PlayerControl pc, Vent vent)
     {
         if (DoubleAgentCanDiffuseBombs.GetBool())
@@ -154,7 +152,6 @@ internal class DoubleAgent : RoleBase
         return true;
     }
 
-    // Clear active bombed players on meeting call if ClearBombedOnMeetingCall is enabled.
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {
         if (_Player != null && _Player.IsModded())
@@ -171,7 +168,6 @@ internal class DoubleAgent : RoleBase
             CurrentBombedTime = -1;
     }
 
-    // If bomb is active set timer after meeting.
     public override void AfterMeetingTasks()
     {
         CurrentBombedTime = BombExplosionTimer.GetFloat() + 1f;
@@ -179,12 +175,11 @@ internal class DoubleAgent : RoleBase
         SendRPC();
     }
 
-    // Active bomb timer update and check.
     private void OnFixedUpdateOthers(PlayerControl player, bool lowLoad, long nowTime)
     {
         if (!CurrentBombedPlayers.Contains(player.PlayerId)) return;
 
-        if (!player.IsAlive()) // If Player is dead clear bomb.
+        if (!player.IsAlive())
             ClearBomb();
 
         if (BombIsActive && !GameStates.IsExilling)
@@ -201,7 +196,6 @@ internal class DoubleAgent : RoleBase
         }
     }
 
-    // Set timer on Double Agent for Non-Modded Clients.
     public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
     {
         if (lowLoad) return;
@@ -214,20 +208,18 @@ internal class DoubleAgent : RoleBase
                 if ((!NameNotifyManager.Notice.TryGetValue(player.PlayerId, out var a) || a.Any()) && Duration != string.Empty) player.Notify(Duration, 1.1f);
             }
 
-            if (CurrentBombedPlayers.Any(playerId => !GetPlayerById(playerId).IsAlive())) // If playerId is a null Player clear bomb.
+            if (CurrentBombedPlayers.Any(playerId => !GetPlayerById(playerId).IsAlive()))
                 ClearBomb();
         }
 
-        // If enabled and if DoubleAgent is last Impostor become set role.
         if (ChangeRoleToOnLast.GetValue() != 0 && StartedWithMoreThanOneImp && !GameStates.IsExilling && !AntiBlackout.SkipTasks)
         {
             if (player.Is(CustomRoles.DoubleAgent) && player.IsAlive() && Main.AliveImpostorCount < 2)
             {
                 var Role = CRoleChangeRoles[ChangeRoleToOnLast.GetValue()];
-                if (ChangeRoleToOnLast.GetValue() == 1) // Random
+                if (ChangeRoleToOnLast.GetValue() == 1)
                     Role = CRoleChangeRoles[IRandom.Instance.Next(2, CRoleChangeRoles.Length)];
 
-                // If role is not on Impostor team remove all Impostor addons if any.
                 if (!Role.IsImpostorTeamV3())
                 {
                     foreach (CustomRoles allAddons in player.GetCustomSubRoles())
@@ -238,11 +230,10 @@ internal class DoubleAgent : RoleBase
                         }
                     }
                 }
-                // If Role is ImpostorTONE aka Admired Impostor opt give Admired Addon if player dose not already have it.
+
                 if (Role == CustomRoles.ImpostorTONE && !player.Is(CustomRoles.Admired) && !player.Is(CustomRoles.Narc))
                     player.GetCustomSubRoles()?.Add(CustomRoles.Admired);
 
-                // If Double Agent is Narc and Role is Traitor,Double Agent turns into Parasite instead
                 if (Role is CustomRoles.Traitor && player.Is(CustomRoles.Narc)) Role = CustomRoles.Parasite;
 
                 Init();
@@ -259,12 +250,11 @@ internal class DoubleAgent : RoleBase
         }
     }
 
-    // Players go bye bye ¯\_(ツ)_/¯
     private void BoomBoom(PlayerControl player)
     {
         if (player.inVent) player.MyPhysics.RpcBootFromVent(player.GetPlayerVentId());
 
-        foreach (PlayerControl target in Main.EnumerateAlivePlayerControls()) // Get players in radius of bomb that are not in a vent.
+        foreach (PlayerControl target in Main.EnumerateAlivePlayerControls())
         {
             if (GetDistance(player.GetCustomPosition(), target.GetCustomPosition()) <= ExplosionRadius.GetFloat() && !(player.IsTransformedNeutralApocalypse() || target.IsTransformedNeutralApocalypse()))
             {
@@ -284,16 +274,13 @@ internal class DoubleAgent : RoleBase
         _Player?.Notify(ColorString(GetRoleColor(CustomRoles.DoubleAgent), GetString("DoubleAgent_BombExploded")));
     }
 
-    // Set bomb mark on player.
     public override string GetMark(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false)
     {
         if (seen == null) return string.Empty;
-        if (CurrentBombedPlayers.Contains(seen.PlayerId)) return ColorString(Color.red, "Ⓑ"); // L Rizz :)
+        if (CurrentBombedPlayers.Contains(seen.PlayerId)) return ColorString(Color.red, "Ⓑ");
         return string.Empty;
     }
 
-
-    // Set timer for Double Agent Modded Clients.
     public override string GetLowerText(PlayerControl player, PlayerControl seen, bool isForMeeting = false, bool isForHud = false)
     {
         if (player == null || player != seen || player.IsModded() && !isForHud) return string.Empty;
@@ -301,7 +288,6 @@ internal class DoubleAgent : RoleBase
         return string.Empty;
     }
 
-    // Send bomb timer to Modded Clients when active.
     private void SendRPC(bool addData = false, byte targetId = byte.MaxValue)
     {
         var writer = MessageWriter.Get(SendOption.Reliable);
@@ -311,7 +297,6 @@ internal class DoubleAgent : RoleBase
         RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
     }
 
-    // Receive and set bomb timer from Host when active.
     public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)
     {
         bool addData = reader.ReadBoolean();
@@ -341,6 +326,3 @@ internal class DoubleAgent : RoleBase
         _Player.RPCPlayCustomSound("Line");
     }
 }
-// FieryFlower was here ඞ
-// Drakos wasn't here, 100% not
-// Niko is here, what dog shxt has you guys code

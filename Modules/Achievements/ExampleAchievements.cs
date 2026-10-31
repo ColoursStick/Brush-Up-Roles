@@ -1,6 +1,5 @@
 namespace TONE;
 
-// 沉默是金：作为勒索者勒索 1 名玩家
 public sealed class BlackmailPerGame : AchievementBase
 {
     public override int Id => 50;
@@ -15,7 +14,6 @@ public sealed class BlackmailPerGame : AchievementBase
     }
 }
 
-// 悬赏猎手：作为赏金猎人一局内连续击杀 3 名悬赏目标
 public sealed class BountyHunterStreak : AchievementBase
 {
     public override int Id => 31;
@@ -35,7 +33,6 @@ public sealed class BountyHunterStreak : AchievementBase
     }
 }
 
-// 扫大街：作为清理工清理 3 个尸体
 public sealed class CleanerCleanBodies : AchievementBase
 {
     public override int Id => 21;
@@ -50,7 +47,6 @@ public sealed class CleanerCleanBodies : AchievementBase
     }
 }
 
-// 初试身手：作为警长走火 1 次
 public sealed class SheriffMisfire : AchievementBase
 {
     public override int Id => 0;
@@ -65,7 +61,6 @@ public sealed class SheriffMisfire : AchievementBase
     }
 }
 
-// 正义裁决：作为警长执法 3 名敌人
 public sealed class SheriffJustice : AchievementBase
 {
     public override int Id => 1;
@@ -80,7 +75,6 @@ public sealed class SheriffJustice : AchievementBase
     }
 }
 
-// 熊熊燃烧：作为纵火犯获胜 1 次
 public sealed class ArsonistWin : AchievementBase
 {
     public override int Id => 10;
@@ -96,7 +90,6 @@ public sealed class ArsonistWin : AchievementBase
     }
 }
 
-// 完美的恶作剧：作为小丑获胜 1 次
 public sealed class JesterWin : AchievementBase
 {
     public override int Id => 40;
@@ -112,7 +105,6 @@ public sealed class JesterWin : AchievementBase
     }
 }
 
-// 贪吃蛇：作为鹈鹕一局内吞下 3 名玩家
 public sealed class PelicanSnake : AchievementBase
 {
     public override int Id => 60;
@@ -128,7 +120,6 @@ public sealed class PelicanSnake : AchievementBase
     }
 }
 
-// 大胃王：作为鹈鹕吞下 6 名玩家
 public sealed class PelicanBigEater : AchievementBase
 {
     public override int Id => 61;
@@ -142,8 +133,3 @@ public sealed class PelicanBigEater : AchievementBase
             AddProgress();
     }
 }
-
-//#######################################
-// 61 last id for achievements (Next use 70)
-// Limit id for achievements --- Endless
-//#######################################

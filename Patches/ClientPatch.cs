@@ -8,9 +8,9 @@ namespace TONE;
 [HarmonyPatch(typeof(GameStartManager), nameof(GameStartManager.MakePublic))]
 internal class MakePublicPatch
 {
-    public static bool Prefix(/*GameStartManager __instance*/)
+    public static bool Prefix()
     {
-        // 定数設定による公開ルームブロック
+
         if (!Main.AllowPublicRoom)
         {
             var message = GetString("DisabledByProgram");
@@ -34,7 +34,7 @@ internal class MakePublicPatch
 [HarmonyPatch(typeof(MMOnlineManager), nameof(MMOnlineManager.Start))]
 internal class MMOnlineManagerStartPatch
 {
-    public static void Postfix(/*MMOnlineManager __instance*/)
+    public static void Postfix()
     {
         if (!((ModUpdater.hasUpdate && ModUpdater.forceUpdate) || ModUpdater.isBroken || !VersionChecker.IsSupported)) return;
         var obj = GameObject.Find("FindGameButton");
@@ -172,46 +172,8 @@ internal class IsMinorByDatePatch
 {
     public static bool Prefix(EOSManager __instance, ref bool __result)
     {
-        /*
-        if (DebugModeManager.AmDebugger)
-        {
-            Logger.Info("Skipped Eos is minor check", "IsMinorByDatePatch");
-            __result = false;
-            return false;
-        }
-        */
 
         return true;
 
     }
 }
-
-
-//[HarmonyPatch(typeof(ResolutionManager), nameof(ResolutionManager.SetResolution))]
-//class SetResolutionManager
-//{
-//    public static void Postfix()
-//    {
-//        if (MainMenuManagerPatch.qqButton != null)
-//            MainMenuManagerPatch.qqButton.transform.localPosition = Vector3.Reflect(MainMenuManagerPatch.template.transform.localPosition, Vector3.left);
-//        if (MainMenuManagerPatch.discordButton != null)
-//            MainMenuManagerPatch.discordButton.transform.localPosition = Vector3.Reflect(MainMenuManagerPatch.template.transform.localPosition, Vector3.left);
-//        if (MainMenuManagerPatch.updateButton != null)
-//            MainMenuManagerPatch.updateButton.transform.localPosition = MainMenuManagerPatch.template.transform.localPosition + new Vector3(0.25f, 0.75f);
-//    }
-//}
-
-//[HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.SendClientReady))]
-//internal class SendClientReadyPatch
-//{
-//    public static void Postfix()
-//    {
-//        if (!AmongUsClient.Instance.AmHost)
-//        {
-//            if (PlayerControl.LocalPlayer)
-//            {
-//                RPC.RpcVersionCheck();
-//            }
-//        }
-//    }
-//}

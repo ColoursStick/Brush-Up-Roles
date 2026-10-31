@@ -15,14 +15,13 @@ namespace TONE.Roles.Neutral;
 
 internal class Pelican : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.Pelican;
     private const int Id = 17300;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Pelican);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;
-    //==================================================================\\
 
     private static OptionItem KillCooldown;
     private static OptionItem HasImpostorVision;
@@ -65,7 +64,7 @@ internal class Pelican : RoleBase
     }
     private void SendRPC(byte playerId)
     {
-        var writer = MessageWriter.Get(SendOption.Reliable); // SetPelicanEatenNum
+        var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(playerId);
         if (playerId != byte.MaxValue && eatenList.ContainsKey(playerId))
         {
@@ -121,13 +120,13 @@ internal class Pelican : RoleBase
     {
         return GetActiveMapId() switch
         {
-            0 => new Vector2(-27f, 3.3f), // The Skeld
-            1 => new Vector2(-11.4f, 8.2f), // MIRA HQ
-            2 => new Vector2(42.6f, -19.9f), // Polus
-            3 => new Vector2(27f, 3.3f), // dlekS ehT
-            4 => new Vector2(-16.8f, -6.2f), // Airship
-            5 => new Vector2(9.6f, 23.2f), // The Fungle
-            7 => new(50f, 50f), // LIMap
+            0 => new Vector2(-27f, 3.3f),
+            1 => new Vector2(-11.4f, 8.2f),
+            2 => new Vector2(42.6f, -19.9f),
+            3 => new Vector2(27f, 3.3f),
+            4 => new Vector2(-16.8f, -6.2f),
+            5 => new Vector2(9.6f, 23.2f),
+            7 => new(50f, 50f),
             _ => throw new System.NotImplementedException(),
         };
     }
@@ -293,7 +292,7 @@ internal class Pelican : RoleBase
                 if (dis < 1f) continue;
 
                 target.RpcTeleport(pos, sendInfoInLogs: false);
-                //NotifyRoles(SpecifySeer: target, ForceLoop: false);
+
             }
         }
     }

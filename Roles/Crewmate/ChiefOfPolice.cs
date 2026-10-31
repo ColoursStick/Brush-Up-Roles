@@ -8,14 +8,13 @@ namespace TONE.Roles.Crewmate;
 
 internal class ChiefOfPolice : RoleBase
 {
-    //===========================SETUP================================\\
+
     public override CustomRoles Role => CustomRoles.ChiefOfPolice;
     private const int Id = 12600;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.ChiefOfPolice);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
-    //==================================================================\\
 
     private static OptionItem SkillCooldown;
     private static OptionItem CanRecruitImpostor;

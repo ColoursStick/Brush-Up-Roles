@@ -38,19 +38,16 @@ class ChatBubbleSetNamePatch
             return;
         }
 
-        // Dog shit
         var seerRoleClass = seer.GetRoleClass();
 
-        // if based role is Shapeshifter/Phantom/Viper and is Desync Shapeshifter/Phantom/Viper
         if (seerRoleClass?.ThisRoleBase.GetRoleTypes() is RoleTypes.Shapeshifter or RoleTypes.Phantom or RoleTypes.Viper && seer.HasDesyncRole())
         {
             __instance.NameText.color = Color.white;
         }
         if (Main.PlayerStates[seer.PlayerId].IsNecromancer || Main.PlayerStates[target.PlayerId].IsNecromancer)
         {
-            // When target is impostor, set name color as white
+
             __instance.NameText.color = Color.white;
         }
     }
 }
-

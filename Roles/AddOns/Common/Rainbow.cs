@@ -4,7 +4,6 @@ using static TONE.Options;
 
 namespace TONE.Roles.AddOns.Common;
 
-// https://github.com/Yumenopai/TownOfHost_Y/blob/main/Roles/Crewmate/Y/Rainbow.cs
 public class Rainbow : IAddon
 {
     public CustomRoles Role => CustomRoles.Rainbow;
@@ -68,7 +67,7 @@ public class Rainbow : IAddon
     }
     private static int PickRandomColor()
     {
-        //make this function so we may extend it in the future
+
         return IRandom.Instance.Next(0, 18);
     }
 }
